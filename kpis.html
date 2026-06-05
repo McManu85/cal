@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1F3A5F">
+<title>KPIs Vitales · Manu</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; color: #1F3A5F; background: #F7F8FA; min-height: 100vh; }
+  body { padding-bottom: 80px; }
+
+  /* HEADER */
+  header { background: #1F3A5F; color: white; padding: 16px 20px 14px; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+  header h1 { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: 0.5px; }
+  header .sub { font-size: 12px; opacity: 0.7; margin-top: 2px; font-weight: 400; }
+
+  /* MAIN CONTAINER */
+  main { padding: 16px; max-width: 600px; margin: 0 auto; }
+  section { display: none; }
+  section.active { display: block; }
+  section h2 { font-size: 16px; margin: 0 0 12px; color: #1F3A5F; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
+  section h3 { font-size: 14px; margin: 20px 0 8px; color: #5A6470; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* CARDS */
+  .card { background: white; border-radius: 12px; padding: 18px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); border: 1px solid #E8EAED; }
+  .card.green { border-left: 4px solid #4CAF50; }
+  .card.amber { border-left: 4px solid #FF9800; }
+  .card.blue { border-left: 4px solid #2E75B6; }
+  .card.star { border-left: 4px solid #FFB300; background: linear-gradient(135deg, #FFFEF5 0%, white 60%); }
+
+  .kpi-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+  .kpi-name { font-size: 13px; color: #5A6470; font-weight: 500; }
+  .kpi-value { font-size: 28px; font-weight: 700; color: #1F3A5F; }
+  .kpi-value .unit { font-size: 14px; font-weight: 500; color: #5A6470; margin-left: 4px; }
+  .kpi-target { font-size: 11px; color: #8892A0; margin-top: 2px; }
+  .kpi-status { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 6px; }
+  .status-ok { background: #E8F5E9; color: #2E7D32; }
+  .status-warn { background: #FFF3E0; color: #E65100; }
+  .status-bad { background: #FFEBEE; color: #C62828; }
+  .status-empty { background: #F0F0F0; color: #999; }
+
+  /* DASHBOARD STATS */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .stat { background: white; border-radius: 12px; padding: 14px; text-align: center; border: 1px solid #E8EAED; }
+  .stat-num { font-size: 28px; font-weight: 700; color: #1F3A5F; line-height: 1; }
+  .stat-label { font-size: 11px; color: #5A6470; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* FORMS */
+  .form-group { margin-bottom: 18px; }
+  label { display: block; font-size: 13px; font-weight: 600; color: #1F3A5F; margin-bottom: 6px; }
+  label .hint { font-weight: 400; color: #8892A0; font-size: 11px; display: block; margin-top: 2px; }
+  input[type="number"], input[type="text"], textarea {
+    width: 100%; padding: 14px 12px; font-size: 16px; border: 2px solid #E8EAED; border-radius: 10px;
+    font-family: inherit; color: #1F3A5F; background: white; -webkit-appearance: none; appearance: none;
+  }
+  input:focus, textarea:focus { outline: none; border-color: #2E75B6; }
+  textarea { min-height: 60px; resize: vertical; }
+  .input-pair { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; }
+  .input-pair .divider { font-size: 20px; color: #5A6470; text-align: center; font-weight: 600; }
+
+  /* SLIDER (for sleep nights) */
+  .slider-group { display: flex; gap: 6px; justify-content: space-between; margin-top: 8px; }
+  .slider-btn { flex: 1; padding: 14px 0; border: 2px solid #E8EAED; border-radius: 10px; background: white;
+    font-size: 16px; font-weight: 600; color: #5A6470; cursor: pointer; transition: all 0.15s; }
+  .slider-btn.selected { border-color: #2E75B6; background: #2E75B6; color: white; }
+
+  /* BUTTONS */
+  button.primary, .btn-primary {
+    width: 100%; padding: 16px; font-size: 16px; font-weight: 700; background: #1F3A5F; color: white;
+    border: none; border-radius: 10px; cursor: pointer; -webkit-appearance: none; appearance: none;
+    text-transform: uppercase; letter-spacing: 0.8px; margin-top: 8px;
+  }
+  button.primary:active, .btn-primary:active { background: #142844; }
+  button.secondary { width: 100%; padding: 14px; font-size: 14px; font-weight: 600; background: white; color: #1F3A5F;
+    border: 2px solid #1F3A5F; border-radius: 10px; cursor: pointer; -webkit-appearance: none; appearance: none; margin-top: 8px; }
+  button.danger { background: white; color: #C62828; border-color: #C62828; }
+
+  /* HISTORY TABLE */
+  .history-table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; }
+  .history-table th, .history-table td { padding: 10px 8px; text-align: left; font-size: 12px; border-bottom: 1px solid #F0F1F4; }
+  .history-table th { background: #1F3A5F; color: white; font-weight: 600; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; }
+  .history-table td { color: #1F3A5F; }
+  .history-table tr:last-child td { border-bottom: none; }
+  .history-empty { text-align: center; padding: 40px 20px; color: #8892A0; font-size: 13px; }
+
+  /* BOTTOM NAV */
+  nav.tabs {
+    position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex;
+    border-top: 1px solid #E8EAED; padding-bottom: env(safe-area-inset-bottom);
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.04); z-index: 20;
+  }
+  .tab-btn { flex: 1; padding: 12px 4px 10px; background: none; border: none; cursor: pointer;
+    color: #8892A0; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+    display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .tab-btn .icon { font-size: 22px; line-height: 1; }
+  .tab-btn.active { color: #1F3A5F; }
+  .tab-btn.active .icon { transform: scale(1.1); }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: #1F3A5F; color: white;
+    padding: 12px 20px; border-radius: 24px; font-size: 14px; font-weight: 500; box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    z-index: 100; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+  .toast.show { opacity: 1; }
+  .toast.error { background: #C62828; }
+
+  /* CALLOUT */
+  .callout { background: #F4F8FC; border-left: 3px solid #2E75B6; padding: 12px 14px; margin: 14px 0; border-radius: 0 8px 8px 0;
+    font-size: 13px; color: #1F3A5F; line-height: 1.5; }
+  .callout strong { color: #1F3A5F; }
+
+  /* PERIOD BADGE */
+  .period-badge { display: inline-block; padding: 4px 10px; background: #E8F0F8; color: #2E75B6;
+    font-size: 12px; font-weight: 600; border-radius: 12px; margin-bottom: 14px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>KPIs Vitales</h1>
+  <div class="sub">Sistema mínimo · 4 indicadores</div>
+</header>
+
+<main>
+  <!-- ============ INICIO / DASHBOARD ============ -->
+  <section id="home" class="active">
+    <div class="period-badge" id="currentPeriod">—</div>
+
+    <div class="stats-grid">
+      <div class="stat"><div class="stat-num" id="statWeeks">0</div><div class="stat-label">Semanas registradas</div></div>
+      <div class="stat"><div class="stat-num" id="statQuarters">0</div><div class="stat-label">Trimestres registrados</div></div>
+    </div>
+
+    <h2>Última semana</h2>
+    <div id="lastWeekCards"></div>
+
+    <h2 style="margin-top: 24px;">Estrella polar</h2>
+    <div id="lastQuarterCard"></div>
+
+    <div class="callout">
+      <strong>Recordatorio.</strong> Si la respuesta al dato es siempre «todo en orden», el KPI sobra. Registra solo cuando hay decisión que tomar.
+    </div>
+  </section>
+
+  <!-- ============ SEMANAL ============ -->
+  <section id="weekly">
+    <div class="period-badge" id="weekLabel">—</div>
+    <h2>Registro semanal</h2>
+
+    <div class="form-group">
+      <label>Noches con ≥7h de sueño esta semana
+        <span class="hint">Objetivo: ≥ 5 de 7</span>
+      </label>
+      <div class="slider-group" id="sleepSlider">
+        <button class="slider-btn" data-val="0">0</button>
+        <button class="slider-btn" data-val="1">1</button>
+        <button class="slider-btn" data-val="2">2</button>
+        <button class="slider-btn" data-val="3">3</button>
+        <button class="slider-btn" data-val="4">4</button>
+        <button class="slider-btn" data-val="5">5</button>
+        <button class="slider-btn" data-val="6">6</button>
+        <button class="slider-btn" data-val="7">7</button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Media de horas de móvil al día
+        <span class="hint">Dato real desde ajustes del teléfono · Objetivo: definir techo personal</span>
+      </label>
+      <input type="number" id="phoneHours" step="0.1" min="0" max="24" placeholder="ej. 2.3" inputmode="decimal">
+    </div>
+
+    <div class="form-group">
+      <label>Trabajo profundo capturado en ventana protegida
+        <span class="hint">Bloques 22:30–01:30 en semanas libres y tardes · Objetivo: ratio ≥ 80%</span>
+      </label>
+      <div class="input-pair">
+        <input type="number" id="dwCaptured" min="0" placeholder="capturados" inputmode="numeric">
+        <span class="divider">/</span>
+        <input type="number" id="dwAvailable" min="0" placeholder="disponibles" inputmode="numeric">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Notas (opcional)<span class="hint">Contexto rápido: turno, evento, lo que sea</span></label>
+      <textarea id="weeklyNotes" placeholder="Semana libre · proyecto X..."></textarea>
+    </div>
+
+    <button class="primary" onclick="saveWeekly()">Guardar semana</button>
+  </section>
+
+  <!-- ============ TRIMESTRAL ============ -->
+  <section id="quarterly">
+    <div class="period-badge" id="quarterLabel">—</div>
+    <h2>Estrella polar trimestral</h2>
+
+    <div class="callout">
+      <strong>Ratio renta pasiva / gastos.</strong> Toda la hoja de ruta vital reduce a este número. Objetivo a largo: ≥ 1.
+    </div>
+
+    <div class="form-group">
+      <label>Renta pasiva mensual media
+        <span class="hint">€ / mes · solo pasivo puro (alquileres, dividendos, intereses)</span>
+      </label>
+      <input type="number" id="passiveIncome" step="1" min="0" placeholder="€/mes" inputmode="decimal">
+    </div>
+
+    <div class="form-group">
+      <label>Gastos de vida mensuales
+        <span class="hint">€ / mes · gastos totales necesarios</span>
+      </label>
+      <input type="number" id="livingExpenses" step="1" min="0" placeholder="€/mes" inputmode="decimal">
+    </div>
+
+    <div id="ratioPreview" style="text-align:center; padding: 18px; background: #FFFEF5; border-radius: 12px; margin-bottom: 16px; display: none;">
+      <div style="font-size: 12px; color: #5A6470; text-transform: uppercase; letter-spacing: 0.5px;">Ratio actual</div>
+      <div style="font-size: 36px; font-weight: 700; color: #1F3A5F; margin-top: 4px;" id="ratioPreviewValue">—</div>
+      <div style="font-size: 12px; color: #5A6470; margin-top: 4px;" id="ratioPreviewProgress">—</div>
+    </div>
+
+    <div class="form-group">
+      <label>Notas (opcional)</label>
+      <textarea id="quarterlyNotes" placeholder="Cambios relevantes este trimestre..."></textarea>
+    </div>
+
+    <button class="primary" onclick="saveQuarterly()">Guardar trimestre</button>
+  </section>
+
+  <!-- ============ HISTÓRICO ============ -->
+  <section id="history">
+    <h2>Histórico semanal</h2>
+    <div id="weeklyHistory"></div>
+
+    <h2 style="margin-top: 24px;">Histórico trimestral</h2>
+    <div id="quarterlyHistory"></div>
+  </section>
+
+  <!-- ============ DATOS / EXPORT-IMPORT ============ -->
+  <section id="data">
+    <h2>Gestión de datos</h2>
+
+    <div class="callout">
+      <strong>Cómo sincronizar entre dispositivos.</strong> Exporta el JSON, súbelo a tu Drive. En el otro dispositivo, abre la web e importa el archivo. Hazlo al menos una vez a la semana para backup.
+    </div>
+
+    <h3>Exportar</h3>
+    <button class="secondary" onclick="exportData()">⬇ Descargar JSON</button>
+
+    <h3>Importar</h3>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+    <button class="secondary" onclick="document.getElementById('importFile').click()">⬆ Subir JSON</button>
+
+    <h3>Estado actual</h3>
+    <div class="card">
+      <div style="font-size: 13px; color: #5A6470;">
+        <div><strong style="color:#1F3A5F">Semanas:</strong> <span id="dataWeeks">0</span></div>
+        <div><strong style="color:#1F3A5F">Trimestres:</strong> <span id="dataQuarters">0</span></div>
+        <div><strong style="color:#1F3A5F">Última edición:</strong> <span id="dataLastEdit">—</span></div>
+      </div>
+    </div>
+
+    <h3 style="color:#C62828">Zona de riesgo</h3>
+    <button class="secondary danger" onclick="clearAll()">🗑 Borrar todos los datos locales</button>
+
+    <div style="text-align:center; margin-top: 30px; font-size: 11px; color: #8892A0;">
+      v1.0 · Sistema de KPIs Vitales · Manu
+    </div>
+  </section>
+</main>
+
+<nav class="tabs">
+  <button class="tab-btn active" data-section="home"><div class="icon">⊟</div>Inicio</button>
+  <button class="tab-btn" data-section="weekly"><div class="icon">▤</div>Semanal</button>
+  <button class="tab-btn" data-section="quarterly"><div class="icon">★</div>Trimestral</button>
+  <button class="tab-btn" data-section="history"><div class="icon">≡</div>Histórico</button>
+  <button class="tab-btn" data-section="data"><div class="icon">⇅</div>Datos</button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============ ESTADO ============
+const STORAGE_KEY = 'kpis_manu_v1';
+let state = { version: '1.0', lastUpdated: null, weekly: [], quarterly: [] };
+let selectedSleepNights = null;
+
+// ============ UTILIDADES DE FECHA ============
+function getMondayOfWeek(date = new Date()) {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  d.setHours(0,0,0,0);
+  return d;
+}
+function isoDate(d) { return d.toISOString().slice(0,10); }
+function weekLabel(monday) {
+  const sunday = new Date(monday); sunday.setDate(sunday.getDate() + 6);
+  const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  return `${monday.getDate()} ${meses[monday.getMonth()]} – ${sunday.getDate()} ${meses[sunday.getMonth()]} ${sunday.getFullYear()}`;
+}
+function getQuarter(date = new Date()) {
+  const y = date.getFullYear();
+  const q = Math.floor(date.getMonth() / 3) + 1;
+  return `${y}-T${q}`;
+}
+function quarterLabel(qid) {
+  const [y, q] = qid.split('-T');
+  const nombres = ['Enero – Marzo', 'Abril – Junio', 'Julio – Septiembre', 'Octubre – Diciembre'];
+  return `T${q} ${y} · ${nombres[parseInt(q)-1]}`;
+}
+
+// ============ PERSISTENCIA ============
+function load() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) state = JSON.parse(raw);
+  } catch (e) { console.warn('No data loaded', e); }
+}
+function save() {
+  state.lastUpdated = new Date().toISOString();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+// ============ NAVEGACIÓN ============
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const target = btn.dataset.section;
+    document.querySelectorAll('section').forEach(s => s.classList.toggle('active', s.id === target));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
+    if (target === 'home') renderHome();
+    if (target === 'weekly') renderWeeklyForm();
+    if (target === 'quarterly') renderQuarterlyForm();
+    if (target === 'history') renderHistory();
+    if (target === 'data') renderData();
+    window.scrollTo(0,0);
+  });
+});
+
+// ============ TOAST ============
+function toast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isError ? ' error' : '');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// ============ KPI STATUS ============
+function sleepStatus(n) {
+  if (n === null || n === undefined) return ['—', 'status-empty'];
+  if (n >= 5) return [n + '/7', 'status-ok'];
+  if (n >= 3) return [n + '/7', 'status-warn'];
+  return [n + '/7', 'status-bad'];
+}
+function phoneStatus(h, ceiling = 2) {
+  if (h === null || h === undefined) return ['—', 'status-empty'];
+  if (h <= ceiling) return [h.toFixed(1) + 'h', 'status-ok'];
+  if (h <= ceiling * 1.5) return [h.toFixed(1) + 'h', 'status-warn'];
+  return [h.toFixed(1) + 'h', 'status-bad'];
+}
+function deepWorkStatus(captured, available) {
+  if (captured === null || available === null || available === 0) return ['—', 'status-empty'];
+  const ratio = captured / available;
+  const pct = Math.round(ratio * 100);
+  if (ratio >= 0.8) return [pct + '%', 'status-ok'];
+  if (ratio >= 0.5) return [pct + '%', 'status-warn'];
+  return [pct + '%', 'status-bad'];
+}
+function ratioStatus(r) {
+  if (r === null || r === undefined) return ['—', 'status-empty'];
+  if (r >= 1) return [r.toFixed(2), 'status-ok'];
+  if (r >= 0.5) return [r.toFixed(2), 'status-warn'];
+  return [r.toFixed(2), 'status-bad'];
+}
+
+// ============ HOME / DASHBOARD ============
+function renderHome() {
+  const today = new Date();
+  document.getElementById('currentPeriod').textContent = `Hoy: ${weekLabel(getMondayOfWeek(today))}  ·  ${getQuarter(today).replace('-T', ' · T')}`;
+  document.getElementById('statWeeks').textContent = state.weekly.length;
+  document.getElementById('statQuarters').textContent = state.quarterly.length;
+
+  // Última semana
+  const lastWeek = state.weekly.length ? state.weekly[state.weekly.length - 1] : null;
+  const wkDiv = document.getElementById('lastWeekCards');
+  if (!lastWeek) {
+    wkDiv.innerHTML = '<div class="card" style="text-align:center;color:#8892A0;font-size:13px;">Sin semanas registradas todavía. Ve a <strong>Semanal</strong> para empezar.</div>';
+  } else {
+    const [sleepV, sleepC] = sleepStatus(lastWeek.sleep7h);
+    const [phoneV, phoneC] = phoneStatus(lastWeek.phoneHours);
+    const [dwV, dwC] = deepWorkStatus(lastWeek.dwCaptured, lastWeek.dwAvailable);
+    wkDiv.innerHTML = `
+      <div class="card green">
+        <div class="kpi-row"><span class="kpi-name">Noches ≥7h sueño</span><span class="kpi-status ${sleepC}">${sleepV}</span></div>
+        <div class="kpi-target">Objetivo: ≥ 5/7</div>
+      </div>
+      <div class="card green">
+        <div class="kpi-row"><span class="kpi-name">Móvil h/día (media)</span><span class="kpi-status ${phoneC}">${phoneV}</span></div>
+        <div class="kpi-target">Techo sugerido: < 2h</div>
+      </div>
+      <div class="card green">
+        <div class="kpi-row"><span class="kpi-name">Trabajo profundo capturado</span><span class="kpi-status ${dwC}">${dwV}</span></div>
+        <div class="kpi-target">${lastWeek.dwCaptured || 0} de ${lastWeek.dwAvailable || 0} bloques · Objetivo: ≥ 80%</div>
+      </div>
+      <div style="font-size:11px;color:#8892A0;text-align:center;margin-top:6px;">${weekLabel(new Date(lastWeek.weekStart))}</div>
+    `;
+  }
+
+  // Último trimestre
+  const lastQ = state.quarterly.length ? state.quarterly[state.quarterly.length - 1] : null;
+  const qDiv = document.getElementById('lastQuarterCard');
+  if (!lastQ) {
+    qDiv.innerHTML = '<div class="card" style="text-align:center;color:#8892A0;font-size:13px;">Sin trimestres registrados. Ve a <strong>Trimestral</strong>.</div>';
+  } else {
+    const ratio = lastQ.livingExpenses > 0 ? lastQ.passiveIncome / lastQ.livingExpenses : null;
+    const [rV, rC] = ratioStatus(ratio);
+    const pct = ratio !== null ? Math.min(100, Math.round(ratio * 100)) : 0;
+    qDiv.innerHTML = `
+      <div class="card star">
+        <div class="kpi-row"><span class="kpi-name">Ratio renta pasiva / gastos</span><span class="kpi-status ${rC}">${rV}</span></div>
+        <div class="kpi-target">${lastQ.passiveIncome || 0} € / ${lastQ.livingExpenses || 0} € · Objetivo a largo: ≥ 1.00</div>
+        <div style="height:6px;background:#F0F1F4;border-radius:3px;margin-top:10px;overflow:hidden;">
+          <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#FFB300,#FF8F00);"></div>
+        </div>
+        <div style="font-size:11px;color:#8892A0;text-align:center;margin-top:10px;">${quarterLabel(lastQ.quarter)}</div>
+      </div>
+    `;
+  }
+}
+
+// ============ WEEKLY FORM ============
+function renderWeeklyForm() {
+  const monday = getMondayOfWeek();
+  const weekStart = isoDate(monday);
+  document.getElementById('weekLabel').textContent = weekLabel(monday);
+
+  // Si ya hay entrada esta semana, cargarla
+  const existing = state.weekly.find(w => w.weekStart === weekStart);
+  selectedSleepNights = existing ? existing.sleep7h : null;
+  document.querySelectorAll('#sleepSlider .slider-btn').forEach(b => {
+    b.classList.toggle('selected', parseInt(b.dataset.val) === selectedSleepNights);
+  });
+  document.getElementById('phoneHours').value = existing ? existing.phoneHours ?? '' : '';
+  document.getElementById('dwCaptured').value = existing ? existing.dwCaptured ?? '' : '';
+  document.getElementById('dwAvailable').value = existing ? existing.dwAvailable ?? '' : '';
+  document.getElementById('weeklyNotes').value = existing ? existing.notes ?? '' : '';
+}
+
+document.querySelectorAll('#sleepSlider .slider-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    selectedSleepNights = parseInt(btn.dataset.val);
+    document.querySelectorAll('#sleepSlider .slider-btn').forEach(b => b.classList.toggle('selected', b === btn));
+  });
+});
+
+function saveWeekly() {
+  const weekStart = isoDate(getMondayOfWeek());
+  const phone = parseFloat(document.getElementById('phoneHours').value);
+  const cap = parseInt(document.getElementById('dwCaptured').value);
+  const avl = parseInt(document.getElementById('dwAvailable').value);
+  const notes = document.getElementById('weeklyNotes').value.trim();
+
+  if (selectedSleepNights === null && isNaN(phone) && isNaN(cap) && isNaN(avl)) {
+    toast('Rellena al menos un campo', true);
+    return;
+  }
+
+  const entry = {
+    weekStart,
+    sleep7h: selectedSleepNights,
+    phoneHours: isNaN(phone) ? null : phone,
+    dwCaptured: isNaN(cap) ? null : cap,
+    dwAvailable: isNaN(avl) ? null : avl,
+    notes,
+    savedAt: new Date().toISOString()
+  };
+
+  const idx = state.weekly.findIndex(w => w.weekStart === weekStart);
+  if (idx >= 0) state.weekly[idx] = entry;
+  else { state.weekly.push(entry); state.weekly.sort((a,b) => a.weekStart.localeCompare(b.weekStart)); }
+  save();
+  toast(idx >= 0 ? 'Semana actualizada' : 'Semana guardada');
+  setTimeout(() => document.querySelector('.tab-btn[data-section="home"]').click(), 600);
+}
+
+// ============ QUARTERLY FORM ============
+function renderQuarterlyForm() {
+  const q = getQuarter();
+  document.getElementById('quarterLabel').textContent = quarterLabel(q);
+  const existing = state.quarterly.find(qq => qq.quarter === q);
+  document.getElementById('passiveIncome').value = existing ? existing.passiveIncome ?? '' : '';
+  document.getElementById('livingExpenses').value = existing ? existing.livingExpenses ?? '' : '';
+  document.getElementById('quarterlyNotes').value = existing ? existing.notes ?? '' : '';
+  updateRatioPreview();
+}
+function updateRatioPreview() {
+  const p = parseFloat(document.getElementById('passiveIncome').value);
+  const e = parseFloat(document.getElementById('livingExpenses').value);
+  const preview = document.getElementById('ratioPreview');
+  if (!isNaN(p) && !isNaN(e) && e > 0) {
+    const ratio = p / e;
+    preview.style.display = 'block';
+    document.getElementById('ratioPreviewValue').textContent = ratio.toFixed(2);
+    const pct = Math.round(ratio * 100);
+    document.getElementById('ratioPreviewProgress').textContent = `${pct}% del camino a la libertad financiera (objetivo: ratio ≥ 1.00)`;
+  } else {
+    preview.style.display = 'none';
+  }
+}
+document.getElementById('passiveIncome').addEventListener('input', updateRatioPreview);
+document.getElementById('livingExpenses').addEventListener('input', updateRatioPreview);
+
+function saveQuarterly() {
+  const q = getQuarter();
+  const p = parseFloat(document.getElementById('passiveIncome').value);
+  const e = parseFloat(document.getElementById('livingExpenses').value);
+  const notes = document.getElementById('quarterlyNotes').value.trim();
+  if (isNaN(p) || isNaN(e)) { toast('Introduce ingresos y gastos', true); return; }
+  const entry = { quarter: q, passiveIncome: p, livingExpenses: e, notes, savedAt: new Date().toISOString() };
+  const idx = state.quarterly.findIndex(qq => qq.quarter === q);
+  if (idx >= 0) state.quarterly[idx] = entry;
+  else { state.quarterly.push(entry); state.quarterly.sort((a,b) => a.quarter.localeCompare(b.quarter)); }
+  save();
+  toast(idx >= 0 ? 'Trimestre actualizado' : 'Trimestre guardado');
+  setTimeout(() => document.querySelector('.tab-btn[data-section="home"]').click(), 600);
+}
+
+// ============ HISTORY ============
+function renderHistory() {
+  const wkDiv = document.getElementById('weeklyHistory');
+  if (!state.weekly.length) {
+    wkDiv.innerHTML = '<div class="history-empty">Aún no hay semanas registradas.</div>';
+  } else {
+    const rows = state.weekly.slice().reverse().slice(0, 16).map(w => {
+      const m = new Date(w.weekStart);
+      const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+      const lbl = `${m.getDate()} ${meses[m.getMonth()]}`;
+      const sleep = w.sleep7h !== null ? `${w.sleep7h}/7` : '—';
+      const phone = w.phoneHours !== null ? `${w.phoneHours.toFixed(1)}h` : '—';
+      const dw = (w.dwCaptured !== null && w.dwAvailable) ? `${w.dwCaptured}/${w.dwAvailable}` : '—';
+      return `<tr><td>${lbl}</td><td>${sleep}</td><td>${phone}</td><td>${dw}</td></tr>`;
+    }).join('');
+    wkDiv.innerHTML = `<table class="history-table"><thead><tr><th>Semana</th><th>Sueño</th><th>Móvil</th><th>TP</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+
+  const qDiv = document.getElementById('quarterlyHistory');
+  if (!state.quarterly.length) {
+    qDiv.innerHTML = '<div class="history-empty">Aún no hay trimestres registrados.</div>';
+  } else {
+    const rows = state.quarterly.slice().reverse().map(q => {
+      const ratio = q.livingExpenses > 0 ? (q.passiveIncome / q.livingExpenses).toFixed(2) : '—';
+      return `<tr><td>${q.quarter.replace('-T',' · T')}</td><td>${q.passiveIncome}€</td><td>${q.livingExpenses}€</td><td><strong>${ratio}</strong></td></tr>`;
+    }).join('');
+    qDiv.innerHTML = `<table class="history-table"><thead><tr><th>Trimestre</th><th>Renta pas.</th><th>Gastos</th><th>Ratio</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+}
+
+// ============ DATA / EXPORT / IMPORT ============
+function renderData() {
+  document.getElementById('dataWeeks').textContent = state.weekly.length;
+  document.getElementById('dataQuarters').textContent = state.quarterly.length;
+  document.getElementById('dataLastEdit').textContent = state.lastUpdated ? new Date(state.lastUpdated).toLocaleString('es-ES') : 'nunca';
+}
+
+function exportData() {
+  const json = JSON.stringify(state, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const fname = `kpis_manu_${isoDate(new Date())}.json`;
+  a.href = url; a.download = fname;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('JSON descargado: ' + fname);
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.version || !Array.isArray(data.weekly) || !Array.isArray(data.quarterly)) throw new Error('Formato inválido');
+      if (!confirm(`¿Importar ${data.weekly.length} semanas y ${data.quarterly.length} trimestres? Esto reemplazará los datos actuales (${state.weekly.length} semanas, ${state.quarterly.length} trimestres).`)) return;
+      state = data;
+      save();
+      toast('Datos importados');
+      renderData();
+      document.querySelector('.tab-btn[data-section="home"]').click();
+    } catch (err) {
+      toast('Error: archivo no válido', true);
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function clearAll() {
+  if (!confirm('¿Borrar TODOS los datos locales? Esto no se puede deshacer. Asegúrate de haber exportado antes.')) return;
+  if (!confirm('Confirmar de nuevo: borrar todo.')) return;
+  state = { version: '1.0', lastUpdated: null, weekly: [], quarterly: [] };
+  localStorage.removeItem(STORAGE_KEY);
+  toast('Datos borrados');
+  renderData();
+  document.querySelector('.tab-btn[data-section="home"]').click();
+}
+
+// ============ INIT ============
+load();
+renderHome();
+</script>
+
+</body>
+</html>
