@@ -68,6 +68,7 @@
   .dcol.wk { background: rgba(0,0,0,.015); }
   .hl  { position: absolute; left: 0; right: 0; border-top: 1px solid #F3F4F6; pointer-events: none; }
   .hl.maj { border-color: #E5E7EB; }
+  .hl.mid { border-color: #94A3B8; border-top-width: 2px; }
 
   /* events */
   .ev {
@@ -108,7 +109,7 @@
 </div>
 
 <script>
-const HH = 34, ST = 6, EN = 26;
+const HH = 80, ST = 6, EN = 30;
 
 function tY(t) {
   const [h, m] = t.split(':').map(Number);
@@ -150,7 +151,7 @@ const WEEKS = {
     {d:5,s:'07:00',e:'07:45',l:'Caminata',c:C.cam},
     {d:5,s:'22:00',e:'01:30',l:'Profundo',c:C.pro},
     {d:6,s:'07:00',e:'07:45',l:'Caminata',c:C.cam},
-    {d:6,s:'10:00',e:'11:30',l:'Limpiar',c:C.lim},
+    {d:6,s:'10:00',e:'11:30',l:'Recoger',c:C.lim},
     {d:6,s:'22:00',e:'01:30',l:'Profundo',c:C.pro},
   ]},
   TARDES: { label: 'TARDES', color: '#0F766E', events: [
@@ -186,7 +187,7 @@ const WEEKS = {
     {d:4,s:'15:30',e:'22:00',l:'Turno',c:'#0F766E'},
     {d:5,s:'07:00',e:'07:45',l:'Caminata',c:C.cam},
     {d:6,s:'07:00',e:'07:45',l:'Caminata',c:C.cam},
-    {d:6,s:'10:00',e:'11:30',l:'Limpiar',c:C.lim},
+    {d:6,s:'10:00',e:'11:30',l:'Recoger',c:C.lim},
     {d:6,s:'22:00',e:'01:30',l:'Profundo',c:C.pro},
   ]},
   NOCHES: { label: 'NOCHES', color: '#B91C1C', events: [
@@ -198,19 +199,19 @@ const WEEKS = {
     {d:0,s:'19:00',e:'19:45',l:'Caminata',c:C.cam},
     {d:0,s:'22:00',e:'23:00',l:'Turno',c:'#B91C1C'},
     {d:0,s:'23:00',e:'23:30',l:'Italiano',c:C.ita},
-    {d:0,s:'23:30',e:'02:00',l:'Turno',c:'#B91C1C'},
+    {d:0,s:'23:30',e:'30:00',l:'Turno',c:'#B91C1C'},
     {d:1,s:'06:00',e:'12:30',l:'Sueño',c:C.sue,x:1},
     {d:1,s:'16:00',e:'17:00',l:'Tenis de Mesa',c:C.ten},
     {d:1,s:'19:00',e:'19:45',l:'Caminata',c:C.cam},
     {d:1,s:'22:00',e:'23:00',l:'Turno',c:'#B91C1C'},
     {d:1,s:'23:00',e:'23:30',l:'Italiano',c:C.ita},
-    {d:1,s:'23:30',e:'02:00',l:'Turno',c:'#B91C1C'},
+    {d:1,s:'23:30',e:'30:00',l:'Turno',c:'#B91C1C'},
     {d:2,s:'06:00',e:'12:30',l:'Sueño',c:C.sue,x:1},
     {d:2,s:'13:00',e:'14:30',l:'Gym',c:C.gym},
     {d:2,s:'19:00',e:'19:45',l:'Caminata',c:C.cam},
     {d:2,s:'22:00',e:'23:00',l:'Turno',c:'#B91C1C'},
     {d:2,s:'23:00',e:'23:30',l:'Italiano',c:C.ita},
-    {d:2,s:'23:30',e:'02:00',l:'Turno',c:'#B91C1C'},
+    {d:2,s:'23:30',e:'30:00',l:'Turno',c:'#B91C1C'},
     {d:3,s:'06:00',e:'12:30',l:'Sueño',c:C.sue,x:1},
     {d:3,s:'13:00',e:'13:45',l:'Compra',c:C.comp},
     {d:3,s:'14:00',e:'15:45',l:'Batch Cook',c:C.coc},
@@ -218,24 +219,24 @@ const WEEKS = {
     {d:3,s:'19:00',e:'19:45',l:'Caminata',c:C.cam},
     {d:3,s:'22:00',e:'23:00',l:'Turno',c:'#B91C1C'},
     {d:3,s:'23:00',e:'23:30',l:'Italiano',c:C.ita},
-    {d:3,s:'23:30',e:'02:00',l:'Turno',c:'#B91C1C'},
+    {d:3,s:'23:30',e:'30:00',l:'Turno',c:'#B91C1C'},
     {d:4,s:'06:00',e:'12:30',l:'Sueño',c:C.sue,x:1},
     {d:4,s:'13:00',e:'14:30',l:'Gym',c:C.gym},
     {d:4,s:'19:00',e:'19:45',l:'Caminata',c:C.cam},
     {d:4,s:'22:00',e:'23:00',l:'Turno',c:'#B91C1C'},
     {d:4,s:'23:00',e:'23:30',l:'Italiano',c:C.ita},
-    {d:4,s:'23:30',e:'02:00',l:'Turno',c:'#B91C1C'},
+    {d:4,s:'23:30',e:'30:00',l:'Turno',c:'#B91C1C'},
     {d:5,s:'06:00',e:'12:30',l:'Sueño',c:C.sue,x:1},
     {d:5,s:'13:00',e:'13:30',l:'Caminata',c:C.cam},
     {d:5,s:'18:00',e:'19:00',l:'Turno',c:'#B91C1C'},
     {d:5,s:'19:00',e:'19:30',l:'Italiano',c:C.ita},
-    {d:5,s:'19:30',e:'02:00',l:'Turno 12h',c:'#B91C1C'},
+    {d:5,s:'19:30',e:'30:00',l:'Turno 12h',c:'#B91C1C'},
     {d:6,s:'06:00',e:'12:30',l:'Sueño',c:C.sue,x:1},
-    {d:6,s:'14:00',e:'14:20',l:'Limpiar',c:C.lim},
+    {d:6,s:'14:00',e:'14:20',l:'Recoger',c:C.lim},
     {d:6,s:'15:00',e:'15:30',l:'Caminata',c:C.cam},
     {d:6,s:'18:00',e:'19:00',l:'Turno',c:'#B91C1C'},
     {d:6,s:'19:00',e:'19:30',l:'Italiano',c:C.ita},
-    {d:6,s:'19:30',e:'02:00',l:'Turno 12h',c:'#B91C1C'},
+    {d:6,s:'19:30',e:'30:00',l:'Turno 12h',c:'#B91C1C'},
   ]},
   MAÑANAS: { label: 'MAÑANAS', color: '#1D4ED8', events: [
     {d:0,s:'06:00',e:'07:00',l:'Turno',c:'#1D4ED8'},
@@ -279,7 +280,7 @@ const LEGEND = [
   {l:'Tenis de Mesa',        c:C.ten},
   {l:'Compra',               c:C.comp},
   {l:'Batch Cook',           c:C.coc},
-  {l:'Limpiar',              c:C.lim},
+  {l:'Recoger',              c:C.lim},
   {l:'Profundo 22:00–01:30', c:C.pro},
   {l:'Sueño',                c:'#94A3B8'},
   {l:'Caminata',             c:C.cam},
@@ -310,8 +311,10 @@ function buildGrid(wk) {
 
   for (let di = 0; di < 7; di++) {
     h += `<div class="dcol${di >= 5 ? ' wk' : ''}" style="height:${gh}px">`;
-    for (let li = 0; li <= EN - ST; li++) {
-      h += `<div class="hl${li % 2 === 0 ? ' maj' : ''}" style="top:${li * HH}px"></div>`;
+    for (let li = 0; li <= (EN - ST) * 2; li++) {
+      const isHour = li % 2 === 0;
+      const isMid  = Math.round((ST + li / 2) % 24) === 0 && isHour;
+      h += `<div class="hl${isHour ? ' maj' : ''}${isMid ? ' mid' : ''}" style="top:${li * HH / 2}px"></div>`;
     }
     W.events.filter(ev => ev.d === di).forEach(ev => {
       const top = tY(ev.s);
