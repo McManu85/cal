@@ -120,7 +120,7 @@ function tH(s, e) { return Math.max(tY(e) - tY(s), 12); }
 const C = {
   gym:  '#0E7490', ten: '#15803D', comp: '#7C3AED',
   coc:  '#EA580C', lim: '#64748B', pro:  '#1E3A5F',
-  sue:  '#CBD5E1', cam: '#A8B5BF', ita:  '#D97706', mj:   '#BE185D',
+  sue:  '#CBD5E1', cam: '#A8B5BF', ita:  '#D97706',
 };
 
 const DAYS = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
@@ -129,7 +129,6 @@ const WEEKS = {
   LIBRE: { label: 'LIBRE', color: '#B8860B', events: [
     {d:0,s:'07:00',e:'07:45',l:'Caminata',c:C.cam},
     {d:0,s:'09:30',e:'10:15',l:'Compra',c:C.comp},
-    {d:0,s:'12:00',e:'14:00',l:'MJ',c:C.mj},
     {d:0,s:'12:00',e:'13:30',l:'Gym',c:C.gym},
     {d:0,s:'14:30',e:'16:30',l:'Batch Cook',c:C.coc},
     {d:0,s:'22:00',e:'01:30',l:'Profundo',c:C.pro},
@@ -271,7 +270,6 @@ const WEEKS = {
 
 const LEGEND = [
   {l:'Turno',                c:'#6B7280'},
-  {l:'MJ',                   c:C.mj},
   {l:'Italiano',             c:C.ita},
   {l:'Gym / HIIT',           c:C.gym},
   {l:'Tenis de Mesa',        c:C.ten},
