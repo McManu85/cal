@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1F3A5F">
+<title>KPIs Vitales v2 · Manu</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; color: #1F3A5F; background: #F7F8FA; min-height: 100vh; }
+  body { padding-bottom: 80px; }
+
+  header { background: #1F3A5F; color: white; padding: 16px 20px 14px; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+  header h1 { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: 0.5px; }
+  header .sub { font-size: 12px; opacity: 0.7; margin-top: 2px; font-weight: 400; }
+
+  main { padding: 16px; max-width: 600px; margin: 0 auto; }
+  section { display: none; }
+  section.active { display: block; }
+  section h2 { font-size: 16px; margin: 0 0 12px; color: #1F3A5F; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
+  section h3 { font-size: 14px; margin: 20px 0 8px; color: #5A6470; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .card { background: white; border-radius: 12px; padding: 18px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); border: 1px solid #E8EAED; }
+  .card.green { border-left: 4px solid #4CAF50; }
+  .card.blue { border-left: 4px solid #2E75B6; }
+  .card.amber { border-left: 4px solid #FF9800; }
+
+  .kpi-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; gap: 8px; }
+  .kpi-name { font-size: 13px; color: #5A6470; font-weight: 500; }
+  .kpi-value { font-size: 22px; font-weight: 700; color: #1F3A5F; }
+  .kpi-target { font-size: 11px; color: #8892A0; margin-top: 4px; }
+  .kpi-trend { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
+  .trend-down { background: #E8F5E9; color: #2E7D32; }
+  .trend-up { background: #FFEBEE; color: #C62828; }
+  .trend-flat { background: #F0F0F0; color: #666; }
+  .status-ok { background: #E8F5E9; color: #2E7D32; }
+  .status-warn { background: #FFF3E0; color: #E65100; }
+  .status-bad { background: #FFEBEE; color: #C62828; }
+  .status-empty { background: #F0F0F0; color: #999; }
+
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .stat { background: white; border-radius: 12px; padding: 14px; text-align: center; border: 1px solid #E8EAED; }
+  .stat-num { font-size: 28px; font-weight: 700; color: #1F3A5F; line-height: 1; }
+  .stat-label { font-size: 11px; color: #5A6470; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .form-group { margin-bottom: 18px; }
+  label { display: block; font-size: 13px; font-weight: 600; color: #1F3A5F; margin-bottom: 6px; }
+  label .hint { font-weight: 400; color: #8892A0; font-size: 11px; display: block; margin-top: 2px; line-height: 1.4; }
+  input[type="number"], input[type="text"], input[type="date"], textarea {
+    width: 100%; padding: 14px 12px; font-size: 16px; border: 2px solid #E8EAED; border-radius: 10px;
+    font-family: inherit; color: #1F3A5F; background: white; -webkit-appearance: none; appearance: none;
+  }
+  input:focus, textarea:focus { outline: none; border-color: #2E75B6; }
+  textarea { min-height: 60px; resize: vertical; }
+  .input-pair { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; }
+  .input-pair .divider { font-size: 20px; color: #5A6470; text-align: center; font-weight: 600; }
+
+  .slider-group { display: flex; gap: 6px; }
+  .slider-btn { flex: 1; padding: 14px 0; border: 2px solid #E8EAED; border-radius: 10px; background: white;
+    font-size: 17px; font-weight: 700; color: #5A6470; cursor: pointer; transition: all 0.15s; }
+  .slider-btn.selected { border-color: #2E75B6; background: #2E75B6; color: white; }
+
+  .toggle-card { background: #FFF8E7; border: 2px solid #FFC107; border-radius: 10px; padding: 14px; margin-bottom: 18px; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+  .toggle-card.active { background: #FFC10720; }
+  .toggle-checkbox { width: 24px; height: 24px; border: 2px solid #FFC107; border-radius: 6px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-weight: 700; color: transparent; }
+  .toggle-card.active .toggle-checkbox { background: #FFC107; color: white; }
+  .toggle-card.active .toggle-checkbox::before { content: "✓"; font-size: 16px; }
+  .toggle-text { font-size: 13px; color: #5D4E00; font-weight: 600; }
+
+  button.primary, .btn-primary {
+    width: 100%; padding: 16px; font-size: 16px; font-weight: 700; background: #1F3A5F; color: white;
+    border: none; border-radius: 10px; cursor: pointer; -webkit-appearance: none; appearance: none;
+    text-transform: uppercase; letter-spacing: 0.8px; margin-top: 8px;
+  }
+  button.primary:active { background: #142844; }
+  button.secondary { width: 100%; padding: 14px; font-size: 14px; font-weight: 600; background: white; color: #1F3A5F;
+    border: 2px solid #1F3A5F; border-radius: 10px; cursor: pointer; -webkit-appearance: none; appearance: none; margin-top: 8px; }
+  button.danger { background: white; color: #C62828; border-color: #C62828; }
+
+  .history-table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; }
+  .history-table th, .history-table td { padding: 10px 6px; text-align: left; font-size: 11px; border-bottom: 1px solid #F0F1F4; }
+  .history-table th { background: #1F3A5F; color: white; font-weight: 600; text-transform: uppercase; font-size: 10px; letter-spacing: 0.3px; }
+  .history-table td { color: #1F3A5F; }
+  .history-table tr:last-child td { border-bottom: none; }
+  .history-empty { text-align: center; padding: 40px 20px; color: #8892A0; font-size: 13px; }
+
+  nav.tabs {
+    position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex;
+    border-top: 1px solid #E8EAED; padding-bottom: env(safe-area-inset-bottom);
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.04); z-index: 20;
+  }
+  .tab-btn { flex: 1; padding: 12px 4px 10px; background: none; border: none; cursor: pointer;
+    color: #8892A0; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+    display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .tab-btn .icon { font-size: 20px; line-height: 1; }
+  .tab-btn.active { color: #1F3A5F; }
+
+  .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: #1F3A5F; color: white;
+    padding: 12px 20px; border-radius: 24px; font-size: 14px; font-weight: 500; box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    z-index: 100; opacity: 0; transition: opacity 0.3s; pointer-events: none; max-width: 90%; text-align: center; }
+  .toast.show { opacity: 1; }
+  .toast.error { background: #C62828; }
+
+  .callout { background: #F4F8FC; border-left: 3px solid #2E75B6; padding: 12px 14px; margin: 14px 0; border-radius: 0 8px 8px 0;
+    font-size: 13px; color: #1F3A5F; line-height: 1.5; }
+  .callout strong { color: #1F3A5F; }
+  .callout.amber { background: #FFF8E7; border-color: #FF9800; color: #5D4E00; }
+  .callout.amber strong { color: #5D4E00; }
+
+  .period-badge { display: inline-block; padding: 4px 10px; background: #E8F0F8; color: #2E75B6;
+    font-size: 12px; font-weight: 600; border-radius: 12px; margin-bottom: 14px; }
+
+  .kpi-protocol { font-size: 11px; color: #8892A0; font-style: italic; margin-top: 6px; line-height: 1.4; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>KPIs Vitales <span style="opacity:0.5;font-weight:400;font-size:13px;">v2</span></h1>
+  <div class="sub">Sistema mínimo · 5 KPIs activos</div>
+</header>
+
+<main>
+
+  <!-- ============ INICIO ============ -->
+  <section id="home" class="active">
+    <div class="period-badge" id="currentPeriod">—</div>
+
+    <div class="stats-grid">
+      <div class="stat"><div class="stat-num" id="statWeeks">0</div><div class="stat-label">Semanas registradas</div></div>
+      <div class="stat"><div class="stat-num" id="statCintura">0</div><div class="stat-label">Mediciones cintura</div></div>
+    </div>
+
+    <h2>Última semana</h2>
+    <div id="lastWeekCards"></div>
+
+    <h2 style="margin-top: 24px;">Cintura — sensor fino</h2>
+    <div id="lastCinturaCard"></div>
+
+    <div class="callout amber">
+      <strong>Dimensión estratégica aplazada.</strong> El ratio renta pasiva / gastos está fuera del sistema hasta montar la hoja consolidada de fuentes no salariales. Sistema operando 100% táctico.
+    </div>
+  </section>
+
+  <!-- ============ SEMANAL ============ -->
+  <section id="weekly">
+    <div class="period-badge" id="weekLabel">—</div>
+    <h2>Registro semanal</h2>
+
+    <!-- KPI 1: APPS LEAK -->
+    <div class="form-group">
+      <label>Horas en apps de leak esta semana
+        <span class="hint">RRSS + 20minutos + El Correo + WhatsApp · suma del Tiempo de Uso</span>
+      </label>
+      <input type="number" id="leakHours" step="0.1" min="0" max="100" placeholder="ej. 8.5" inputmode="decimal">
+      <div class="kpi-protocol">Cada lunes: Configuración → Tiempo de Uso (iOS) / Bienestar Digital (Android) → últimos 7 días → suma de las 4 categorías.</div>
+    </div>
+
+    <!-- KPI 2: TRABAJO PROFUNDO -->
+    <div class="form-group">
+      <label>Trabajo profundo capturado / disponible
+        <span class="hint">Bloques 22:30 – 01:30 · Objetivo: ratio ≥ 80%</span>
+      </label>
+      <div class="input-pair">
+        <input type="number" id="dwCaptured" min="0" placeholder="capturados" inputmode="numeric">
+        <span class="divider">/</span>
+        <input type="number" id="dwAvailable" min="0" placeholder="disponibles" inputmode="numeric">
+      </div>
+    </div>
+
+    <!-- KPI 3: GYM -->
+    <div class="form-group">
+      <label>Sesiones de gym efectivas esta semana
+        <span class="hint">Solo gym · NO tenis de mesa · Objetivo: 3/3</span>
+      </label>
+      <div class="slider-group" id="gymSlider">
+        <button class="slider-btn" data-val="0">0</button>
+        <button class="slider-btn" data-val="1">1</button>
+        <button class="slider-btn" data-val="2">2</button>
+        <button class="slider-btn" data-val="3">3</button>
+      </div>
+    </div>
+
+    <!-- KPI 4: PESO (with morning week exception) -->
+    <div class="toggle-card" id="morningToggle" onclick="toggleMorning()">
+      <div class="toggle-checkbox"></div>
+      <div class="toggle-text">Esta semana es de mañanas — no hay pesaje</div>
+    </div>
+
+    <div class="form-group" id="weightGroup">
+      <label>Peso (kg)
+        <span class="hint">Lunes a las 12:00 · función: radar de alta frecuencia</span>
+      </label>
+      <input type="number" id="weight" step="0.1" min="40" max="200" placeholder="ej. 78.5" inputmode="decimal">
+    </div>
+
+    <div class="form-group">
+      <label>Notas (opcional)<span class="hint">Turno, evento, contexto rápido</span></label>
+      <textarea id="weeklyNotes" placeholder="Semana libre · proyecto X..."></textarea>
+    </div>
+
+    <button class="primary" onclick="saveWeekly()">Guardar semana</button>
+  </section>
+
+  <!-- ============ CINTURA ============ -->
+  <section id="cintura">
+    <h2>Cintura — medición fina</h2>
+
+    <div class="callout">
+      <strong>Cadencia:</strong> cada 5 semanas, viernes de la semana de tardes. <strong>Razón:</strong> mismas condiciones que la medición anterior (mismo punto del ciclo de turnos = misma rutina previa). Dos mediciones consistentes valen más que cinco contaminadas.
+    </div>
+
+    <div class="form-group">
+      <label>Fecha de medición
+        <span class="hint">Por defecto hoy. Edita si registras una medición anterior.</span>
+      </label>
+      <input type="date" id="cinturaDate">
+    </div>
+
+    <div class="form-group">
+      <label>Cintura (cm)
+        <span class="hint">Medición en ayunas idealmente · ombligo como referencia</span>
+      </label>
+      <input type="number" id="cinturaCm" step="0.1" min="40" max="200" placeholder="ej. 88.5" inputmode="decimal">
+    </div>
+
+    <div class="form-group">
+      <label>Notas (opcional)<span class="hint">Cambios de dieta, entreno, hidratación...</span></label>
+      <textarea id="cinturaNotes" placeholder="..."></textarea>
+    </div>
+
+    <button class="primary" onclick="saveCintura()">Guardar medición</button>
+
+    <h3 style="margin-top: 30px;">Últimas mediciones</h3>
+    <div id="cinturaPreview"></div>
+  </section>
+
+  <!-- ============ HISTÓRICO ============ -->
+  <section id="history">
+    <h2>Histórico semanal</h2>
+    <div id="weeklyHistory"></div>
+
+    <h2 style="margin-top: 24px;">Histórico cintura</h2>
+    <div id="cinturaHistory"></div>
+  </section>
+
+  <!-- ============ DATOS ============ -->
+  <section id="data">
+    <h2>Gestión de datos</h2>
+
+    <div class="callout">
+      <strong>Sync entre dispositivos.</strong> Exporta el JSON, súbelo a Drive. En el otro dispositivo, importa el archivo. Hazlo al menos una vez a la semana como backup.
+    </div>
+
+    <h3>Exportar</h3>
+    <button class="secondary" onclick="exportData()">⬇ Descargar JSON</button>
+
+    <h3>Importar</h3>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+    <button class="secondary" onclick="document.getElementById('importFile').click()">⬆ Subir JSON</button>
+
+    <h3>Estado actual</h3>
+    <div class="card">
+      <div style="font-size: 13px; color: #5A6470; line-height: 1.7;">
+        <div><strong style="color:#1F3A5F">Semanas registradas:</strong> <span id="dataWeeks">0</span></div>
+        <div><strong style="color:#1F3A5F">Mediciones cintura:</strong> <span id="dataCintura">0</span></div>
+        <div><strong style="color:#1F3A5F">Última edición:</strong> <span id="dataLastEdit">—</span></div>
+        <div><strong style="color:#1F3A5F">Versión datos:</strong> <span id="dataVersion">2.0</span></div>
+      </div>
+    </div>
+
+    <h3>KPIs aplazados (no se registran aún)</h3>
+    <div class="card amber">
+      <div style="font-size:13px; line-height:1.6; color:#5A6470;">
+        <strong style="color:#1F3A5F">Pendientes hasta tener la hoja consolidada de fuentes no salariales:</strong>
+        <ul style="margin: 8px 0 0 16px; padding: 0; font-size: 12px;">
+          <li>Ratio renta pasiva / gastos (estrella polar)</li>
+          <li>Cash flow neto no salarial</li>
+          <li>Renta pasiva pura</li>
+          <li>Capital desplegado nuevo</li>
+          <li>Rentabilidad neta sobre capital invertido</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3 style="color:#C62828">Zona de riesgo</h3>
+    <button class="secondary danger" onclick="clearAll()">🗑 Borrar todos los datos locales</button>
+
+    <div style="text-align:center; margin-top: 30px; font-size: 11px; color: #8892A0;">
+      v2.0 · Sistema de KPIs Vitales · Manu
+    </div>
+  </section>
+</main>
+
+<nav class="tabs">
+  <button class="tab-btn active" data-section="home"><div class="icon">⊟</div>Inicio</button>
+  <button class="tab-btn" data-section="weekly"><div class="icon">▤</div>Semanal</button>
+  <button class="tab-btn" data-section="cintura"><div class="icon">◎</div>Cintura</button>
+  <button class="tab-btn" data-section="history"><div class="icon">≡</div>Histórico</button>
+  <button class="tab-btn" data-section="data"><div class="icon">⇅</div>Datos</button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============ ESTADO ============
+const STORAGE_KEY = 'kpis_manu_v2';
+let state = { version: '2.0', lastUpdated: null, weekly: [], cintura: [] };
+let selectedGym = null;
+let isMorningWeek = false;
+
+// ============ FECHAS ============
+function getMondayOfWeek(date = new Date()) {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  d.setHours(0,0,0,0);
+  return d;
+}
+function isoDate(d) { return d.toISOString().slice(0,10); }
+function weekLabel(monday) {
+  const sunday = new Date(monday); sunday.setDate(sunday.getDate() + 6);
+  const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  return `${monday.getDate()} ${meses[monday.getMonth()]} – ${sunday.getDate()} ${meses[sunday.getMonth()]} ${sunday.getFullYear()}`;
+}
+function shortDate(d) {
+  const dt = new Date(d);
+  const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  return `${dt.getDate()} ${meses[dt.getMonth()]} ${dt.getFullYear()}`;
+}
+
+// ============ PERSISTENCIA ============
+function load() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) state = JSON.parse(raw);
+  } catch (e) { console.warn('No data loaded', e); }
+}
+function save() {
+  state.lastUpdated = new Date().toISOString();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+// ============ NAVEGACIÓN ============
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const target = btn.dataset.section;
+    document.querySelectorAll('section').forEach(s => s.classList.toggle('active', s.id === target));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
+    if (target === 'home') renderHome();
+    if (target === 'weekly') renderWeeklyForm();
+    if (target === 'cintura') renderCinturaForm();
+    if (target === 'history') renderHistory();
+    if (target === 'data') renderData();
+    window.scrollTo(0,0);
+  });
+});
+
+function toast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isError ? ' error' : '');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// ============ INDICADORES DE TENDENCIA ============
+function trendBadge(current, previous, lowerIsBetter = true) {
+  if (current === null || current === undefined || previous === null || previous === undefined) {
+    return '';
+  }
+  const diff = current - previous;
+  if (Math.abs(diff) < 0.001) return `<span class="kpi-trend trend-flat">→ 0</span>`;
+  const goodDirection = lowerIsBetter ? diff < 0 : diff > 0;
+  const cls = goodDirection ? 'trend-down' : 'trend-up';
+  const arrow = diff < 0 ? '▼' : '▲';
+  const val = Math.abs(diff).toFixed(diff % 1 === 0 ? 0 : 1);
+  return `<span class="kpi-trend ${cls}">${arrow} ${val}</span>`;
+}
+
+function gymStatus(n) {
+  if (n === null || n === undefined) return ['—', 'status-empty'];
+  if (n === 3) return [`${n}/3`, 'status-ok'];
+  if (n === 2) return [`${n}/3`, 'status-warn'];
+  return [`${n}/3`, 'status-bad'];
+}
+
+function tpStatus(c, a) {
+  if (c === null || a === null || !a) return ['—', 'status-empty'];
+  const pct = Math.round((c/a)*100);
+  if (pct >= 80) return [`${pct}%`, 'status-ok'];
+  if (pct >= 50) return [`${pct}%`, 'status-warn'];
+  return [`${pct}%`, 'status-bad'];
+}
+
+// ============ HOME ============
+function renderHome() {
+  const today = new Date();
+  document.getElementById('currentPeriod').textContent = `Hoy · ${weekLabel(getMondayOfWeek(today))}`;
+  document.getElementById('statWeeks').textContent = state.weekly.length;
+  document.getElementById('statCintura').textContent = state.cintura.length;
+
+  const lastWeek = state.weekly.length ? state.weekly[state.weekly.length - 1] : null;
+  const prevWeek = state.weekly.length > 1 ? state.weekly[state.weekly.length - 2] : null;
+  const wkDiv = document.getElementById('lastWeekCards');
+
+  if (!lastWeek) {
+    wkDiv.innerHTML = '<div class="card" style="text-align:center;color:#8892A0;font-size:13px;">Sin semanas registradas. Ve a <strong>Semanal</strong> para empezar.</div>';
+  } else {
+    const [tpV, tpC] = tpStatus(lastWeek.dwCaptured, lastWeek.dwAvailable);
+    const [gymV, gymC] = gymStatus(lastWeek.gymSessions);
+
+    // Leak hours
+    const leakTrend = prevWeek ? trendBadge(lastWeek.leakHours, prevWeek.leakHours, true) : '';
+    // Weight (only if not morning week)
+    const weightTrend = (prevWeek && lastWeek.weight !== null && prevWeek.weight !== null) ?
+      trendBadge(lastWeek.weight, prevWeek.weight, true) : '';
+
+    let html = `
+      <div class="card green">
+        <div class="kpi-row">
+          <span class="kpi-name">Horas en apps de leak</span>
+          <span class="kpi-value">${lastWeek.leakHours !== null ? lastWeek.leakHours.toFixed(1) + 'h' : '—'}</span>
+        </div>
+        <div class="kpi-target">${lastWeek.leakHours !== null ? '~' + (lastWeek.leakHours/7).toFixed(1) + 'h/día media' : ''} ${leakTrend}</div>
+      </div>
+      <div class="card green">
+        <div class="kpi-row">
+          <span class="kpi-name">Trabajo profundo</span>
+          <span class="kpi-trend ${tpC}">${tpV}</span>
+        </div>
+        <div class="kpi-target">${lastWeek.dwCaptured ?? 0} de ${lastWeek.dwAvailable ?? 0} bloques · Objetivo ≥ 80%</div>
+      </div>
+      <div class="card green">
+        <div class="kpi-row">
+          <span class="kpi-name">Adherencia gym</span>
+          <span class="kpi-trend ${gymC}">${gymV}</span>
+        </div>
+        <div class="kpi-target">Objetivo: 3 sesiones</div>
+      </div>
+    `;
+    if (lastWeek.morningShift) {
+      html += `
+      <div class="card amber">
+        <div class="kpi-row">
+          <span class="kpi-name">Peso</span>
+          <span class="kpi-value" style="font-size:14px;color:#8892A0;font-weight:600;">Semana mañanas</span>
+        </div>
+        <div class="kpi-target">Sin medición esta semana</div>
+      </div>`;
+    } else {
+      html += `
+      <div class="card green">
+        <div class="kpi-row">
+          <span class="kpi-name">Peso</span>
+          <span class="kpi-value">${lastWeek.weight !== null ? lastWeek.weight.toFixed(1) + ' kg' : '—'}</span>
+        </div>
+        <div class="kpi-target">${weightTrend}</div>
+      </div>`;
+    }
+    html += `<div style="font-size:11px;color:#8892A0;text-align:center;margin-top:6px;">${weekLabel(new Date(lastWeek.weekStart))}</div>`;
+    wkDiv.innerHTML = html;
+  }
+
+  // Cintura
+  const lastC = state.cintura.length ? state.cintura[state.cintura.length - 1] : null;
+  const prevC = state.cintura.length > 1 ? state.cintura[state.cintura.length - 2] : null;
+  const cDiv = document.getElementById('lastCinturaCard');
+  if (!lastC) {
+    cDiv.innerHTML = '<div class="card" style="text-align:center;color:#8892A0;font-size:13px;">Sin mediciones de cintura. Ve a <strong>Cintura</strong>.</div>';
+  } else {
+    const trend = prevC ? trendBadge(lastC.cm, prevC.cm, true) : '';
+    cDiv.innerHTML = `
+      <div class="card blue">
+        <div class="kpi-row">
+          <span class="kpi-name">Cintura</span>
+          <span class="kpi-value">${lastC.cm.toFixed(1)} cm</span>
+        </div>
+        <div class="kpi-target">${trend} · ${shortDate(lastC.date)}</div>
+      </div>
+    `;
+  }
+}
+
+// ============ WEEKLY FORM ============
+function toggleMorning() {
+  isMorningWeek = !isMorningWeek;
+  document.getElementById('morningToggle').classList.toggle('active', isMorningWeek);
+  document.getElementById('weightGroup').style.display = isMorningWeek ? 'none' : 'block';
+  if (isMorningWeek) document.getElementById('weight').value = '';
+}
+
+function renderWeeklyForm() {
+  const monday = getMondayOfWeek();
+  const weekStart = isoDate(monday);
+  document.getElementById('weekLabel').textContent = weekLabel(monday);
+
+  const existing = state.weekly.find(w => w.weekStart === weekStart);
+
+  document.getElementById('leakHours').value = existing?.leakHours ?? '';
+  document.getElementById('dwCaptured').value = existing?.dwCaptured ?? '';
+  document.getElementById('dwAvailable').value = existing?.dwAvailable ?? '';
+  selectedGym = existing?.gymSessions ?? null;
+  document.querySelectorAll('#gymSlider .slider-btn').forEach(b => {
+    b.classList.toggle('selected', parseInt(b.dataset.val) === selectedGym);
+  });
+  document.getElementById('weight').value = existing?.weight ?? '';
+  isMorningWeek = existing?.morningShift ?? false;
+  document.getElementById('morningToggle').classList.toggle('active', isMorningWeek);
+  document.getElementById('weightGroup').style.display = isMorningWeek ? 'none' : 'block';
+  document.getElementById('weeklyNotes').value = existing?.notes ?? '';
+}
+
+document.querySelectorAll('#gymSlider .slider-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    selectedGym = parseInt(btn.dataset.val);
+    document.querySelectorAll('#gymSlider .slider-btn').forEach(b => b.classList.toggle('selected', b === btn));
+  });
+});
+
+function saveWeekly() {
+  const weekStart = isoDate(getMondayOfWeek());
+  const leak = parseFloat(document.getElementById('leakHours').value);
+  const cap = parseInt(document.getElementById('dwCaptured').value);
+  const avl = parseInt(document.getElementById('dwAvailable').value);
+  const weight = isMorningWeek ? null : parseFloat(document.getElementById('weight').value);
+  const notes = document.getElementById('weeklyNotes').value.trim();
+
+  if (isNaN(leak) && isNaN(cap) && isNaN(avl) && selectedGym === null && (isMorningWeek || isNaN(weight))) {
+    toast('Rellena al menos un campo', true);
+    return;
+  }
+
+  const entry = {
+    weekStart,
+    leakHours: isNaN(leak) ? null : leak,
+    dwCaptured: isNaN(cap) ? null : cap,
+    dwAvailable: isNaN(avl) ? null : avl,
+    gymSessions: selectedGym,
+    weight: (isMorningWeek || isNaN(weight)) ? null : weight,
+    morningShift: isMorningWeek,
+    notes,
+    savedAt: new Date().toISOString()
+  };
+
+  const idx = state.weekly.findIndex(w => w.weekStart === weekStart);
+  if (idx >= 0) state.weekly[idx] = entry;
+  else { state.weekly.push(entry); state.weekly.sort((a,b) => a.weekStart.localeCompare(b.weekStart)); }
+  save();
+  toast(idx >= 0 ? 'Semana actualizada' : 'Semana guardada');
+  setTimeout(() => document.querySelector('.tab-btn[data-section="home"]').click(), 600);
+}
+
+// ============ CINTURA FORM ============
+function renderCinturaForm() {
+  const today = isoDate(new Date());
+  document.getElementById('cinturaDate').value = today;
+  document.getElementById('cinturaCm').value = '';
+  document.getElementById('cinturaNotes').value = '';
+
+  // Show last 5 measurements as preview
+  const prev = document.getElementById('cinturaPreview');
+  if (!state.cintura.length) {
+    prev.innerHTML = '<div class="history-empty" style="padding:20px;">Aún no hay mediciones.</div>';
+  } else {
+    const recent = state.cintura.slice().reverse().slice(0, 5);
+    let html = '<table class="history-table"><thead><tr><th>Fecha</th><th>cm</th><th>Δ</th></tr></thead><tbody>';
+    recent.forEach((c, i) => {
+      const prevC = recent[i + 1];
+      let delta = '';
+      if (prevC) {
+        const d = c.cm - prevC.cm;
+        const cls = d < 0 ? 'trend-down' : (d > 0 ? 'trend-up' : 'trend-flat');
+        const arrow = d < 0 ? '▼' : (d > 0 ? '▲' : '→');
+        delta = `<span class="kpi-trend ${cls}">${arrow} ${Math.abs(d).toFixed(1)}</span>`;
+      }
+      html += `<tr><td>${shortDate(c.date)}</td><td><strong>${c.cm.toFixed(1)}</strong></td><td>${delta}</td></tr>`;
+    });
+    html += '</tbody></table>';
+    prev.innerHTML = html;
+  }
+}
+
+function saveCintura() {
+  const date = document.getElementById('cinturaDate').value;
+  const cm = parseFloat(document.getElementById('cinturaCm').value);
+  const notes = document.getElementById('cinturaNotes').value.trim();
+  if (!date || isNaN(cm)) { toast('Introduce fecha y medida', true); return; }
+  const entry = { date, cm, notes, savedAt: new Date().toISOString() };
+  const idx = state.cintura.findIndex(c => c.date === date);
+  if (idx >= 0) state.cintura[idx] = entry;
+  else { state.cintura.push(entry); state.cintura.sort((a,b) => a.date.localeCompare(b.date)); }
+  save();
+  toast(idx >= 0 ? 'Medición actualizada' : 'Medición guardada');
+  setTimeout(() => document.querySelector('.tab-btn[data-section="home"]').click(), 600);
+}
+
+// ============ HISTORY ============
+function renderHistory() {
+  const wkDiv = document.getElementById('weeklyHistory');
+  if (!state.weekly.length) {
+    wkDiv.innerHTML = '<div class="history-empty">Aún no hay semanas registradas.</div>';
+  } else {
+    const rows = state.weekly.slice().reverse().slice(0, 20).map(w => {
+      const m = new Date(w.weekStart);
+      const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+      const lbl = `${m.getDate()} ${meses[m.getMonth()]}`;
+      const leak = w.leakHours !== null ? `${w.leakHours.toFixed(1)}h` : '—';
+      const tp = (w.dwCaptured !== null && w.dwAvailable) ? `${w.dwCaptured}/${w.dwAvailable}` : '—';
+      const gym = w.gymSessions !== null ? `${w.gymSessions}/3` : '—';
+      const weight = w.morningShift ? '—' : (w.weight !== null ? `${w.weight.toFixed(1)}` : '—');
+      return `<tr><td>${lbl}</td><td>${leak}</td><td>${tp}</td><td>${gym}</td><td>${weight}</td></tr>`;
+    }).join('');
+    wkDiv.innerHTML = `<table class="history-table"><thead><tr><th>Sem</th><th>Leak</th><th>TP</th><th>Gym</th><th>Peso</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+
+  const cDiv = document.getElementById('cinturaHistory');
+  if (!state.cintura.length) {
+    cDiv.innerHTML = '<div class="history-empty">Aún no hay mediciones de cintura.</div>';
+  } else {
+    const rows = state.cintura.slice().reverse().map(c => {
+      return `<tr><td>${shortDate(c.date)}</td><td><strong>${c.cm.toFixed(1)} cm</strong></td><td style="color:#8892A0;font-size:10px;">${c.notes || ''}</td></tr>`;
+    }).join('');
+    cDiv.innerHTML = `<table class="history-table"><thead><tr><th>Fecha</th><th>cm</th><th>Notas</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+}
+
+// ============ DATA ============
+function renderData() {
+  document.getElementById('dataWeeks').textContent = state.weekly.length;
+  document.getElementById('dataCintura').textContent = state.cintura.length;
+  document.getElementById('dataLastEdit').textContent = state.lastUpdated ? new Date(state.lastUpdated).toLocaleString('es-ES') : 'nunca';
+  document.getElementById('dataVersion').textContent = state.version || '2.0';
+}
+
+function exportData() {
+  const json = JSON.stringify(state, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const fname = `kpis_manu_v2_${isoDate(new Date())}.json`;
+  a.href = url; a.download = fname;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('JSON descargado: ' + fname);
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.version || !Array.isArray(data.weekly)) throw new Error('Formato inválido');
+      // Migration v1.0 -> v2.0
+      if (data.version === '1.0') {
+        if (!confirm('El archivo es v1.0. La migración descartará el sueño y los datos trimestrales (KPIs ya no activos). ¿Continuar?')) return;
+        data.version = '2.0';
+        data.cintura = data.cintura || [];
+        // Map old weekly schema to new
+        data.weekly = data.weekly.map(w => ({
+          weekStart: w.weekStart,
+          leakHours: w.phoneHours ?? null,
+          dwCaptured: w.dwCaptured ?? null,
+          dwAvailable: w.dwAvailable ?? null,
+          gymSessions: null,
+          weight: null,
+          morningShift: false,
+          notes: w.notes ?? '',
+          savedAt: w.savedAt
+        }));
+        delete data.quarterly;
+      }
+      if (!Array.isArray(data.cintura)) data.cintura = [];
+      if (!confirm(`¿Importar ${data.weekly.length} semanas y ${data.cintura.length} cinturas? Reemplaza los datos actuales.`)) return;
+      state = data;
+      save();
+      toast('Datos importados');
+      renderData();
+      document.querySelector('.tab-btn[data-section="home"]').click();
+    } catch (err) {
+      toast('Error: archivo no válido', true);
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function clearAll() {
+  if (!confirm('¿Borrar TODOS los datos locales? Esto no se puede deshacer. Asegúrate de haber exportado antes.')) return;
+  if (!confirm('Confirmar de nuevo: borrar todo.')) return;
+  state = { version: '2.0', lastUpdated: null, weekly: [], cintura: [] };
+  localStorage.removeItem(STORAGE_KEY);
+  toast('Datos borrados');
+  renderData();
+  document.querySelector('.tab-btn[data-section="home"]').click();
+}
+
+// ============ INIT ============
+load();
+renderHome();
+</script>
+
+</body>
+</html>
