@@ -8,6 +8,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="GYM">
   <title>GYM</title>
+  <link rel="manifest" href="/cal/gym-manifest.json">
+  <link rel="apple-touch-icon" href="/cal/gym-icon.svg">
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -866,6 +868,13 @@ function toast(msg) {
 // INIT
 // ─────────────────────────────────────────────────────────────────────────────
 renderHome();
+
+// PWA: service worker para offline + instalación sin barra
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/cal/gym-sw.js', { scope: '/cal/' });
+  });
+}
 </script>
 </body>
 </html>
