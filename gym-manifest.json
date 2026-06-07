@@ -1,0 +1,19 @@
+{
+  "name": "GYM — Manu",
+  "short_name": "GYM",
+  "description": "Tracker de entrenamientos",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#080808",
+  "theme_color": "#080808",
+  "start_url": "/cal/gym.html",
+  "scope": "/cal/",
+  "icons": [
+    {
+      "src": "/cal/gym-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
