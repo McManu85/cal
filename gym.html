@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#080808">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="GYM">
+  <title>GYM</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:   #080808;
+      --s1:   #111111;
+      --s2:   #1A1A1A;
+      --s3:   #232323;
+      --b:    #2A2A2A;
+      --acc:  #C8FF00;
+      --acc2: rgba(200,255,0,.1);
+      --txt:  #EFEFEF;
+      --mut:  #555555;
+      --red:  #FF3B30;
+      --r:    8px;
+    }
+
+    html, body {
+      height: 100%; background: var(--bg); color: var(--txt);
+      font-family: 'Barlow Condensed', sans-serif;
+      overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    /* ── SCREENS ─────────────────────────────────── */
+    .screen {
+      position: fixed; inset: 0;
+      display: flex; flex-direction: column;
+      background: var(--bg);
+      transform: translateX(100%);
+      transition: transform .28s cubic-bezier(.4,0,.2,1);
+    }
+    .screen.active  { transform: translateX(0); }
+    .screen.behind  { transform: translateX(-28%); }
+
+    /* ── HEADER ──────────────────────────────────── */
+    .hdr {
+      display: flex; align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      padding-top: max(14px, env(safe-area-inset-top));
+      border-bottom: 1px solid var(--b);
+      flex-shrink: 0;
+    }
+    .hdr-logo {
+      font-size: 32px; font-weight: 900; letter-spacing: -1px; color: var(--acc);
+    }
+    .hdr-title {
+      flex: 1; font-size: 20px; font-weight: 700;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      outline: none; min-width: 0;
+    }
+    .hdr-title[contenteditable="true"] {
+      border-bottom: 1.5px solid var(--acc); padding-bottom: 1px;
+    }
+    .hdr-sub { font-size: 13px; color: var(--mut); font-weight: 600; margin-top: 2px; }
+
+    /* ── ICON BUTTONS ────────────────────────────── */
+    .ico { width: 44px; height: 44px; border: none; background: none;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 6px; cursor: pointer; color: var(--mut);
+      transition: color .12s, background .12s; flex-shrink: 0; }
+    .ico:active { background: var(--s2); color: var(--txt); }
+    .ico.red:active { color: var(--red); }
+
+    /* ── SCROLL AREA ─────────────────────────────── */
+    .scroll {
+      flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+      padding-bottom: max(32px, env(safe-area-inset-bottom));
+    }
+
+    /* ── HOME ────────────────────────────────────── */
+    .btn-new {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      margin: 16px; height: 64px; border-radius: var(--r); border: none;
+      background: var(--acc); color: #000;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 22px; font-weight: 900; letter-spacing: 1.5px;
+      text-transform: uppercase; cursor: pointer;
+      transition: opacity .12s;
+    }
+    .btn-new:active { opacity: .82; }
+
+    .list-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 2.5px;
+      text-transform: uppercase; color: var(--mut);
+      padding: 4px 20px 10px;
+    }
+    .card {
+      margin: 0 14px 8px;
+      background: var(--s1); border: 1px solid var(--b);
+      border-radius: var(--r); overflow: hidden;
+    }
+    .card-main {
+      padding: 14px 16px; cursor: pointer;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .card-main:active { background: var(--s2); }
+    .card-info { flex: 1; min-width: 0; }
+    .card-date {
+      font-size: 11px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--acc); margin-bottom: 3px;
+    }
+    .card-name {
+      font-size: 20px; font-weight: 700;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .card-meta { font-size: 13px; color: var(--mut); margin-top: 2px; }
+    .card-repeat {
+      border-top: 1px solid var(--b);
+      padding: 10px 16px; cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .card-repeat:active { background: var(--s2); }
+    .card-repeat span {
+      font-size: 13px; font-weight: 700; letter-spacing: .5px;
+      text-transform: uppercase; color: var(--mut);
+    }
+
+    .empty-state {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 14px; padding: 80px 40px;
+    }
+    .empty-state svg { opacity: .18; }
+    .empty-state p { color: var(--mut); font-size: 18px; font-weight: 600; text-align: center; line-height: 1.4; }
+
+    /* ── SESSION EDITOR ──────────────────────────── */
+    .ex-block {
+      margin: 12px 14px 0;
+      background: var(--s1); border: 1px solid var(--b);
+      border-radius: var(--r); overflow: hidden;
+    }
+    .ex-hdr {
+      padding: 12px 14px; display: flex; align-items: center; gap: 10px;
+      border-bottom: 1px solid var(--b);
+    }
+    .ex-name {
+      flex: 1; font-size: 17px; font-weight: 700; letter-spacing: .3px;
+      text-transform: uppercase; color: var(--txt);
+      background: none; border: none; cursor: pointer;
+      text-align: left; padding: 0;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .ex-name span { color: var(--acc); font-size: 13px; }
+
+    /* Series */
+    .serie-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 14px; border-bottom: 1px solid var(--b);
+    }
+    .serie-n {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px; color: var(--mut); width: 20px;
+      flex-shrink: 0; text-align: center;
+    }
+    .serie-field {
+      display: flex; align-items: stretch;
+      background: var(--s3); border: 1px solid var(--b); border-radius: 5px;
+      overflow: hidden; flex: 1;
+    }
+    .serie-field label {
+      font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--mut);
+      padding: 0 8px; display: flex; align-items: center;
+      border-right: 1px solid var(--b); flex-shrink: 0; background: var(--s2);
+    }
+    .serie-input {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 22px; font-weight: 700; color: var(--txt);
+      background: none; border: none; outline: none;
+      width: 100%; text-align: center; padding: 8px 4px;
+      -moz-appearance: textfield;
+    }
+    .serie-input::-webkit-outer-spin-button,
+    .serie-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .serie-input:focus { background: rgba(200,255,0,.06); }
+
+    .serie-del {
+      width: 34px; height: 34px; border: none; background: none;
+      color: var(--mut); border-radius: 5px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .serie-del:active { background: rgba(255,59,48,.15); color: var(--red); }
+
+    .ex-foot { display: flex; border-top: 1px solid var(--b); }
+    .ex-foot-btn {
+      flex: 1; height: 46px; border: none; background: none;
+      color: var(--acc); cursor: pointer;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .ex-foot-btn:active { background: var(--acc2); }
+    .ex-foot-btn + .ex-foot-btn { border-left: 1px solid var(--b); }
+    .ex-foot-btn.del { color: #555; }
+    .ex-foot-btn.del:active { color: var(--red); background: rgba(255,59,48,.08); }
+
+    .btn-add-ex {
+      margin: 12px 14px 0;
+      width: calc(100% - 28px); height: 52px;
+      border: 1.5px dashed var(--b); background: none;
+      border-radius: var(--r); cursor: pointer;
+      color: var(--acc);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 15px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-add-ex:active { background: var(--acc2); border-style: solid; }
+
+    /* ── PICKER OVERLAY ──────────────────────────── */
+    .overlay {
+      position: fixed; inset: 0; z-index: 100;
+      background: rgba(0,0,0,.72);
+      display: flex; align-items: flex-end;
+      opacity: 0; pointer-events: none;
+      transition: opacity .2s;
+    }
+    .overlay.open { opacity: 1; pointer-events: all; }
+    .sheet {
+      width: 100%; background: var(--s1);
+      border-radius: 14px 14px 0 0; border-top: 1px solid var(--b);
+      padding-bottom: max(16px, env(safe-area-inset-bottom));
+      max-height: 82vh; display: flex; flex-direction: column;
+      transform: translateY(16px);
+      transition: transform .22s cubic-bezier(.4,0,.2,1);
+    }
+    .overlay.open .sheet { transform: translateY(0); }
+    .sheet-hdr {
+      padding: 16px 18px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--b); flex-shrink: 0;
+    }
+    .sheet-hdr-title { font-size: 15px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--mut); }
+    .search-wrap {
+      margin: 12px 14px; flex-shrink: 0;
+      display: flex; align-items: center; gap: 8px;
+      background: var(--s3); border: 1px solid var(--b);
+      border-radius: var(--r); padding: 0 12px;
+    }
+    .search-wrap svg { flex-shrink: 0; color: var(--mut); }
+    .search-wrap input {
+      flex: 1; background: none; border: none; outline: none;
+      color: var(--txt); caret-color: var(--acc);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 20px; padding: 12px 0;
+    }
+    .search-wrap input::placeholder { color: var(--mut); }
+    .picker-items { overflow-y: auto; flex: 1; padding: 4px 8px 8px; }
+    .picker-item {
+      padding: 13px 12px; border-radius: 6px; cursor: pointer;
+      font-size: 18px; font-weight: 600;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .picker-item:active { background: var(--s3); }
+    .picker-item.new { color: var(--acc); font-weight: 700; }
+
+    /* ── CONFIRM SHEET ───────────────────────────── */
+    .confirm-body { padding: 16px 20px; font-size: 16px; color: var(--mut); line-height: 1.5; }
+    .confirm-btns { display: flex; gap: 10px; padding: 8px 16px 4px; }
+    .btn-cancel {
+      flex: 1; height: 50px; border-radius: var(--r);
+      border: 1px solid var(--b); background: none; color: var(--txt);
+      font-family: 'Barlow Condensed', sans-serif; font-size: 17px; font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-cancel:active { background: var(--s2); }
+    .btn-danger {
+      flex: 1; height: 50px; border-radius: var(--r);
+      border: none; background: var(--red); color: #fff;
+      font-family: 'Barlow Condensed', sans-serif; font-size: 17px; font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-danger:active { opacity: .82; }
+
+    /* ── TOAST ───────────────────────────────────── */
+    .toast {
+      position: fixed; z-index: 300;
+      bottom: max(28px, env(safe-area-inset-bottom));
+      left: 50%; transform: translateX(-50%) translateY(64px);
+      background: var(--acc); color: #000;
+      font-size: 13px; font-weight: 900; letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 10px 22px; border-radius: 100px;
+      transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+      pointer-events: none; white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ── SAVE INDICATOR ──────────────────────────── */
+    .save-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--acc); opacity: 0;
+      transition: opacity .3s; flex-shrink: 0;
+    }
+    .save-dot.on { opacity: 1; }
+
+    svg { display: block; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════ SCREEN: HOME ══════════════════════════════ -->
+<div id="scr-home" class="screen active">
+  <div class="hdr">
+    <div class="hdr-logo">GYM</div>
+    <div style="flex:1"></div>
+    <button class="ico" id="btn-import" title="Importar JSON">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    </button>
+    <button class="ico" id="btn-export" title="Exportar JSON">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    </button>
+  </div>
+  <div class="scroll">
+    <button class="btn-new" id="btn-new">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      NUEVA SESIÓN
+    </button>
+    <div id="sessions-list"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════ SCREEN: SESSION EDITOR ══════════════════════ -->
+<div id="scr-session" class="screen">
+  <div class="hdr">
+    <button class="ico" id="btn-back">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+    </button>
+    <div id="ses-title" class="hdr-title" contenteditable="false"></div>
+    <div class="save-dot" id="save-dot"></div>
+    <button class="ico red" id="btn-del-ses">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+    </button>
+  </div>
+  <div class="scroll" id="ses-scroll">
+    <div id="exercises"></div>
+    <button class="btn-add-ex" id="btn-add-ex">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      AÑADIR EJERCICIO
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════ OVERLAY: PICKER ═══════════════════════════ -->
+<div class="overlay" id="picker-overlay">
+  <div class="sheet">
+    <div class="sheet-hdr">
+      <span class="sheet-hdr-title">Ejercicio</span>
+      <button class="ico" id="picker-close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="search-wrap">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" id="picker-q" placeholder="Buscar o escribir nuevo…" autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <div class="picker-items" id="picker-items"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════ OVERLAY: DELETE CONFIRM ═══════════════════════ -->
+<div class="overlay" id="del-overlay">
+  <div class="sheet">
+    <div class="sheet-hdr">
+      <span class="sheet-hdr-title">Eliminar sesión</span>
+    </div>
+    <div class="confirm-body">¿Eliminar esta sesión? La acción no se puede deshacer.</div>
+    <div class="confirm-btns">
+      <button class="btn-cancel" id="del-cancel">Cancelar</button>
+      <button class="btn-danger" id="del-confirm">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- IMPORT hidden input -->
+<input type="file" id="file-import" accept=".json" style="display:none">
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// DATA
+// ─────────────────────────────────────────────────────────────────────────────
+const LS = 'gym_manu_v1';
+
+const PREDEFINED = [
+  'Press banca','Press inclinado','Press declinado','Aperturas cable','Fondos pecho',
+  'Sentadilla','Sentadilla búlgara','Prensa','Zancadas','Extensiones cuádriceps',
+  'Curl femoral','Buenos días',
+  'Peso muerto','Peso muerto rumano','Hip thrust','Abducción cadera',
+  'Press militar','Press Arnold','Elevaciones laterales','Elevaciones frontales',
+  'Pájaros','Face pulls',
+  'Remo barra','Remo mancuerna','Remo cable','Jalones polea','Pull-ups','Dominadas',
+  'Curl bíceps barra','Curl mancuerna','Curl martillo','Curl concentrado',
+  'Tríceps polea','Tríceps francés','Extensión tríceps cabeza','Fondos tríceps',
+  'Plancha','Crunch','Elevación piernas','Ab wheel','Russian twist',
+];
+
+let db = loadDB();
+let ses = null;       // sesión activa
+let sesIdx = -1;      // índice en db.sesiones (-1 = nueva)
+let pickerFor = null; // null = añadir ejercicio, number = renombrar ejercicio[n]
+
+function loadDB() {
+  try {
+    const raw = localStorage.getItem(LS);
+    if (raw) {
+      const p = JSON.parse(raw);
+      p.ejercicios_predefinidos = [
+        ...new Set([...PREDEFINED, ...(p.ejercicios_predefinidos || [])])
+      ];
+      return p;
+    }
+  } catch(e) {}
+  return { version: 1, ejercicios_predefinidos: [...PREDEFINED], sesiones: [] };
+}
+
+function saveDB() { localStorage.setItem(LS, JSON.stringify(db)); }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// NAVIGATION
+// ─────────────────────────────────────────────────────────────────────────────
+function goSession() {
+  document.getElementById('scr-home').classList.add('behind');
+  document.getElementById('scr-session').classList.add('active');
+}
+function goHome() {
+  document.getElementById('scr-session').classList.remove('active');
+  document.getElementById('scr-home').classList.remove('behind');
+  renderHome();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HOME
+// ─────────────────────────────────────────────────────────────────────────────
+function renderHome() {
+  const el = document.getElementById('sessions-list');
+  if (!db.sesiones.length) {
+    el.innerHTML = `<div class="empty-state">
+      <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round">
+        <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
+      </svg>
+      <p>Sin sesiones todavía.<br>Empieza la primera.</p>
+    </div>`;
+    return;
+  }
+  const sorted = db.sesiones.map((s,i) => ({...s,_i:i})).reverse();
+  let html = `<div class="list-label">Sesiones</div>`;
+  sorted.forEach(s => {
+    const ex = s.ejercicios.length;
+    const sets = s.ejercicios.reduce((a,e) => a + e.series.length, 0);
+    html += `<div class="card">
+      <div class="card-main" data-idx="${s._i}">
+        <div class="card-info">
+          <div class="card-date">${fmtDate(s.fecha)}</div>
+          <div class="card-name">${esc(s.nombre)}</div>
+          <div class="card-meta">${ex} ejercicio${ex!==1?'s':''} · ${sets} serie${sets!==1?'s':''}</div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--mut)" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="card-repeat" data-repeat="${s._i}">
+        <span>↺ Repetir sesión</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--acc)" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      </div>
+    </div>`;
+  });
+  el.innerHTML = html;
+}
+
+document.getElementById('sessions-list').addEventListener('click', e => {
+  const main = e.target.closest('[data-idx]');
+  const rep  = e.target.closest('[data-repeat]');
+  if (main) openSes(+main.dataset.idx);
+  if (rep)  repeatSes(+rep.dataset.repeat);
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SESSION LIFECYCLE
+// ─────────────────────────────────────────────────────────────────────────────
+function newSes() {
+  const today = todayStr();
+  ses = { id: String(Date.now()), fecha: today, nombre: 'Sesión — ' + fmtDate(today), ejercicios: [] };
+  sesIdx = -1;
+  startSesScreen();
+}
+
+function openSes(idx) {
+  sesIdx = idx;
+  ses = JSON.parse(JSON.stringify(db.sesiones[idx]));
+  startSesScreen();
+}
+
+function repeatSes(idx) {
+  const orig = db.sesiones[idx];
+  const today = todayStr();
+  ses = {
+    id: String(Date.now()), fecha: today,
+    nombre: orig.nombre,
+    ejercicios: orig.ejercicios.map(e => ({ nombre: e.nombre, series: [] }))
+  };
+  sesIdx = -1;
+  startSesScreen();
+}
+
+function startSesScreen() {
+  const titleEl = document.getElementById('ses-title');
+  titleEl.textContent = ses.nombre;
+  titleEl.contentEditable = 'true';
+  renderSession();
+  goSession();
+}
+
+// autosave
+let saveTimer;
+function autosave() {
+  dot(true);
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    commitSave();
+    dot(false);
+  }, 400);
+}
+
+function commitSave() {
+  const t = document.getElementById('ses-title');
+  ses.nombre = t.textContent.trim() || ses.nombre;
+  if (sesIdx === -1) {
+    db.sesiones.push(ses);
+    sesIdx = db.sesiones.length - 1;
+  } else {
+    db.sesiones[sesIdx] = ses;
+  }
+  saveDB();
+}
+
+function dot(on) {
+  document.getElementById('save-dot').classList.toggle('on', on);
+}
+
+// title blur
+document.getElementById('ses-title').addEventListener('blur', () => {
+  if (!ses) return;
+  ses.nombre = document.getElementById('ses-title').textContent.trim() || ses.nombre;
+  autosave();
+});
+document.getElementById('ses-title').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); }
+});
+
+// back
+document.getElementById('btn-back').addEventListener('click', () => {
+  commitSave();
+  goHome();
+});
+
+// delete session
+document.getElementById('btn-del-ses').addEventListener('click', () => {
+  document.getElementById('del-overlay').classList.add('open');
+});
+document.getElementById('del-cancel').addEventListener('click', () => {
+  document.getElementById('del-overlay').classList.remove('open');
+});
+document.getElementById('del-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('del-overlay'))
+    document.getElementById('del-overlay').classList.remove('open');
+});
+document.getElementById('del-confirm').addEventListener('click', () => {
+  document.getElementById('del-overlay').classList.remove('open');
+  if (sesIdx !== -1) { db.sesiones.splice(sesIdx, 1); saveDB(); }
+  ses = null; sesIdx = -1;
+  goHome();
+  toast('Sesión eliminada');
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SESSION RENDER
+// ─────────────────────────────────────────────────────────────────────────────
+function renderSession() {
+  const container = document.getElementById('exercises');
+  container.innerHTML = '';
+  ses.ejercicios.forEach((ex, ei) => {
+    container.appendChild(buildExBlock(ex, ei));
+  });
+}
+
+function buildExBlock(ex, ei) {
+  const div = document.createElement('div');
+  div.className = 'ex-block';
+  div.id = `ex${ei}`;
+
+  // series rows
+  let serHTML = '';
+  ex.series.forEach((s, si) => {
+    serHTML += `<div class="serie-row" id="sr${ei}-${si}">
+      <span class="serie-n">${si+1}</span>
+      <div class="serie-field">
+        <label>REPS</label>
+        <input class="serie-input" type="number" inputmode="numeric" min="0" max="99"
+          value="${s.reps !== '' ? s.reps : ''}" placeholder="—"
+          data-ei="${ei}" data-si="${si}" data-f="reps">
+      </div>
+      <div class="serie-field">
+        <label>KG</label>
+        <input class="serie-input" type="number" inputmode="decimal" min="0" step="0.5"
+          value="${s.kg !== '' ? s.kg : ''}" placeholder="—"
+          data-ei="${ei}" data-si="${si}" data-f="kg">
+      </div>
+      <button class="serie-del" data-del-serie="${ei}-${si}">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>`;
+  });
+
+  div.innerHTML = `
+    <div class="ex-hdr">
+      <button class="ex-name" data-rename="${ei}">
+        ${esc(ex.nombre)} <span>▾</span>
+      </button>
+    </div>
+    <div class="serie-list">${serHTML}</div>
+    <div class="ex-foot">
+      <button class="ex-foot-btn" data-add-serie="${ei}">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        SERIE
+      </button>
+      <button class="ex-foot-btn" data-dup-serie="${ei}">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        IGUAL
+      </button>
+      <button class="ex-foot-btn del" data-del-ex="${ei}">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+        QUITAR
+      </button>
+    </div>`;
+  return div;
+}
+
+// delegate all session interactions
+document.getElementById('ses-scroll').addEventListener('click', e => {
+  const rename   = e.target.closest('[data-rename]');
+  const addSerie = e.target.closest('[data-add-serie]');
+  const dupSerie = e.target.closest('[data-dup-serie]');
+  const delSerie = e.target.closest('[data-del-serie]');
+  const delEx    = e.target.closest('[data-del-ex]');
+
+  if (rename)   { openPicker(+rename.dataset.rename); return; }
+  if (addSerie) { addSet(+addSerie.dataset.addSerie); return; }
+  if (dupSerie) { dupLastSet(+dupSerie.dataset.dupSerie); return; }
+  if (delEx)    { removeEx(+delEx.dataset.delEx); return; }
+  if (delSerie) {
+    const [ei, si] = delSerie.dataset.delSerie.split('-').map(Number);
+    removeSet(ei, si); return;
+  }
+});
+
+document.getElementById('ses-scroll').addEventListener('change', e => {
+  const inp = e.target.closest('.serie-input');
+  if (!inp) return;
+  const {ei, si, f} = inp.dataset;
+  ses.ejercicios[+ei].series[+si][f] = inp.value === '' ? '' : parseFloat(inp.value);
+  autosave();
+});
+
+document.getElementById('ses-scroll').addEventListener('focus', e => {
+  if (e.target.classList.contains('serie-input')) e.target.select();
+}, true);
+
+document.getElementById('btn-add-ex').addEventListener('click', () => openPicker(null));
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EXERCISE OPS
+// ─────────────────────────────────────────────────────────────────────────────
+function addEx(nombre) {
+  ses.ejercicios.push({ nombre, series: [] });
+  autosave();
+  renderSession();
+  setTimeout(() => {
+    document.getElementById('ses-scroll').scrollTo({ top: 99999, behavior: 'smooth' });
+  }, 60);
+}
+
+function renameEx(ei, nombre) {
+  ses.ejercicios[ei].nombre = nombre;
+  autosave();
+  // patch just the button text
+  const btn = document.querySelector(`#ex${ei} .ex-name`);
+  if (btn) btn.innerHTML = `${esc(nombre)} <span>▾</span>`;
+}
+
+function removeEx(ei) {
+  ses.ejercicios.splice(ei, 1);
+  autosave();
+  renderSession();
+}
+
+function addSet(ei) {
+  ses.ejercicios[ei].series.push({ reps: '', kg: '' });
+  autosave();
+  renderSession();
+  setTimeout(() => {
+    const inputs = document.querySelectorAll(`#ex${ei} .serie-input`);
+    if (inputs.length) inputs[inputs.length - 2].focus();
+  }, 60);
+}
+
+function dupLastSet(ei) {
+  const series = ses.ejercicios[ei].series;
+  if (!series.length) { addSet(ei); return; }
+  const last = series[series.length - 1];
+  series.push({ reps: last.reps, kg: last.kg });
+  autosave();
+  renderSession();
+  toast('Serie duplicada');
+}
+
+function removeSet(ei, si) {
+  ses.ejercicios[ei].series.splice(si, 1);
+  autosave();
+  renderSession();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PICKER
+// ─────────────────────────────────────────────────────────────────────────────
+function openPicker(forEx) {
+  pickerFor = forEx;
+  document.getElementById('picker-q').value = '';
+  renderPicker('');
+  document.getElementById('picker-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('picker-q').focus(), 120);
+}
+
+function closePicker() {
+  document.getElementById('picker-overlay').classList.remove('open');
+  document.getElementById('picker-q').blur();
+}
+
+document.getElementById('picker-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('picker-overlay')) closePicker();
+});
+document.getElementById('picker-close').addEventListener('click', closePicker);
+document.getElementById('picker-q').addEventListener('input', e => renderPicker(e.target.value));
+
+function renderPicker(q) {
+  const qn = q.trim().toLowerCase();
+  const list = document.getElementById('picker-items');
+  const matches = db.ejercicios_predefinidos
+    .filter(n => !qn || n.toLowerCase().includes(qn))
+    .sort((a,b) => a.localeCompare(b, 'es'));
+
+  let html = '';
+  const exactMatch = db.ejercicios_predefinidos.some(n => n.toLowerCase() === qn);
+  if (qn && !exactMatch) {
+    const cap = q.trim().charAt(0).toUpperCase() + q.trim().slice(1);
+    html += `<div class="picker-item new" data-new="${esc(cap)}">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      Añadir "${esc(cap)}"
+    </div>`;
+  }
+  matches.forEach(n => {
+    html += `<div class="picker-item" data-pick="${esc(n)}">${esc(n)}</div>`;
+  });
+  if (!html) html = `<div style="padding:28px;text-align:center;color:var(--mut);font-size:17px;">Sin resultados</div>`;
+  list.innerHTML = html;
+}
+
+document.getElementById('picker-items').addEventListener('click', e => {
+  const pick = e.target.closest('[data-pick]');
+  const newEx = e.target.closest('[data-new]');
+  if (pick) { selectEx(pick.dataset.pick); return; }
+  if (newEx) {
+    const n = newEx.dataset.new;
+    if (!db.ejercicios_predefinidos.includes(n)) {
+      db.ejercicios_predefinidos.push(n);
+      saveDB();
+    }
+    selectEx(n);
+    toast(`"${n}" guardado`);
+  }
+});
+
+function selectEx(nombre) {
+  closePicker();
+  if (pickerFor === null) addEx(nombre);
+  else renameEx(pickerFor, nombre);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EXPORT / IMPORT
+// ─────────────────────────────────────────────────────────────────────────────
+document.getElementById('btn-export').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'gym_manu.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('JSON exportado');
+});
+
+document.getElementById('btn-import').addEventListener('click', () => {
+  document.getElementById('file-import').click();
+});
+
+document.getElementById('file-import').addEventListener('change', e => {
+  const f = e.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try {
+      const parsed = JSON.parse(ev.target.result);
+      if (parsed.sesiones) {
+        db = parsed;
+        db.ejercicios_predefinidos = [...new Set([...PREDEFINED, ...(db.ejercicios_predefinidos || [])])];
+        saveDB();
+        renderHome();
+        toast('Datos importados');
+      }
+    } catch(err) { toast('Error al importar'); }
+  };
+  r.readAsText(f);
+  e.target.value = '';
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────────────────────────────────────
+document.getElementById('btn-new').addEventListener('click', newSes);
+
+function todayStr() { return new Date().toISOString().slice(0,10); }
+
+function fmtDate(d) {
+  if (!d) return '';
+  return new Date(d + 'T12:00:00').toLocaleDateString('es-ES',
+    { day:'2-digit', month:'short', year:'numeric' }).replace('.','');
+}
+
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────────────────────
+renderHome();
+</script>
+</body>
+</html>
