@@ -150,10 +150,10 @@
     <!-- KPI 1: APPS LEAK -->
     <div class="form-group">
       <label>Horas en apps de leak esta semana
-        <span class="hint">RRSS + 20minutos + El Correo + WhatsApp · suma del Tiempo de Uso</span>
+        <span class="hint">WhatsApp + Instagram · suma del Tiempo de Uso · Objetivo: &lt; 2h/día</span>
       </label>
-      <input type="number" id="leakHours" step="0.1" min="0" max="100" placeholder="ej. 8.5" inputmode="decimal">
-      <div class="kpi-protocol">Cada lunes: Configuración → Tiempo de Uso (iOS) / Bienestar Digital (Android) → últimos 7 días → suma de las 4 categorías.</div>
+      <input type="number" id="leakHours" step="0.1" min="0" max="100" placeholder="ej. 12.5" inputmode="decimal">
+      <div class="kpi-protocol">Cada lunes: Configuración → Tiempo de Uso (iOS) / Bienestar Digital (Android) → últimos 7 días → suma de WhatsApp + Instagram.</div>
     </div>
 
     <!-- KPI 2: TRABAJO PROFUNDO -->
@@ -378,6 +378,14 @@ function trendBadge(current, previous, lowerIsBetter = true) {
   return `<span class="kpi-trend ${cls}">${arrow} ${val}</span>`;
 }
 
+function leakStatus(weeklyHours) {
+  if (weeklyHours === null || weeklyHours === undefined) return ['—', 'status-empty'];
+  const daily = weeklyHours / 7;
+  if (daily < 2) return [`${daily.toFixed(1)}h/día`, 'status-ok'];
+  if (daily < 3) return [`${daily.toFixed(1)}h/día`, 'status-warn'];
+  return [`${daily.toFixed(1)}h/día`, 'status-bad'];
+}
+
 function gymStatus(n) {
   if (n === null || n === undefined) return ['—', 'status-empty'];
   if (n === 3) return [`${n}/3`, 'status-ok'];
@@ -409,8 +417,9 @@ function renderHome() {
   } else {
     const [tpV, tpC] = tpStatus(lastWeek.dwCaptured, lastWeek.dwAvailable);
     const [gymV, gymC] = gymStatus(lastWeek.gymSessions);
+    const [leakV, leakC] = leakStatus(lastWeek.leakHours);
 
-    // Leak hours
+    // Leak hours trend (lower is better)
     const leakTrend = prevWeek ? trendBadge(lastWeek.leakHours, prevWeek.leakHours, true) : '';
     // Weight (only if not morning week)
     const weightTrend = (prevWeek && lastWeek.weight !== null && prevWeek.weight !== null) ?
@@ -420,9 +429,9 @@ function renderHome() {
       <div class="card green">
         <div class="kpi-row">
           <span class="kpi-name">Horas en apps de leak</span>
-          <span class="kpi-value">${lastWeek.leakHours !== null ? lastWeek.leakHours.toFixed(1) + 'h' : '—'}</span>
+          <span class="kpi-trend ${leakC}">${leakV}</span>
         </div>
-        <div class="kpi-target">${lastWeek.leakHours !== null ? '~' + (lastWeek.leakHours/7).toFixed(1) + 'h/día media' : ''} ${leakTrend}</div>
+        <div class="kpi-target">${lastWeek.leakHours !== null ? lastWeek.leakHours.toFixed(1) + 'h/sem total' : '—'} · Objetivo &lt; 2h/día ${leakTrend}</div>
       </div>
       <div class="card green">
         <div class="kpi-row">
