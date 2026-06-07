@@ -1,0 +1,19 @@
+{
+  "name": "KPIs Vitales",
+  "short_name": "KPIs",
+  "description": "Sistema de KPIs Vitales · Manu",
+  "start_url": "kpis.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F7F8FA",
+  "theme_color": "#1F3A5F",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
