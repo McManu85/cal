@@ -54,22 +54,15 @@
       padding-bottom:max(32px,env(safe-area-inset-bottom)); }
 
     /* ── HOME BUTTONS ────────────────────────── */
-    .home-btns { padding:14px 14px 6px; display:flex; flex-direction:column; gap:8px; }
-    .btn-new { display:flex; align-items:center; justify-content:center; gap:10px;
-      height:62px; border-radius:var(--r); border:none;
-      background:var(--acc); color:#000;
-      font-family:'Bebas Neue',sans-serif;
-      font-size:22px; font-weight:400; letter-spacing:2px; text-transform:uppercase;
-      cursor:pointer; transition:opacity .12s; }
-    .btn-new:active { opacity:.82; }
-    .btn-tpl { display:flex; align-items:center; justify-content:center; gap:10px;
-      height:50px; border-radius:var(--r);
-      border:1.5px solid var(--b); background:none; color:var(--txt);
-      font-family:'DM Sans',sans-serif;
-      font-size:14px; font-weight:700; letter-spacing:.8px; text-transform:uppercase;
-      cursor:pointer; transition:background .12s; }
-    .btn-tpl:active { background:var(--s2); }
-    .btn-tpl svg { color:var(--acc); }
+    .home-btns { padding:12px 12px 6px; display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .btn-start { height:88px; border-radius:var(--r); border:none; cursor:pointer;
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; transition:opacity .15s; }
+    .btn-start:active { opacity:.75; }
+    .btn-start .bs-ico { flex-shrink:0; }
+    .btn-start .bs-lbl { font-family:'Bebas Neue',sans-serif; font-size:13px; letter-spacing:1.5px; text-align:center; line-height:1.25; }
+    .btn-start.accent { background:var(--acc); color:#000; }
+    .btn-start.outline { background:var(--s2); border:1px solid var(--border2,var(--b)); color:var(--txt); }
+
 
     /* ── SESSION CARDS ───────────────────────── */
     .list-label { font-family:'DM Sans',sans-serif; font-size:10px; font-weight:700; letter-spacing:2.5px;
@@ -309,13 +302,13 @@
   </div>
   <div class="scroll">
     <div class="home-btns">
-      <button class="btn-new" id="btn-new">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-        NUEVA SESIÓN
+      <button class="btn-start accent" id="btn-new">
+        <svg class="bs-ico" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        <span class="bs-lbl">SESIÓN<br>EN BLANCO</span>
       </button>
-      <button class="btn-tpl" id="btn-from-tpl">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-        DESDE PLANTILLA
+      <button class="btn-start outline" id="btn-from-tpl">
+        <svg class="bs-ico" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        <span class="bs-lbl">DESDE<br>PLANTILLA</span>
       </button>
     </div>
 
@@ -358,6 +351,9 @@
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
     </button>
     <div id="tpl-edit-title" class="hdr-title" contenteditable="false"></div>
+    <button class="ico acc" id="tpl-edit-save" title="Guardar plantilla">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </button>
     <button class="ico red" id="tpl-edit-del">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
     </button>
@@ -368,6 +364,7 @@
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
       AÑADIR EJERCICIO
     </button>
+    <button class="sheet-btn" id="tpl-edit-use" style="margin:8px 12px 4px;width:calc(100% - 24px)">INICIAR SESIÓN CON ESTA PLANTILLA</button>
   </div>
 </div>
 
@@ -915,6 +912,14 @@ function saveTpl() {
 
 document.getElementById('tpl-edit-back').addEventListener('click', () => {
   saveTpl(); showScreen('scr-home'); renderHome(); toast('Plantilla guardada');
+});
+document.getElementById('tpl-edit-save').addEventListener('click', () => {
+  saveTpl(); toast('Plantilla guardada ✓');
+});
+document.getElementById('tpl-edit-use').addEventListener('click', () => {
+  saveTpl();
+  const idx = tplIdx !== -1 ? tplIdx : db.plantillas.length - 1;
+  sesFromTpl(idx);
 });
 
 document.getElementById('tpl-edit-title').addEventListener('blur', () => {
