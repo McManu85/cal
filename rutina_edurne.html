@@ -18,7 +18,6 @@
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:'Jost',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden}
 
-/* ─── HEADER ─────────────────────────────────────────────────────────── */
 .hdr{max-width:740px;margin:0 auto;padding:4rem 2rem 2.5rem;border-bottom:1px solid var(--b)}
 .hdr-top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:1.6rem}
 .hdr-eyebrow{font-size:.6rem;letter-spacing:.35em;text-transform:uppercase;color:var(--muted)}
@@ -30,126 +29,105 @@ body{background:var(--bg);color:var(--text);font-family:'Jost',sans-serif;font-w
 .hdr-stat-lbl{font-size:.55rem;letter-spacing:.25em;text-transform:uppercase;color:var(--muted)}
 .hdr-stat-val{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--muted2)}
 
-/* ─── NAV ────────────────────────────────────────────────────────────── */
 .nav{max-width:740px;margin:0 auto;display:flex;gap:0;padding:0 2rem;border-bottom:1px solid var(--b);overflow-x:auto;scrollbar-width:none}
 .nav::-webkit-scrollbar{display:none}
 .nb{background:none;border:none;border-bottom:1px solid transparent;color:var(--muted);font-family:'Jost',sans-serif;font-size:.58rem;font-weight:400;letter-spacing:.25em;text-transform:uppercase;padding:.85rem 1.1rem;cursor:pointer;white-space:nowrap;transition:all .2s;margin-bottom:-1px}
 .nb:hover{color:var(--muted2)}
 .nb.active{color:var(--rose);border-bottom-color:var(--rose)}
 
-/* ─── CONTENT ────────────────────────────────────────────────────────── */
 .content{max-width:740px;margin:0 auto;padding:2.5rem 2rem}
 .panel{display:none}
 .panel.active{display:block;animation:fi .3s ease}
 @keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
 
-/* ─── SECTION HEADER ─────────────────────────────────────────────────── */
 .sh{margin-bottom:2rem}
 .sh .title{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;font-size:2rem;color:var(--rose);letter-spacing:.01em}
 .sh .desc{font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-top:.4rem}
 
-/* ─── SEMANA TIPO ────────────────────────────────────────────────────── */
-.turno-tabs{display:flex;gap:.5rem;margin-bottom:2rem;flex-wrap:wrap}
-.tb{background:none;border:1px solid var(--b);border-radius:2px;color:var(--muted);font-family:'Jost',sans-serif;font-size:.58rem;font-weight:400;letter-spacing:.2em;text-transform:uppercase;padding:.4rem .9rem;cursor:pointer;transition:all .2s}
-.tb:hover{border-color:var(--b2);color:var(--muted2)}
-.tb.active{border-color:var(--rose);color:var(--rose);background:var(--rose2)}
-.ciclo-sel{display:flex;align-items:center;gap:.5rem;margin-bottom:1.8rem}
-.ciclo-sel-lbl{font-size:.55rem;letter-spacing:.25em;text-transform:uppercase;color:var(--muted)}
-.ciclo-btn{background:none;border:1px solid var(--b);border-radius:2px;color:var(--muted);font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1rem;padding:.2rem .7rem;cursor:pointer;transition:all .2s}
-.ciclo-btn:hover{border-color:var(--rose);color:var(--rose)}
-.ciclo-btn.active{border-color:var(--rose);color:var(--bg);background:var(--rose)}
-
-/* ─── WEEK GRID ──────────────────────────────────────────────────────── */
-.wg{display:grid;grid-template-columns:repeat(7,1fr);gap:.4rem;margin-bottom:2rem}
-.dc{background:var(--s1);border:1px solid var(--b);border-radius:2px;padding:.6rem .3rem;text-align:center;position:relative;overflow:hidden;transition:all .25s}
+/* ── SEMANA ── */
+.wg{display:grid;grid-template-columns:repeat(7,1fr);gap:.4rem;margin-bottom:1.5rem}
+.dc{background:var(--s1);border:1px solid var(--b);border-radius:2px;padding:.7rem .3rem;text-align:center;position:relative;overflow:hidden;transition:all .25s}
 .dc.clickable{cursor:pointer}
 .dc.clickable:hover{border-color:var(--rose);background:var(--rose2)}
-.dc::before{content:'';position:absolute;top:0;left:0;right:0;height:1px}
-.dc.gym::before{background:var(--rose)}
-.dc.hiit::before{background:var(--gold)}
-.dc.tt::before{background:var(--sage)}
+.dc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.dc.fun::before{background:var(--rose)}
+.dc.sprint::before{background:var(--gold)}
 .dc.rest::before{background:var(--b2)}
-.dc.opt::before{background:linear-gradient(90deg,var(--sage),transparent)}
-.dn{font-size:.48rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:.3rem}
-.dtype{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:.9rem;margin-bottom:.2rem}
-.dc.gym .dtype{color:var(--rose)}
-.dc.hiit .dtype{color:var(--gold)}
-.dc.tt .dtype{color:var(--sage)}
-.dc.rest .dtype{color:var(--muted)}
-.dc.opt .dtype{color:var(--sage)}
+.dc.active-rest::before{background:linear-gradient(90deg,var(--sage),transparent)}
+.dn{font-size:.48rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem}
+.dtype{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:.95rem;margin-bottom:.15rem}
+.dc.fun .dtype{color:var(--rose)}
+.dc.sprint .dtype{color:var(--gold)}
+.dc.rest .dtype,.dc.active-rest .dtype{color:var(--muted)}
 .dtime{font-family:'JetBrains Mono',monospace;font-size:.5rem;color:var(--muted)}
-.dfocus{font-size:.5rem;color:var(--muted);margin-top:.15rem;line-height:1.3}
 
-/* ─── LEGEND ─────────────────────────────────────────────────────────── */
 .legend{display:flex;gap:1.5rem;flex-wrap:wrap;margin-bottom:1.8rem}
 .li{display:flex;align-items:center;gap:.4rem;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .ld{width:6px;height:6px;border-radius:50%}
 
-/* ─── CICLOS ─────────────────────────────────────────────────────────── */
-.ciclo-list{display:flex;flex-direction:column;gap:1px;border:1px solid var(--b);border-radius:2px;overflow:hidden;margin-bottom:2rem}
-.cc{background:var(--s1);cursor:pointer;overflow:hidden;transition:background .2s}
-.cc:hover{background:var(--s3)}
-.cc.expanded{background:var(--bg)}
-.cc-hdr{display:flex;align-items:center;gap:1.2rem;padding:1.1rem 1.4rem;border-bottom:1px solid transparent}
-.cc.expanded .cc-hdr{border-bottom-color:var(--b)}
-.cl{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;font-size:2.4rem;line-height:1;width:2rem;text-align:center;flex-shrink:0}
-.ca .cl{color:var(--gold)} .cb .cl{color:var(--rose)} .cc-c .cl{color:var(--sage)}
-.ci .cn{font-size:.55rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
-.ci .ct{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;font-size:1.1rem;margin:.1rem 0;color:var(--muted2)}
-.ci .cd{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--muted)}
-.cbadge{margin-left:auto;font-size:.55rem;letter-spacing:.15em;text-transform:uppercase;padding:.2rem .6rem;border-radius:1px;border:1px solid}
-.ca .cbadge{border-color:rgba(212,186,138,.3);color:var(--gold)} .cb .cbadge{border-color:rgba(200,160,144,.3);color:var(--rose)} .cc-c .cbadge{border-color:rgba(138,158,140,.3);color:var(--sage)}
-.cc-body{display:none;padding:0 1.4rem 1.4rem}
-.cc.expanded .cc-body{display:block;animation:fi .2s ease}
-.sb{margin-bottom:1.2rem}
-.sl{font-size:.55rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem;display:flex;align-items:center;gap:.5rem;margin-top:.9rem}
-.el{list-style:none}
-.el li{display:flex;align-items:center;gap:.6rem;font-size:.8rem;padding:.3rem 0;border-bottom:1px solid var(--b)}
-.el li:last-child{border-bottom:none}
-.en{flex:1;color:var(--muted2)}
-.es{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--muted);white-space:nowrap}
-.sn{border-left:2px solid var(--b2);padding-left:.8rem;font-size:.72rem;color:var(--muted);line-height:1.7;margin-top:.8rem}
-.sn em{color:var(--rose);font-style:normal}
+.note{border-left:2px solid var(--rose);padding-left:.9rem;margin-bottom:1.5rem;font-size:.75rem;color:var(--muted2);line-height:1.7}
+.note strong{color:var(--rose);font-weight:400}
 
-/* ─── CALENDARIO ─────────────────────────────────────────────────────── */
-.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.8rem;margin-bottom:2rem}
-.stat-box{background:var(--s1);border:1px solid var(--b);border-radius:2px;padding:.8rem 1rem}
-.stat-box-lbl{font-size:.5rem;letter-spacing:.25em;text-transform:uppercase;color:var(--muted);margin-bottom:.2rem}
-.stat-box-val{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.4rem;line-height:1}
-.stat-box-sub{font-size:.62rem;color:var(--muted);margin-top:.15rem}
-.cal-table{width:100%;border-collapse:collapse;font-size:.72rem}
-.cal-table th{text-align:left;padding:.45rem .7rem;font-size:.52rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--b2)}
-.cal-table td{padding:.5rem .7rem;border-bottom:1px solid var(--b);vertical-align:top}
-.cal-table tr:hover td{background:var(--s3)}
-.cal-table .wn{font-family:'JetBrains Mono',monospace;color:var(--muted);font-size:.65rem}
-.cal-table .dates{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--muted2)}
-.tpill{display:inline-block;font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;padding:.12rem .45rem;border-radius:1px;border:1px solid}
-.t-libre{border-color:rgba(138,158,140,.3);color:var(--sage)} .t-mananas{border-color:rgba(200,160,144,.3);color:var(--rose)} .t-tardes{border-color:rgba(212,186,138,.3);color:var(--gold)} .t-noches{border-color:rgba(125,112,96,.3);color:var(--muted2)} .t-dl{border-color:var(--b2);color:var(--muted)}
-.pp{display:inline-block;font-size:.52rem;letter-spacing:.08em;text-transform:uppercase;padding:.12rem .45rem;border-radius:1px;margin-left:.3rem}
-.ph-b{background:rgba(200,160,144,.1);color:var(--rose)} .ph-c{background:rgba(138,158,140,.1);color:var(--sage)} .ph-a{background:rgba(212,186,138,.1);color:var(--gold)} .ph-dl{background:rgba(125,112,96,.1);color:var(--muted2)}
-.cal-note{font-size:.6rem;color:var(--muted);margin-top:.15rem}
-.auto-c{font-size:.55rem;color:var(--rose)}
+/* ── EJERCICIOS ── */
+.day-card{background:var(--s1);border:1px solid var(--b);border-radius:2px;margin-bottom:1px;overflow:hidden}
+.day-card-hdr{display:flex;align-items:center;gap:1.2rem;padding:1.1rem 1.4rem;cursor:pointer;transition:background .2s;border-left:3px solid transparent}
+.day-card-hdr:hover{background:var(--s2)}
+.day-card.expanded .day-card-hdr{border-left-color:var(--rose)}
+.day-card.sp.expanded .day-card-hdr{border-left-color:var(--gold)}
+.day-card-letter{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;font-size:2.8rem;line-height:1;width:2.2rem;text-align:center;flex-shrink:0;color:var(--rose)}
+.day-card.sp .day-card-letter{color:var(--gold)}
+.day-card-info .dc-type{font-size:.52rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.day-card-info .dc-name{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;font-size:1.15rem;color:var(--muted2);margin:.1rem 0}
+.day-card-info .dc-meta{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--muted)}
+.day-card-body{display:none;padding:0 1.4rem 1.4rem;border-top:1px solid var(--b)}
+.day-card.expanded .day-card-body{display:block;animation:fi .2s ease}
+.section-lbl{font-size:.52rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin:1rem 0 .5rem;display:block}
+.wu-list{list-style:none;margin-bottom:.3rem}
+.wu-list li{font-size:.75rem;color:var(--muted2);padding:.18rem 0;border-bottom:1px solid var(--b);line-height:1.5;display:flex;gap:.4rem}
+.wu-list li:last-child{border-bottom:none}
+.wu-list li::before{content:'·';color:var(--rose);flex-shrink:0}
+.ex-table{width:100%;border-collapse:collapse}
+.ex-table th{text-align:left;font-size:.5rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);padding:.28rem .3rem;border-bottom:1px solid var(--b2)}
+.ex-table td{font-size:.76rem;padding:.38rem .3rem;border-bottom:1px solid var(--b);color:var(--muted2);vertical-align:top}
+.ex-table tr:last-child td{border-bottom:none}
+.td-s{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--rose);white-space:nowrap}
+.td-c{font-size:.68rem;color:var(--muted)}
+.td-r{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--muted);white-space:nowrap}
+.day-card.sp .td-s{color:var(--gold)}
+.day-note{border-left:1px solid var(--b2);padding-left:.7rem;font-size:.68rem;color:var(--muted);line-height:1.6;margin-top:.9rem}
+.prog-block{background:var(--s2);border-radius:2px;padding:.7rem .9rem;margin-top:.7rem;font-size:.72rem;color:var(--muted2);line-height:1.7}
+.prog-block strong{color:var(--rose);font-weight:400}
 
-/* ─── AYUNO ──────────────────────────────────────────────────────────── */
-.ayuno-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-bottom:2rem}
-.ac{background:var(--s1);border:1px solid var(--b);border-radius:2px;padding:1.1rem}
-.ac-title{font-size:.55rem;letter-spacing:.2em;text-transform:uppercase;color:var(--rose);margin-bottom:.7rem}
-.ac ul{list-style:none}
-.ac ul li{font-size:.75rem;color:var(--muted2);padding:.25rem 0;border-bottom:1px solid var(--b);line-height:1.5;display:flex;gap:.5rem}
-.ac ul li:last-child{border-bottom:none}
-.ac ul li::before{content:'·';color:var(--rose);flex-shrink:0}
-.timeline-h{display:flex;background:var(--s1);border:1px solid var(--b);border-radius:2px;overflow:hidden;margin-bottom:2rem}
-.tslot{flex:1;padding:.7rem .4rem;text-align:center;border-right:1px solid var(--b)}
-.tslot:last-child{border-right:none}
-.ts-time{font-family:'JetBrains Mono',monospace;font-size:.52rem;color:var(--muted);margin-bottom:.15rem}
-.ts-label{font-size:.6rem;font-weight:400}
-.ts-note{font-size:.5rem;color:var(--muted);margin-top:.1rem}
-.tslot.ayuno-z{background:rgba(158,90,82,.06)}
-.tslot.eat-z{background:rgba(74,110,90,.06)}
-.tslot.train-z{background:rgba(158,90,82,.07)}
-.ts-label.a{color:var(--muted2)} .ts-label.e{color:var(--sage)} .ts-label.t{color:var(--rose)}
+/* ── STAT BOXES ── */
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.8rem;margin-bottom:2rem}
+.stat-box{background:var(--s1);border:1px solid var(--b);border-radius:2px;padding:.9rem 1rem}
+.stat-box-lbl{font-size:.5rem;letter-spacing:.25em;text-transform:uppercase;color:var(--muted);margin-bottom:.3rem}
+.stat-box-val{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.5rem;line-height:1}
+.stat-box-sub{font-size:.62rem;color:var(--muted);margin-top:.2rem}
 
-/* ─── PRINCIPIOS / HABITOS ───────────────────────────────────────────── */
+/* ── NUTRICIÓN ── */
+.macro-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-bottom:2rem}
+.macro-box{background:var(--s1);border:1px solid var(--b);border-radius:2px;padding:.8rem .7rem;text-align:center}
+.macro-val{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.8rem;line-height:1}
+.macro-val.p{color:var(--rose)} .macro-val.c{color:var(--gold)} .macro-val.f{color:var(--sage)} .macro-val.k{color:var(--muted2)}
+.macro-lbl{font-size:.5rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-top:.2rem}
+.macro-sub{font-size:.6rem;color:var(--muted);margin-top:.15rem}
+.nutr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-bottom:2rem}
+.nc{background:var(--s1);border:1px solid var(--b);border-radius:2px;padding:1.1rem}
+.nc .nc-title{font-size:.55rem;letter-spacing:.2em;text-transform:uppercase;color:var(--rose);margin-bottom:.7rem}
+.nc ul{list-style:none}
+.nc ul li{font-size:.75rem;color:var(--muted2);padding:.25rem 0;border-bottom:1px solid var(--b);line-height:1.5}
+.nc ul li:last-child{border-bottom:none}
+.day-types{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-bottom:2rem}
+.dt-box{background:var(--s1);border:1px solid var(--b);border-radius:2px;padding:.8rem .9rem}
+.dt-lbl{font-size:.5rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem}
+.dt-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1rem;margin-bottom:.4rem}
+.dt-box.gym-d .dt-title{color:var(--rose)} .dt-box.sprint-d .dt-title{color:var(--gold)} .dt-box.rest-d .dt-title{color:var(--muted2)}
+.dt-rows{list-style:none}
+.dt-rows li{font-size:.65rem;color:var(--muted2);padding:.12rem 0;border-bottom:1px solid var(--b)}
+.dt-rows li:last-child{border-bottom:none}
+
+/* ── PRINCIPIOS / HÁBITOS ── */
 .pr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
 .pr-card{background:var(--s1);border:1px solid var(--b);border-radius:2px;padding:1.1rem}
 .pr-card .pc-title{font-size:.55rem;letter-spacing:.2em;text-transform:uppercase;color:var(--rose);margin-bottom:.7rem}
@@ -157,48 +135,40 @@ body{background:var(--bg);color:var(--text);font-family:'Jost',sans-serif;font-w
 .pr-card ul li{font-size:.75rem;color:var(--muted2);padding:.25rem 0;border-bottom:1px solid var(--b);line-height:1.5}
 .pr-card ul li:last-child{border-bottom:none}
 
-/* ─── NOTE BOX ───────────────────────────────────────────────────────── */
-.note{border-left:2px solid var(--rose);padding-left:.9rem;margin-bottom:1.5rem;font-size:.75rem;color:var(--muted2);line-height:1.7}
-.note strong{color:var(--rose);font-weight:400}
-
-/* ─── MODAL ──────────────────────────────────────────────────────────── */
+/* ── MODAL ── */
 .modal-ov{position:fixed;inset:0;background:rgba(30,26,20,.6);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .25s;padding:1rem}
 .modal-ov.open{opacity:1;pointer-events:all}
 .modal-bx{background:var(--s1);border:1px solid var(--b);box-shadow:0 8px 40px rgba(0,0,0,.12);border-radius:2px;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;transform:translateY(10px);transition:transform .3s;scrollbar-width:thin;scrollbar-color:var(--b2) transparent}
 .modal-ov.open .modal-bx{transform:translateY(0)}
 .modal-head{display:flex;align-items:flex-start;justify-content:space-between;padding:1.2rem 1.4rem 1rem;border-bottom:1px solid var(--b);position:sticky;top:0;background:var(--s1);z-index:1}
-.modal-day{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;font-size:1.6rem;line-height:1;color:var(--rose)}
+.modal-day{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;font-size:1.7rem;line-height:1;color:var(--rose)}
 .modal-sess{font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted2);margin-top:.2rem}
-.modal-badge{font-size:.5rem;letter-spacing:.15em;text-transform:uppercase;padding:.1rem .45rem;border-radius:1px;border:1px solid;margin-top:.3rem;display:inline-block}
-.modal-cb-b{border-color:rgba(200,160,144,.3);color:var(--rose)} .modal-cb-c{border-color:rgba(138,158,140,.3);color:var(--sage)} .modal-cb-a{border-color:rgba(212,186,138,.3);color:var(--gold)}
 .modal-x{background:none;border:none;color:var(--muted);font-size:1rem;cursor:pointer;padding:.3rem .4rem;transition:color .15s}
 .modal-x:hover{color:var(--text)}
 .modal-body{padding:1.1rem 1.4rem 1.5rem}
 .m-label{font-size:.52rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem;margin-top:.9rem;display:block}
 .m-label:first-child{margin-top:0}
-.m-wu{list-style:none;margin-bottom:.2rem}
-.m-wu li{font-size:.76rem;color:var(--muted2);padding:.18rem 0;display:flex;gap:.4rem;line-height:1.5}
+.m-wu{list-style:none}
+.m-wu li{font-size:.76rem;color:var(--muted2);padding:.18rem 0;border-bottom:1px solid var(--b);line-height:1.5;display:flex;gap:.4rem}
+.m-wu li:last-child{border-bottom:none}
 .m-wu li::before{content:'·';color:var(--rose);flex-shrink:0}
-.m-struct{border-left:2px solid var(--rose);padding-left:.7rem;font-size:.7rem;color:var(--rose);margin-bottom:.7rem;line-height:1.5}
 .m-table{width:100%;border-collapse:collapse}
 .m-table th{text-align:left;font-size:.5rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);padding:.25rem .3rem;border-bottom:1px solid var(--b2)}
 .m-table td{font-size:.76rem;padding:.35rem .3rem;border-bottom:1px solid var(--b);vertical-align:top;color:var(--muted2)}
 .m-table tr:last-child td{border-bottom:none}
-.td-s{font-family:'JetBrains Mono',monospace;font-size:.64rem;color:var(--rose);white-space:nowrap}
-.td-c{font-size:.68rem;color:var(--muted)}
-.td-r{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--muted);white-space:nowrap}
+.mt-s{font-family:'JetBrains Mono',monospace;font-size:.64rem;color:var(--rose);white-space:nowrap}
+.mt-c{font-size:.68rem;color:var(--muted)}
 .m-nota{border-left:1px solid var(--b2);padding-left:.7rem;font-size:.68rem;color:var(--muted);line-height:1.6;margin-top:.8rem}
-.m-blk{margin-top:.8rem}
-.m-blk-title{font-size:.55rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:.3rem;padding-bottom:.2rem;border-bottom:1px solid var(--b)}
 .m-special{text-align:center;padding:2rem 1.5rem}
 .m-sp-icon{font-size:2rem;margin-bottom:.5rem;opacity:.5}
 .m-sp-label{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.4rem;color:var(--rose)}
 .m-sp-desc{font-size:.73rem;color:var(--muted);margin-top:.3rem;line-height:1.6}
 
 @media(max-width:580px){
-  .wg{gap:.25rem}.dc{padding:.4rem .2rem}.dtype{font-size:.75rem}.dtime,.dfocus{display:none}
+  .wg{gap:.25rem}.dc{padding:.45rem .2rem}.dtime{display:none}
   .hdr,.nav,.content{padding-left:1.2rem;padding-right:1.2rem}
-  .timeline-h{flex-direction:column}.tslot{border-right:none;border-bottom:1px solid var(--b)}
+  .macro-grid{grid-template-columns:repeat(2,1fr)}
+  .day-types{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -210,221 +180,402 @@ body{background:var(--bg);color:var(--text);font-family:'Jost',sans-serif;font-w
     <span class="hdr-date">Junio 2026</span>
   </div>
   <div class="hdr-title">Edurne</div>
-  <div class="hdr-sub">Recomposición corporal · 18 semanas</div>
+  <div class="hdr-sub">Fuerza funcional · masa muscular · composición saludable</div>
   <div class="hdr-stats">
-    <div class="hdr-stat"><span class="hdr-stat-lbl">Perfil</span><span class="hdr-stat-val">41 a · 95 kg · 1.81 m</span></div>
-    <div class="hdr-stat"><span class="hdr-stat-lbl">Deporte</span><span class="hdr-stat-val">Tenis de mesa + Gym × 3</span></div>
-    <div class="hdr-stat"><span class="hdr-stat-lbl">Objetivo</span><span class="hdr-stat-val">~12% grasa corporal</span></div>
-    <div class="hdr-stat"><span class="hdr-stat-lbl">Inicio</span><span class="hdr-stat-val">8 junio 2026</span></div>
+    <div class="hdr-stat"><span class="hdr-stat-lbl">Perfil</span><span class="hdr-stat-val">41 a · 60 kg · 1.70 m</span></div>
+    <div class="hdr-stat"><span class="hdr-stat-lbl">Entrena</span><span class="hdr-stat-val">Funcional × 2 + Sprints × 1</span></div>
+    <div class="hdr-stat"><span class="hdr-stat-lbl">Objetivo</span><span class="hdr-stat-val">Ganar masa muscular</span></div>
+    <div class="hdr-stat"><span class="hdr-stat-lbl">Proteína</span><span class="hdr-stat-val">120 – 130 g / día</span></div>
   </div>
 </header>
 
 <nav class="nav">
   <button class="nb active" onclick="showP('semana',this)">Semana</button>
-  <button class="nb" onclick="showP('ciclos',this)">Ciclos</button>
-  <button class="nb" onclick="showP('calendario',this)">Calendario</button>
-  <button class="nb" onclick="showP('ayuno',this)">Ayuno</button>
+  <button class="nb" onclick="showP('ejercicios',this)">Ejercicios</button>
+  <button class="nb" onclick="showP('nutricion',this)">Nutrición</button>
   <button class="nb" onclick="showP('principios',this)">Principios</button>
   <button class="nb" onclick="showP('habitos',this)">Hábitos</button>
 </nav>
 
 <div class="content">
 
-<!-- ── SEMANA ─────────────────────────────────────────────────────────── -->
+<!-- ══ SEMANA ══════════════════════════════════════════════════════════ -->
 <div id="panel-semana" class="panel active">
-  <div class="sh"><div class="title">Semana tipo</div><div class="desc">Toca cualquier día para ver la sesión</div></div>
-
-  <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:1.5rem">
-    <span class="ciclo-sel-lbl">Ciclo</span>
-    <button class="ciclo-btn active" id="ciclo-btn-B" onclick="setCiclo('B')">B</button>
-    <button class="ciclo-btn" id="ciclo-btn-C" onclick="setCiclo('C')">C</button>
-    <button class="ciclo-btn" id="ciclo-btn-A" onclick="setCiclo('A')">A</button>
-  </div>
-
-  <div class="turno-tabs">
-    <button class="tb active" onclick="showT('libre',this)">Libre</button>
-    <button class="tb" onclick="showT('tardes',this)">Tardes</button>
-    <button class="tb" onclick="showT('noches',this)">Noches</button>
-    <button class="tb" onclick="showT('mananas',this)">Mañanas</button>
+  <div class="sh">
+    <div class="title">Semana tipo</div>
+    <div class="desc">3 sesiones · toca un día para ver el detalle</div>
   </div>
 
   <div class="legend">
-    <div class="li"><div class="ld" style="background:var(--rose)"></div>Gym</div>
-    <div class="li"><div class="ld" style="background:var(--gold)"></div>HIIT</div>
-    <div class="li"><div class="ld" style="background:var(--sage)"></div>Tenis</div>
-    <div class="li"><div class="ld" style="background:var(--sage);opacity:.5"></div>Casa</div>
+    <div class="li"><div class="ld" style="background:var(--rose)"></div>Funcional</div>
+    <div class="li"><div class="ld" style="background:var(--gold)"></div>Sprints</div>
     <div class="li"><div class="ld" style="background:var(--b2)"></div>Descanso</div>
+    <div class="li"><div class="ld" style="background:var(--sage)"></div>Activo</div>
   </div>
 
-  <div id="t-libre">
-    <div class="wg">
-      <div class="dc gym clickable" onclick="openDay('lunes')"><div class="dn">Lun</div><div class="dtype">gym</div><div class="dtime">09:00</div></div>
-      <div class="dc tt clickable" onclick="openDay('martes')"><div class="dn">Mar</div><div class="dtype">tt</div><div class="dtime">16:00</div></div>
-      <div class="dc gym clickable" onclick="openDay('miercoles')"><div class="dn">Mié</div><div class="dtype">gym</div><div class="dtime">12:00</div></div>
-      <div class="dc tt clickable" onclick="openDay('jueves')"><div class="dn">Jue</div><div class="dtype">tt</div><div class="dtime">16:00</div></div>
-      <div class="dc gym clickable" onclick="openDay('viernes')"><div class="dn">Vie</div><div class="dtype">gym</div><div class="dtime">12:00</div></div>
-      <div class="dc opt clickable" onclick="openDay('sabado')"><div class="dn">Sáb</div><div class="dtype">casa?</div></div>
-      <div class="dc rest clickable" onclick="openDay('domingo')"><div class="dn">Dom</div><div class="dtype">off</div></div>
+  <div class="wg">
+    <div class="dc fun clickable" onclick="openDay('lunes')">
+      <div class="dn">Lun</div><div class="dtype">func A</div><div class="dtime">preferible</div>
+    </div>
+    <div class="dc active-rest clickable" onclick="openDay('martes')">
+      <div class="dn">Mar</div><div class="dtype">activo</div>
+    </div>
+    <div class="dc sprint clickable" onclick="openDay('miercoles')">
+      <div class="dn">Mié</div><div class="dtype">sprints</div><div class="dtime">20–30 min</div>
+    </div>
+    <div class="dc active-rest clickable" onclick="openDay('jueves')">
+      <div class="dn">Jue</div><div class="dtype">activo</div>
+    </div>
+    <div class="dc fun clickable" onclick="openDay('viernes')">
+      <div class="dn">Vie</div><div class="dtype">func B</div><div class="dtime">preferible</div>
+    </div>
+    <div class="dc rest clickable" onclick="openDay('sabado')">
+      <div class="dn">Sáb</div><div class="dtype">off</div>
+    </div>
+    <div class="dc rest clickable" onclick="openDay('domingo')">
+      <div class="dn">Dom</div><div class="dtype">off</div>
     </div>
   </div>
-  <div id="t-tardes" style="display:none">
-    <div class="wg">
-      <div class="dc gym clickable" onclick="openDay('lunes')"><div class="dn">Lun</div><div class="dtype">gym</div><div class="dtime">09:00</div></div>
-      <div class="dc tt clickable" onclick="openDay('martes')"><div class="dn">Mar</div><div class="dtype">tt</div><div class="dtime">16:00</div></div>
-      <div class="dc gym clickable" onclick="openDay('miercoles')"><div class="dn">Mié</div><div class="dtype">gym</div><div class="dtime">11:30</div></div>
-      <div class="dc tt clickable" onclick="openDay('jueves')"><div class="dn">Jue</div><div class="dtype">tt</div><div class="dtime">16:00</div></div>
-      <div class="dc gym clickable" onclick="openDay('viernes')"><div class="dn">Vie</div><div class="dtype">gym</div><div class="dtime">11:30</div></div>
-      <div class="dc opt clickable" onclick="openDay('sabado')"><div class="dn">Sáb</div><div class="dtype">casa?</div></div>
-      <div class="dc rest clickable" onclick="openDay('domingo')"><div class="dn">Dom</div><div class="dtype">off</div></div>
-    </div>
-  </div>
-  <div id="t-noches" style="display:none">
-    <div class="wg">
-      <div class="dc gym clickable" onclick="openDay('lunes')"><div class="dn">Lun</div><div class="dtype">gym</div><div class="dtime">13:00</div><div class="dfocus">−10%</div></div>
-      <div class="dc tt clickable" onclick="openDay('martes')"><div class="dn">Mar</div><div class="dtype">tt</div><div class="dtime">16:00</div></div>
-      <div class="dc gym clickable" onclick="openDay('miercoles')"><div class="dn">Mié</div><div class="dtype">gym</div><div class="dtime">13:00</div><div class="dfocus">−10%</div></div>
-      <div class="dc tt clickable" onclick="openDay('jueves')"><div class="dn">Jue</div><div class="dtype">tt</div><div class="dtime">16:00</div></div>
-      <div class="dc gym clickable" onclick="openDay('viernes')"><div class="dn">Vie</div><div class="dtype">gym</div><div class="dtime">13:00</div><div class="dfocus">−10%</div></div>
-      <div class="dc opt clickable" onclick="openDay('sabado')"><div class="dn">Sáb</div><div class="dtype">casa?</div></div>
-      <div class="dc rest clickable" onclick="openDay('domingo')"><div class="dn">Dom</div><div class="dtype">off</div></div>
-    </div>
-  </div>
-  <div id="t-mananas" style="display:none">
-    <div class="wg">
-      <div class="dc hiit clickable" onclick="openDay('lunes')"><div class="dn">Lun</div><div class="dtype">hiit</div><div class="dtime">14:30</div><div class="dfocus">auto C</div></div>
-      <div class="dc tt clickable" onclick="openDay('martes')"><div class="dn">Mar</div><div class="dtype">tt</div><div class="dtime">16:00</div></div>
-      <div class="dc hiit clickable" onclick="openDay('miercoles')"><div class="dn">Mié</div><div class="dtype">hiit</div><div class="dtime">14:30</div></div>
-      <div class="dc tt clickable" onclick="openDay('jueves')"><div class="dn">Jue</div><div class="dtype">tt</div><div class="dtime">16:00</div></div>
-      <div class="dc hiit clickable" onclick="openDay('viernes')"><div class="dn">Vie</div><div class="dtype">hiit</div><div class="dtime">14:30</div></div>
-      <div class="dc rest clickable" onclick="openDay('sabado')"><div class="dn">Sáb</div><div class="dtype">off</div></div>
-      <div class="dc rest clickable" onclick="openDay('domingo')"><div class="dn">Dom</div><div class="dtype">off</div></div>
-    </div>
-    <div class="note"><strong>Mañanas →</strong> 45 min post-turno. Activa Ciclo C automáticamente.</div>
-  </div>
-</div>
 
-<!-- ── CICLOS ─────────────────────────────────────────────────────────── -->
-<div id="panel-ciclos" class="panel">
-  <div class="sh"><div class="title">Los tres ciclos</div><div class="desc">Toca para desplegar los ejercicios</div></div>
-  <div class="ciclo-list">
-    <div class="cc cb" id="card-b" onclick="toggleC('b')">
-      <div class="cc-hdr"><div class="cl">B</div><div class="ci"><div class="cn">Ciclo B · Arranca el 8 jun</div><div class="ct">Potencia &amp; Explosividad</div><div class="cd">4–6 semanas · 30–60% 1RM</div></div><div class="cbadge">primero</div></div>
-      <div class="cc-body">
-        <div class="sb"><div class="sl">Lunes — Potencia Superior</div><ul class="el"><li><span class="en">Push press</span><span class="es">4×4 vel. máxima</span></li><li><span class="en">Plyo push-ups</span><span class="es">4×8</span></li><li><span class="en">KB press 1 brazo</span><span class="es">3×8/lado</span></li><li><span class="en">Muscle-up progresión</span><span class="es">3×AMRAP</span></li><li><span class="en">Remo explosivo KB</span><span class="es">3×6/lado</span></li></ul></div>
-        <div class="sb"><div class="sl">Miércoles — Potencia Inferior + Core</div><ul class="el"><li><span class="en">Box jump</span><span class="es">5×5</span></li><li><span class="en">KB swing 2 brazos</span><span class="es">4×12</span></li><li><span class="en">Bulgarian split squat exp.</span><span class="es">3×6/lado</span></li><li><span class="en">Pallof press</span><span class="es">3×12/lado</span></li><li><span class="en">KB halos</span><span class="es">3×10/lado</span></li></ul></div>
-        <div class="sb"><div class="sl">Viernes — Full Body Explosivo</div><ul class="el"><li><span class="en">Sprints 20m</span><span class="es">8 rep</span></li><li><span class="en">TRX row / KB row</span><span class="es">4×10</span></li><li><span class="en">CMJ</span><span class="es">4×8</span></li><li><span class="en">KB thruster (Tabata)</span><span class="es">8×(20s/10s)</span></li><li><span class="en">KB swing 1 brazo</span><span class="es">4×10/lado</span></li><li><span class="en">Burpee explosivo</span><span class="es">3×10</span></li></ul></div>
-        <div class="sn"><em>Base:</em> RFD neural — adaptación SNC, no estructural. Compatible con déficit calórico.</div>
-      </div>
-    </div>
-    <div class="cc cc-c" id="card-c" onclick="toggleC('c')">
-      <div class="cc-hdr"><div class="cl">C</div><div class="ci"><div class="cn">Ciclo C · Auto en Mañanas</div><div class="ct">Metabólico &amp; Recomposición</div><div class="cd">4 semanas · EPOC máximo</div></div><div class="cbadge">grasa</div></div>
-      <div class="cc-body">
-        <div class="sb"><div class="sl">Lunes — Circuito Full Body</div><ul class="el"><li><span class="en">Goblet squat</span><span class="es">40s/20s · 4 rondas</span></li><li><span class="en">KB press bilateral</span><span class="es">40s/20s · 4 rondas</span></li><li><span class="en">Remo KB</span><span class="es">40s/20s · 4 rondas</span></li><li><span class="en">Push-ups explosivos</span><span class="es">40s/20s · 4 rondas</span></li><li><span class="en">Mountain climbers</span><span class="es">40s/20s · 4 rondas</span></li></ul></div>
-        <div class="sb"><div class="sl">Miércoles — Tabata Inferior + Core</div><ul class="el"><li><span class="en">KB swing (Tabata)</span><span class="es">8×(20s/10s)</span></li><li><span class="en">Goblet squat (Tabata)</span><span class="es">8×(20s/10s)</span></li><li><span class="en">KB halos (Tabata)</span><span class="es">8×(20s/10s)</span></li><li><span class="en">Mountain climbers (Tabata)</span><span class="es">8×(20s/10s)</span></li></ul></div>
-        <div class="sb"><div class="sl">Viernes — HIIT Completo</div><ul class="el"><li><span class="en">Sprints 200m</span><span class="es">8 rep · 90s desc.</span></li><li><span class="en">Circuito KB thruster / Burpee / Swing</span><span class="es">3 rondas</span></li><li><span class="en">Tabata burpees (finisher)</span><span class="es">4×(20s/10s)</span></li></ul></div>
-        <div class="sn"><em>Base:</em> EPOC +6–15% hasta 24h post-sesión (Laforgia, 2006). Progresión: reducir descansos.</div>
-      </div>
-    </div>
-    <div class="cc ca" id="card-a" onclick="toggleC('a')">
-      <div class="cc-hdr"><div class="cl">A</div><div class="ci"><div class="cn">Ciclo A · Cierre de bloque</div><div class="ct">Fuerza Funcional</div><div class="cd">4 semanas · Base ya construida</div></div><div class="cbadge">cierre</div></div>
-      <div class="cc-body">
-        <div class="sb"><div class="sl">Lunes — Push</div><ul class="el"><li><span class="en">Press banca</span><span class="es">4×5 · 80-85% 1RM</span></li><li><span class="en">Press militar</span><span class="es">3×6</span></li><li><span class="en">Fondos lastrados</span><span class="es">3×8</span></li><li><span class="en">Push-ups explosivos</span><span class="es">3×10</span></li><li><span class="en">Face pull</span><span class="es">3×15</span></li></ul></div>
-        <div class="sb"><div class="sl">Miércoles — Pierna + Core</div><ul class="el"><li><span class="en">Sentadilla</span><span class="es">4×5 · 80-85% 1RM</span></li><li><span class="en">Romanian Deadlift</span><span class="es">3×8</span></li><li><span class="en">KB swings</span><span class="es">4×15</span></li><li><span class="en">Pallof press</span><span class="es">3×12/lado</span></li><li><span class="en">Plancha RKC</span><span class="es">3×45s</span></li></ul></div>
-        <div class="sb"><div class="sl">Viernes — Pull + Integración</div><ul class="el"><li><span class="en">Dominadas lastradas</span><span class="es">4×5</span></li><li><span class="en">Remo barra</span><span class="es">3×6</span></li><li><span class="en">KB swing 1 brazo</span><span class="es">4×10/lado</span></li><li><span class="en">Sprints 40m</span><span class="es">6 rep</span></li><li><span class="en">Curl bíceps</span><span class="es">3×10</span></li></ul></div>
-        <div class="sn"><em>Base:</em> Tensión mecánica → mTOR → síntesis proteica. +2.5 kg/sem press, +5 kg/sem sentadilla.</div>
-      </div>
-    </div>
+  <div class="note">
+    <strong>Los días son orientativos.</strong> Lo que importa es respetar al menos un día de descanso entre sesión de fuerza y sprints, y no hacer dos funcionales consecutivos. Lunes / Miércoles / Viernes es la distribución más eficiente.
   </div>
-</div>
 
-<!-- ── CALENDARIO ─────────────────────────────────────────────────────── -->
-<div id="panel-calendario" class="panel">
-  <div class="sh"><div class="title">Dieciocho semanas</div><div class="desc">Inicio 8 junio 2026 · Turno: Libre post-Mañanas</div></div>
   <div class="stat-row">
-    <div class="stat-box"><div class="stat-box-lbl">Semanas Mañanas</div><div class="stat-box-val" style="color:var(--rose)">5, 10, 15</div><div class="stat-box-sub">Auto Ciclo C · 45 min</div></div>
-    <div class="stat-box"><div class="stat-box-lbl">Semanas Noches</div><div class="stat-box-val" style="color:var(--muted2)">3, 8, 13</div><div class="stat-box-sub">−10% carga</div></div>
-    <div class="stat-box"><div class="stat-box-lbl">Deload</div><div class="stat-box-val" style="color:var(--muted2)">Sem. 14</div><div class="stat-box-sub">50% volumen</div></div>
-    <div class="stat-box"><div class="stat-box-lbl">Déficit máximo</div><div class="stat-box-val" style="color:var(--gold)">~600 kcal</div><div class="stat-box-sub">Fase 2 · sem. 6–9</div></div>
-  </div>
-  <div style="overflow-x:auto">
-  <table class="cal-table"><thead><tr><th>Sem.</th><th>Fechas</th><th>Turno</th><th>Fase</th><th>Déficit</th><th>Notas</th></tr></thead><tbody>
-    <tr><td class="wn">01</td><td class="dates">8–14 jun</td><td><span class="tpill t-libre">Libre</span></td><td>Fase 1 <span class="pp ph-b">B</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted)">~400</td><td class="cal-note">Arranque · ayunas · cafeína</td></tr>
-    <tr><td class="wn">02</td><td class="dates">15–21 jun</td><td><span class="tpill t-tardes">Tardes</span></td><td>Fase 1 <span class="pp ph-b">B</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted)">~400</td><td class="cal-note">Gym mañana</td></tr>
-    <tr><td class="wn">03</td><td class="dates">22–28 jun</td><td><span class="tpill t-noches">Noches</span></td><td>Fase 1 <span class="pp ph-b">B</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted)">~400</td><td class="cal-note">−10% carga</td></tr>
-    <tr><td class="wn">04</td><td class="dates">29 jun–5 jul</td><td><span class="tpill t-libre">Libre</span></td><td>Fase 1 <span class="pp ph-b">B</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted)">~400</td><td class="cal-note">Consolidación</td></tr>
-    <tr style="background:rgba(200,160,144,.04)"><td class="wn">05</td><td class="dates">6–12 jul</td><td><span class="tpill t-mananas">Mañanas</span></td><td>Fase 1 <span class="pp ph-c">Auto C</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted)">~500</td><td><span class="auto-c">↺ Auto C · sáb OFF</span></td></tr>
-    <tr><td class="wn">06</td><td class="dates">13–19 jul</td><td><span class="tpill t-libre">Libre</span></td><td>Fase 2 <span class="pp ph-c">C</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted)">~600</td><td class="cal-note">Déficit máximo</td></tr>
-    <tr><td class="wn">07</td><td class="dates">20–26 jul</td><td><span class="tpill t-tardes">Tardes</span></td><td>Fase 2 <span class="pp ph-c">C</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted)">~600</td><td class="cal-note">Reducir descansos</td></tr>
-    <tr><td class="wn">08</td><td class="dates">27 jul–2 ago</td><td><span class="tpill t-noches">Noches</span></td><td>Fase 2 <span class="pp ph-c">C</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted)">~500</td><td class="cal-note">−10% intensidad</td></tr>
-    <tr><td class="wn">09</td><td class="dates">3–9 ago</td><td><span class="tpill t-libre">Libre</span></td><td>Fase 2 <span class="pp ph-c">C</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted)">~600</td><td class="cal-note">Fin bloque C · evaluar</td></tr>
-    <tr style="background:rgba(200,160,144,.04)"><td class="wn">10</td><td class="dates">10–16 ago</td><td><span class="tpill t-mananas">Mañanas</span></td><td>Fase 3 <span class="pp ph-c">Auto C</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted)">~500</td><td><span class="auto-c">↺ Auto C · sáb OFF</span></td></tr>
-    <tr><td class="wn">11</td><td class="dates">17–23 ago</td><td><span class="tpill t-libre">Libre</span></td><td>Fase 3 <span class="pp ph-b">B</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted)">~300</td><td class="cal-note">Retorno explosividad</td></tr>
-    <tr><td class="wn">12</td><td class="dates">24–30 ago</td><td><span class="tpill t-tardes">Tardes</span></td><td>Fase 3 <span class="pp ph-b">B</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted)">~300</td><td class="cal-note">Mantener masa</td></tr>
-    <tr><td class="wn">13</td><td class="dates">31 ago–6 sep</td><td><span class="tpill t-noches">Noches</span></td><td>Fase 3 <span class="pp ph-b">B</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted)">~300</td><td class="cal-note">−10% carga</td></tr>
-    <tr style="background:rgba(125,112,96,.04)"><td class="wn">14</td><td class="dates">7–13 sep</td><td><span class="tpill t-libre">Libre</span></td><td><span class="tpill t-dl">Deload</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted)">mant.</td><td class="cal-note">50% vol · movilidad</td></tr>
-    <tr style="background:rgba(200,160,144,.04)"><td class="wn">15</td><td class="dates">14–20 sep</td><td><span class="tpill t-mananas">Mañanas</span></td><td>Fase 4 <span class="pp ph-c">Auto C</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted)">mant.</td><td><span class="auto-c">↺ Auto C</span></td></tr>
-    <tr><td class="wn">16</td><td class="dates">21–27 sep</td><td><span class="tpill t-libre">Libre</span></td><td>Fase 4 <span class="pp ph-a">A</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted)">mant.</td><td class="cal-note">Fuerza · cargas nuevas</td></tr>
-    <tr><td class="wn">17</td><td class="dates">28 sep–4 oct</td><td><span class="tpill t-tardes">Tardes</span></td><td>Fase 4 <span class="pp ph-a">A</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted)">mant.</td><td class="cal-note">Progresión lineal</td></tr>
-    <tr><td class="wn">18</td><td class="dates">5–11 oct</td><td><span class="tpill t-noches">Noches</span></td><td>Fase 4 <span class="pp ph-a">A</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted)">mant.</td><td class="cal-note">Cierre · nuevo ciclo</td></tr>
-  </tbody></table></div>
-</div>
-
-<!-- ── AYUNO ──────────────────────────────────────────────────────────── -->
-<div id="panel-ayuno" class="panel">
-  <div class="sh"><div class="title">Entrenamiento en ayunas</div><div class="desc">Protocolo adaptado · ventana 14:10</div></div>
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;margin-bottom:2rem">
-    <div class="stat-box"><div class="stat-box-lbl">Cualidad</div><div class="stat-box-val" style="color:var(--rose)">RFD Neural</div><div class="stat-box-sub">Adaptación SNC</div></div>
-    <div class="stat-box"><div class="stat-box-lbl">Ventana</div><div class="stat-box-val" style="color:var(--gold)">14 : 10</div><div class="stat-box-sub">Libre / Tardes</div></div>
-    <div class="stat-box"><div class="stat-box-lbl">Proteína</div><div class="stat-box-val" style="color:var(--sage)">180 g</div><div class="stat-box-sub">Mínimo diario</div></div>
-  </div>
-  <div class="timeline-h" style="margin-bottom:2rem">
-    <div class="tslot ayuno-z"><div class="ts-time">22:00–08:00</div><div class="ts-label a">Ayuno</div><div class="ts-note">sueño</div></div>
-    <div class="tslot train-z"><div class="ts-time">08:30</div><div class="ts-label t">💊 Cafeína</div><div class="ts-note">100–200 mg</div></div>
-    <div class="tslot train-z"><div class="ts-time">09:00–10:30</div><div class="ts-label t">Gym</div><div class="ts-note">en ayunas</div></div>
-    <div class="tslot eat-z"><div class="ts-time">10:45</div><div class="ts-label e">1ª comida</div><div class="ts-note">prot + CHO</div></div>
-    <div class="tslot eat-z"><div class="ts-time">10:45–22:00</div><div class="ts-label e">Ventana</div><div class="ts-note">3–4 comidas</div></div>
-  </div>
-  <div class="ayuno-grid">
-    <div class="ac"><div class="ac-title">💊 Cafeína pre-entreno</div><ul><li>100–200 mg, 30–45 min antes</li><li>Antagonista de adenosina → reclutamiento motor</li><li>+3–5% potencia pico en explosivo</li><li>Compatible con el ayuno</li><li>Pastilla — sin calorías, sin lácteos</li></ul></div>
-    <div class="ac"><div class="ac-title">🍽 Cena anterior = pre-entreno real</div><ul><li>El glucógeno muscular no vacía durante el ayuno</li><li>Solo el hepático baja de noche</li><li>Cena previa a L/X/V: CHO de carga media</li><li>Boniato, arroz basmati, legumbres</li><li>Siempre con proteína + verdura</li></ul></div>
-    <div class="ac"><div class="ac-title">⚡ Post-entreno</div><ul><li>Primera comida: proteína rápida + CHO</li><li>Beef protein o vegetal (guisante/arroz)</li><li>No whey — protocolo piel activo</li><li>Dentro de los 30–45 min post-gym</li></ul></div>
-    <div class="ac"><div class="ac-title">📋 Por turno</div><ul><li>Libre / Tardes: 14:10 sin modificar</li><li>Noches: suspender — recuperación prioritaria</li><li>Mañanas: suspender — turno 06:00, gym 14:30</li><li>Días TT: comer pre-TT sin restricción</li></ul></div>
+    <div class="stat-box">
+      <div class="stat-box-lbl">Sesiones/semana</div>
+      <div class="stat-box-val" style="color:var(--rose)">3</div>
+      <div class="stat-box-sub">2 funcional + 1 sprint</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-box-lbl">Duración funcional</div>
+      <div class="stat-box-val" style="color:var(--muted2)">50–60 min</div>
+      <div class="stat-box-sub">incluye calentamiento</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-box-lbl">Duración sprints</div>
+      <div class="stat-box-val" style="color:var(--gold)">25–30 min</div>
+      <div class="stat-box-sub">+ 10 min calentamiento</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-box-lbl">Progressive overload</div>
+      <div class="stat-box-val" style="color:var(--sage)">semanal</div>
+      <div class="stat-box-sub">+0.5–1 kg o +1 rep</div>
+    </div>
   </div>
 </div>
 
-<!-- ── PRINCIPIOS ────────────────────────────────────────────────────── -->
+<!-- ══ EJERCICIOS ══════════════════════════════════════════════════════ -->
+<div id="panel-ejercicios" class="panel">
+  <div class="sh">
+    <div class="title">Los tres entrenamientos</div>
+    <div class="desc">Toca para desplegar · progressive overload cada semana</div>
+  </div>
+
+  <!-- FUNCIONAL A -->
+  <div class="day-card" id="card-fa" onclick="toggleCard('fa')">
+    <div class="day-card-hdr">
+      <div class="day-card-letter">A</div>
+      <div class="day-card-info">
+        <div class="dc-type">Funcional A</div>
+        <div class="dc-name">Fuerza Superior + Core</div>
+        <div class="dc-meta">50–60 min · 4 ejercicios principales + core</div>
+      </div>
+    </div>
+    <div class="day-card-body">
+      <span class="section-lbl">Calentamiento · 8 min</span>
+      <ul class="wu-list">
+        <li>Movilidad de hombros: círculos + rotaciones externas 2×10</li>
+        <li>Band pull-apart (o sin banda) 2×15</li>
+        <li>Push-ups lentos 2×6 · foco en escápulas</li>
+        <li>Remo con banda/toalla 2×10</li>
+      </ul>
+      <span class="section-lbl">Bloque principal</span>
+      <table class="ex-table">
+        <tr><th>Ejercicio</th><th>Series</th><th>Carga</th><th>Descanso</th></tr>
+        <tr><td>Press de hombros con mancuernas</td><td class="td-s">4 × 10</td><td class="td-c">moderada · último rep cuesta</td><td class="td-r">90 s</td></tr>
+        <tr><td>Remo con mancuerna (un brazo)</td><td class="td-s">4 × 10 / lado</td><td class="td-c">moderada · espalda plana</td><td class="td-r">60 s</td></tr>
+        <tr><td>Push-up progresivo *</td><td class="td-s">3 × 10–12</td><td class="td-c">corporal · excéntrico 3s</td><td class="td-r">75 s</td></tr>
+        <tr><td>Hip thrust con mancuerna / barra</td><td class="td-s">4 × 12</td><td class="td-c">glúteo máx. · pausa arriba</td><td class="td-r">90 s</td></tr>
+      </table>
+      <span class="section-lbl">Core · 3 rondas sin descanso</span>
+      <table class="ex-table">
+        <tr><th>Ejercicio</th><th>Duración</th><th>Notas</th></tr>
+        <tr><td>Plancha con toque de hombro</td><td class="td-s">30 s</td><td class="td-c">core antirotación</td></tr>
+        <tr><td>Dead bug</td><td class="td-s">8 / lado</td><td class="td-c">zona lumbar en el suelo</td></tr>
+        <tr><td>Puente de glúteo (isométrico)</td><td class="td-s">30 s</td><td class="td-c">activación final</td></tr>
+      </table>
+      <div class="prog-block">
+        <strong>Progresión:</strong> cuando completes todas las series con buena técnica, sube 1 kg la siguiente semana en los ejercicios principales. En push-ups, avanza de inclinado → suelo → archer progresivo.
+      </div>
+      <div class="day-note">* Push-up progresivo: si en suelo no consigues 8 reps limpias, usa una superficie elevada (banco, escalón). El objetivo es llegar a 3×10 en suelo en 8–10 semanas.</div>
+    </div>
+  </div>
+
+  <!-- SPRINTS -->
+  <div class="day-card sp" id="card-sp" onclick="toggleCard('sp')">
+    <div class="day-card-hdr">
+      <div class="day-card-letter">⚡</div>
+      <div class="day-card-info">
+        <div class="dc-type">Sprints</div>
+        <div class="dc-name">Protocolo de velocidad</div>
+        <div class="dc-meta">25–30 min totales · 1 vez / semana</div>
+      </div>
+    </div>
+    <div class="day-card-body">
+      <span class="section-lbl">Calentamiento · 10 min obligatorio</span>
+      <ul class="wu-list">
+        <li>5 min trote suave</li>
+        <li>Movilidad dinámica: cadera, rodillas, tobillos</li>
+        <li>Skipping, talones-glúteo, zancadas dinámicas</li>
+        <li>2–3 aceleraciones suaves al 60–70%</li>
+      </ul>
+      <span class="section-lbl">Protocolo principal</span>
+      <table class="ex-table">
+        <tr><th>Fase</th><th>Distancia</th><th>Intensidad</th><th>Descanso</th></tr>
+        <tr><td>Sprints cortos</td><td class="td-s">40 m × 8</td><td class="td-c">95–100% · velocidad máxima</td><td class="td-r">90 s completo</td></tr>
+      </table>
+      <div class="prog-block">
+        <strong>Progresión semanal:</strong> semanas 1–4 → 6 sprints · semanas 5–8 → 8 sprints · semanas 9+ → 10 sprints o reducir descanso a 75s. El descanso debe ser completo para mantener la calidad — los sprints a mitad de potencia no valen.
+      </div>
+      <span class="section-lbl" style="margin-top:1rem">Enfriamiento · 5 min</span>
+      <ul class="wu-list">
+        <li>Caminar 3 min · bajada gradual</li>
+        <li>Estiramiento isquiotibiales, cuádriceps, gemelos</li>
+        <li>Respiración diafragmática</li>
+      </ul>
+      <div class="day-note">Los sprints activan GH y sensibilizan los receptores de insulina sin comer músculo — siempre que no sean excesivos (1×/semana) y la proteína esté cubierta ese día.</div>
+    </div>
+  </div>
+
+  <!-- FUNCIONAL B -->
+  <div class="day-card" id="card-fb" onclick="toggleCard('fb')">
+    <div class="day-card-hdr">
+      <div class="day-card-letter">B</div>
+      <div class="day-card-info">
+        <div class="dc-type">Funcional B</div>
+        <div class="dc-name">Fuerza Inferior + Full Body</div>
+        <div class="dc-meta">50–60 min · énfasis piernas y tirón</div>
+      </div>
+    </div>
+    <div class="day-card-body">
+      <span class="section-lbl">Calentamiento · 8 min</span>
+      <ul class="wu-list">
+        <li>Hip 90/90: 60 s / lado</li>
+        <li>Leg swings: 10 / lado · frontal y lateral</li>
+        <li>Sentadilla corporal lenta 2×10</li>
+        <li>Puente de glúteo activo 2×12</li>
+      </ul>
+      <span class="section-lbl">Bloque principal</span>
+      <table class="ex-table">
+        <tr><th>Ejercicio</th><th>Series</th><th>Carga</th><th>Descanso</th></tr>
+        <tr><td>Sentadilla con mancuernas / goblet</td><td class="td-s">4 × 10</td><td class="td-c">moderada · profundidad completa</td><td class="td-r">90 s</td></tr>
+        <tr><td>Romanian Deadlift (RDL)</td><td class="td-s">4 × 10</td><td class="td-c">isquios · espalda neutra</td><td class="td-r">90 s</td></tr>
+        <tr><td>Zancadas caminando</td><td class="td-s">3 × 10 / lado</td><td class="td-c">corporal o mancuernas</td><td class="td-r">75 s</td></tr>
+        <tr><td>Remo en TRX / Remo invertido *</td><td class="td-s">4 × 10</td><td class="td-c">escápulas activas</td><td class="td-r">75 s</td></tr>
+        <tr><td>KB swing (o mancuerna)</td><td class="td-s">3 × 15</td><td class="td-c">potencia de cadera</td><td class="td-r">60 s</td></tr>
+      </table>
+      <span class="section-lbl">Core · 2 rondas</span>
+      <table class="ex-table">
+        <tr><th>Ejercicio</th><th>Duración</th></tr>
+        <tr><td>Hollow hold</td><td class="td-s">20–30 s</td></tr>
+        <tr><td>Bird dog</td><td class="td-s">8 / lado</td></tr>
+        <tr><td>Puente glúteo isométrico</td><td class="td-s">30 s</td></tr>
+      </table>
+      <div class="prog-block">
+        <strong>Objetivo a 12 semanas:</strong> sentadilla goblet con 20–24 kg · RDL con 2×16 kg · remo TRX con pies elevados.
+      </div>
+      <div class="day-note">* Si no hay TRX: remo con mancuernas en banco o remo invertido en mesa/barra baja. El trabajo de tirón es esencial — muchas mujeres lo descuidan y crea desequilibrios posturales.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ NUTRICIÓN ═══════════════════════════════════════════════════════ -->
+<div id="panel-nutricion" class="panel">
+  <div class="sh">
+    <div class="title">Nutrición</div>
+    <div class="desc">Sin dietas restrictivas · sin ayuno · proteína como eje central</div>
+  </div>
+
+  <div class="macro-grid">
+    <div class="macro-box"><div class="macro-val p">~125 g</div><div class="macro-lbl">Proteína</div><div class="macro-sub">2 g / kg · diario</div></div>
+    <div class="macro-box"><div class="macro-val c">~200 g</div><div class="macro-lbl">Carbohidratos</div><div class="macro-sub">más en días de gym</div></div>
+    <div class="macro-box"><div class="macro-val f">~65 g</div><div class="macro-lbl">Grasas</div><div class="macro-sub">calidad · esenciales</div></div>
+    <div class="macro-box"><div class="macro-val k">~1900</div><div class="macro-lbl">kcal totales</div><div class="macro-sub">ajustar por semana</div></div>
+  </div>
+
+  <div class="day-types">
+    <div class="dt-box gym-d">
+      <div class="dt-lbl">Día funcional</div>
+      <div class="dt-title">Más carbohidratos</div>
+      <ul class="dt-rows">
+        <li>+40–50 g CHO extra</li>
+        <li>Pre-entreno: fruta + avena</li>
+        <li>Post-entreno: proteína + arroz/boniato</li>
+        <li>~2.000–2.100 kcal</li>
+      </ul>
+    </div>
+    <div class="dt-box sprint-d">
+      <div class="dt-lbl">Día sprints</div>
+      <div class="dt-title">Carbohidratos moderados</div>
+      <ul class="dt-rows">
+        <li>Pre-sprint: plátano o dátil</li>
+        <li>Post-sprint: proteína rápida</li>
+        <li>No en ayunas para los sprints</li>
+        <li>~1.900 kcal</li>
+      </ul>
+    </div>
+    <div class="dt-box rest-d">
+      <div class="dt-lbl">Día descanso</div>
+      <div class="dt-title">Base limpia</div>
+      <ul class="dt-rows">
+        <li>Proteína igual: 120–130 g</li>
+        <li>CHO reducidos ~20%</li>
+        <li>Grasas saludables ↑</li>
+        <li>~1.700–1.800 kcal</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="nutr-grid">
+    <div class="nc"><div class="nc-title">🥩 Fuentes de proteína</div><ul>
+      <li>Pollo, pavo, ternera magra</li>
+      <li>Huevo entero (2–3) + claras extra</li>
+      <li>Salmón, merluza, atún</li>
+      <li>Queso cottage, yogur griego 0%</li>
+      <li>Legumbres + cereal (proteína completa)</li>
+      <li>Proteína en polvo si falta cubrir</li>
+    </ul></div>
+    <div class="nc"><div class="nc-title">🌾 Carbohidratos de calidad</div><ul>
+      <li>Avena, arroz basmati, quinoa</li>
+      <li>Boniato, patata cocida</li>
+      <li>Fruta entera (no zumos)</li>
+      <li>Legumbres (doble función: prot + CHO)</li>
+      <li>Pan de centeno o masa madre</li>
+    </ul></div>
+    <div class="nc"><div class="nc-title">🥑 Grasas esenciales</div><ul>
+      <li>Aceite de oliva virgen extra</li>
+      <li>Aguacate · nueces · almendras</li>
+      <li>Salmón salvaje 2–3×/semana</li>
+      <li>Omega-3 si no hay pescado azul</li>
+      <li>Evitar grasas trans / ultraprocesados</li>
+    </ul></div>
+    <div class="nc"><div class="nc-title">💊 Suplementos clave</div><ul>
+      <li><strong>Creatina monohidrato:</strong> 3–5 g/día · evidencia sólida en mujeres</li>
+      <li><strong>Vitamina D3:</strong> 2.000 UI + K2 MK-7</li>
+      <li><strong>Calcio:</strong> si ingesta dietética baja</li>
+      <li><strong>Hierro:</strong> analítica — las mujeres son más propensas al déficit</li>
+      <li><strong>Magnesio glicinato:</strong> sueño + recuperación muscular</li>
+    </ul></div>
+  </div>
+
+  <div class="note">
+    <strong>Sin ayuno intermitente para ganar músculo.</strong> El ayuno es una herramienta útil en déficit calórico, pero para ganancia muscular es contraproducente: necesitas proteína distribuida cada 3–4 h para maximizar la síntesis proteica (MPS). Desayuna siempre, especialmente si entrenas por la mañana.
+  </div>
+</div>
+
+<!-- ══ PRINCIPIOS ══════════════════════════════════════════════════════ -->
 <div id="panel-principios" class="panel">
-  <div class="sh"><div class="title">Principios</div><div class="desc">Base científica aplicada — actualizada con biofeedback</div></div>
+  <div class="sh">
+    <div class="title">Principios</div>
+    <div class="desc">Lo que realmente importa para una mujer de 41 años que quiere ganar músculo</div>
+  </div>
   <div class="pr-grid">
-    <div class="pr-card"><div class="pc-title">Regla única — TT</div><ul><li>No upper body en martes ni jueves</li><li>Pierna el día antes del TT: permitida</li><li>Mínimo 6–8h entre fuerza y TT</li><li>TT = habilidad motora fina, respetarla</li></ul></div>
-    <div class="pr-card"><div class="pc-title">Fuerza / peso · 12%</div><ul><li>Perder 8–12 kg netos de grasa</li><li>El entreno preserva músculo · la dieta quema grasa</li><li>A ~83–85 kg: ratio fuerza/peso mejora solo</li><li>La explosividad funcional la da el ratio, no el músculo</li></ul></div>
-    <div class="pr-card"><div class="pc-title">Explosividad en déficit</div><ul><li>RFD es adaptación neural, no estructural</li><li>Proteína &gt;180 g/día → evita catabolismo</li><li>Glucógeno muscular intacto si cena tuvo CHO</li><li>Cafeína: +3–5% potencia pico</li></ul></div>
-    <div class="pr-card"><div class="pc-title">Turnos nocturnos</div><ul><li>Desincronización circadiana → −8–12% RFD</li><li>Reducir cargas ~10%</li><li>No forzar el ayuno</li><li>Hidratación extra, recuperación prioritaria</li></ul></div>
-    <div class="pr-card"><div class="pc-title">Vitamina D · Laudio 43°N</div><ul><li>Síntesis insuficiente oct–mar</li><li>2.000–4.000 UI D3 todo el año</li><li>Siempre con K2 MK-7</li><li>Fototipo VI: menor síntesis cutánea</li></ul></div>
-    <div class="pr-card"><div class="pc-title">Pathways por fase</div><ul><li>Ciclo B: RFD · fosfágeno · glucólisis rápida</li><li>Ciclo C: EPOC · AMPK · oxidación de grasas</li><li>Ciclo A: mTOR · tensión mecánica · síntesis</li><li>Ayuno: AMPK · GH · autofagia · sensibilidad</li></ul></div>
+    <div class="pr-card"><div class="pc-title">Progressive overload · la regla de oro</div><ul>
+      <li>Sin progresión no hay estímulo · sin estímulo no hay músculo</li>
+      <li>+0.5–1 kg o +1 rep cada semana en los principales</li>
+      <li>Si no puedes progresar: duerme más, come más proteína</li>
+      <li>Anotar el entreno es obligatorio para saber si progresas</li>
+    </ul></div>
+    <div class="pr-card"><div class="pc-title">Las mujeres y el músculo</div><ul>
+      <li>Ganas músculo más lento que los hombres pero con menos agujetas</li>
+      <li>Menor testosterona → mejor tolerancia al volumen de entrenamiento</li>
+      <li>Puedes entrenar con más frecuencia relativa sin sobreentrenar</li>
+      <li>La escasez estrogénica acelera pérdida ósea · el peso libre la frena</li>
+    </ul></div>
+    <div class="pr-card"><div class="pc-title">A los 41 · diferencias reales</div><ul>
+      <li>Recuperación más lenta → descanso entre sesiones es sagrado</li>
+      <li>Fluctuaciones hormonales (ciclo, perimenopausia) afectan fuerza</li>
+      <li>Fase folicular (días 1–14): pico de fuerza · días difíciles son normales</li>
+      <li>Progesterona alta → mayor fatiga · reduce intensidad si necesario</li>
+    </ul></div>
+    <div class="pr-card"><div class="pc-title">Sprints 1×/semana</div><ul>
+      <li>Activan GH endógena → anabólico + quema de grasa</li>
+      <li>Mejoran sensibilidad a la insulina en 24–48h</li>
+      <li>Preservan músculo mejor que el cardio largo</li>
+      <li>Más de 2×/semana interfiere con la recuperación de fuerza</li>
+    </ul></div>
+    <div class="pr-card"><div class="pc-title">Composición corporal saludable</div><ul>
+      <li>Atlética mujer adulta: 18–25% grasa · no bajar de 18%</li>
+      <li>Ganar 1–2 kg masa muscular al año es un resultado excelente</li>
+      <li>La báscula sube cuando ganas músculo · eso es el objetivo</li>
+      <li>La ropa, el espejo y la fuerza son mejores métricas</li>
+    </ul></div>
+    <div class="pr-card"><div class="pc-title">Vitamina D · salud ósea</div><ul>
+      <li>Las mujeres son más vulnerables a osteoporosis con la edad</li>
+      <li>El entrenamiento de fuerza es la mejor prevención</li>
+      <li>D3 + K2 + Calcio en la dieta · no negociable</li>
+      <li>Hierro: analítica anual · déficit frecuente en mujeres activas</li>
+    </ul></div>
   </div>
 </div>
 
-<!-- ── HÁBITOS ────────────────────────────────────────────────────────── -->
+<!-- ══ HÁBITOS ══════════════════════════════════════════════════════════ -->
 <div id="panel-habitos" class="panel">
-  <div class="sh"><div class="title">Hábitos</div><div class="desc">Variables de soporte — determinan si el entrenamiento y la nutrición funcionan</div></div>
+  <div class="sh">
+    <div class="title">Hábitos</div>
+    <div class="desc">El músculo se construye fuera del gimnasio</div>
+  </div>
   <div class="pr-grid">
-    <div class="pr-card"><div class="pc-title">Pasos diarios · NEAT</div><ul><li>Gym / TT: mínimo 7.000 pasos</li><li>Descanso: mínimo 9.000–10.000</li><li>Noches: vigilar activamente — cae sin notarlo</li><li>El NEAT puede variar 2.000 kcal/día</li></ul></div>
-    <div class="pr-card"><div class="pc-title">Sueño</div><ul><li>Mínimo 7–8 horas sin excepción</li><li>Privación → cortisol → sebo y grasa visceral</li><li>Semanas noches: proteger el bloque diurno</li><li>Alcohol altera sueño 48–72h tras consumo</li></ul></div>
-    <div class="pr-card"><div class="pc-title">Exposición solar</div><ul><li>Laudio 43°N → insuficiente oct–mar</li><li>10–20 min al mediodía en brazos y cara</li><li>No sustituye suplementación D3</li><li>D3 + K2 MK-7 todo el año</li></ul></div>
-    <div class="pr-card"><div class="pc-title">Estrés crónico</div><ul><li>Eje HPA → cortisol → sebo + grasa visceral</li><li>Turnos rotativos: estrés fisiológico per se</li><li>Respiración diafragmática, naturaleza</li><li>Entreno regular: antiinflamatorio sistémico</li></ul></div>
-    <div class="pr-card"><div class="pc-title">Higiene pre-entreno</div><ul><li>Ducha tras cualquier sesión</li><li>Effaclar en barba, cuello, hombros, espalda</li><li>No tocar la cara durante el entreno</li><li>Ropa técnica transpirable</li></ul></div>
-    <div class="pr-card"><div class="pc-title">Hidratación</div><ul><li>Mínimo 2–2,5 L/día de base</li><li>Gym / TT: +0,5–1 L adicional</li><li>Noches: mayor riesgo de deshidratación</li><li>Té verde o jengibre como alternativa</li></ul></div>
+    <div class="pr-card"><div class="pc-title">Sueño · lo más anabólico que existe</div><ul>
+      <li>7–9 horas · sin excepciones en días de gym</li>
+      <li>GH se segrega en el sueño profundo → construcción muscular nocturna</li>
+      <li>Privación → cortisol elevado → catabolismo + grasa visceral</li>
+      <li>Magnesio glicinato antes de dormir mejora calidad del sueño</li>
+    </ul></div>
+    <div class="pr-card"><div class="pc-title">Estrés y cortisol</div><ul>
+      <li>Cortisol crónico alto = principal enemigo de la composición corporal</li>
+      <li>10 min de respiración diafragmática reducen cortisol un 23%</li>
+      <li>Naturaleza, paseos, tiempo sin pantalla · no es opcional</li>
+      <li>Si hay mucho estrés: reduce intensidad del entreno esa semana</li>
+    </ul></div>
+    <div class="pr-card"><div class="pc-title">Movilidad y recuperación activa</div><ul>
+      <li>10 min de movilidad en los días de descanso (no estiramiento estático)</li>
+      <li>Caminar 8.000–10.000 pasos en días sin gym</li>
+      <li>Foam roller · especialmente isquiotibiales y dorsales</li>
+      <li>Baño frío o ducha fría post-sprint: reduce inflamación</li>
+    </ul></div>
+    <div class="pr-card"><div class="pc-title">Hidratación</div><ul>
+      <li>Mínimo 2 litros/día · +500 ml en días de entrenamiento</li>
+      <li>Orina color pajizo claro = bien hidratada</li>
+      <li>El café y el té cuentan (con moderación)</li>
+      <li>Sal o electrolitos en días de mucho calor o sudoración</li>
+    </ul></div>
+    <div class="pr-card"><div class="pc-title">Ciclo menstrual y entrenamiento</div><ul>
+      <li>Días 1–14 (folicular): estrógeno sube · fuerza y energía mejoran</li>
+      <li>Días 14–28 (lútea): progesterona sube · mayor fatiga, menos fuerza</li>
+      <li>Días previos a regla: reduce carga o descansa · no es rendirse</li>
+      <li>Registrar el ciclo junto al entrenamiento da perspectiva</li>
+    </ul></div>
+    <div class="pr-card"><div class="pc-title">Constancia sobre intensidad</div><ul>
+      <li>48 semanas mediocres > 8 semanas perfectas + abandono</li>
+      <li>No te saltes el entreno · aunque sea más corto o más suave</li>
+      <li>El cuerpo se adapta a lo que repites, no a lo que haces una vez</li>
+      <li>Revisar los objetivos cada 4–6 semanas · celebrar los progresos</li>
+    </ul></div>
   </div>
 </div>
 
-</div>
+</div><!-- end .content -->
 
-<!-- ── MODAL ──────────────────────────────────────────────────────────── -->
+<!-- ── MODAL ────────────────────────────────────────────────────────── -->
 <div id="modal" class="modal-ov" onclick="closeModalOv(event)">
   <div class="modal-bx">
     <div class="modal-head">
-      <div><div class="modal-day" id="modal-day"></div><div class="modal-sess" id="modal-sess"></div><div id="modal-badge"></div></div>
+      <div>
+        <div class="modal-day" id="modal-day"></div>
+        <div class="modal-sess" id="modal-sess"></div>
+      </div>
       <button class="modal-x" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-body" id="modal-body"></div>
@@ -432,77 +583,88 @@ body{background:var(--bg);color:var(--text);font-family:'Jost',sans-serif;font-w
 </div>
 
 <script>
-const DIAS_ES = {lunes:'Lunes',martes:'Martes',miercoles:'Miércoles',jueves:'Jueves',viernes:'Viernes',sabado:'Sábado',domingo:'Domingo'};
-const DATA = {
-  B:{
-    lunes:{title:'Potencia Superior',warmup:['Shoulder CARs 2×5/lado','Band pull-apart 2×15','Push-ups lentos 2×8','Remo con banda 2×10'],rows:[['Push press','4×4','40–60% 1RM · vel. máxima','3 min'],['Plyo push-ups','4×8','Corporal · máx explosividad','90s'],['KB press 1 brazo','3×8/lado','Moderada · control','90s'],['Muscle-up progresión *','3×AMRAP','—','2 min'],['Remo explosivo KB','3×6/lado','Tirar tan rápido como sea posible','90s']],nota:'* Sin muscle-up: chest-to-bar o dominada explosiva.'},
-    miercoles:{title:'Potencia Inferior + Core',warmup:['Hip 90/90 2×60s/lado','Leg swings 2×10/lado','Goblet squat corporal 2×10','CMJ submáximos ×5'],rows:[['Box jump','5×5','Máxima altura · bajar caminando','3 min'],['KB swing 2 brazos','4×12','Potencia de cadera máxima','90s'],['Bulgarian split squat exp.','3×6/lado','Moderada · concéntrico explosivo','2 min'],['Pallof press','3×12/lado','Control total · sin rotación','60s'],['KB halos','3×10/lado','Ligera · movilidad','60s']],nota:null},
-    viernes:{title:'Full Body Explosivo',warmup:['Movilidad 5 min','2–3 sprints submáximos 20m','CMJ ×5'],rows:[['Sprints 20m','8 rep','Velocidad máxima absoluta','2 min'],['TRX row / KB row','4×10','Excéntrico controlado','90s'],['CMJ','4×8','Corporal · máxima altura','90s'],['KB thruster (Tabata)','8×(20s/10s)','Moderada · ritmo sostenible','—'],['KB swing 1 brazo','4×10/lado','Potencia de cadera','90s'],['Burpee explosivo','3×10','Corporal · salto máximo','90s']],nota:null}
-  },
-  C:{
-    lunes:{title:'Circuito Full Body',tipo:'circuito',estructura:'5 ejercicios · 40s trabajo / 20s descanso · 4 rondas · 3 min entre rondas',items:['Goblet squat','KB press bilateral','Remo KB','Push-ups explosivos','Mountain climbers'],nota:null},
-    miercoles:{title:'Tabata Inferior + Core',tipo:'tabata',estructura:'4 bloques Tabata · 8×(20s/10s) · 1 min entre bloques',items:['KB swing 2 brazos','Goblet squat','KB halos','Mountain climbers'],nota:null},
-    viernes:{title:'HIIT Completo',tipo:'bloques',bloques:[{titulo:'Bloque 1 — Sprints',rows:[['Sprints 200m','8 rep','Velocidad máxima','90s desc.']]},{titulo:'Bloque 2 — Circuito · 3 rondas',rows:[['KB thruster','10 rep','',''],['Burpee','8 rep','',''],['KB swing','15 rep','','']]},{titulo:'Bloque 3 — Finisher',rows:[['Tabata burpees','4×(20s/10s)','','']]}],nota:null}
-  },
-  A:{
-    lunes:{title:'Push',warmup:['Band pull-apart 2×20','Rotación torácica 2×8/lado','Push-ups lentos 2×10','Press con banda 2×15'],rows:[['Press banca','4×5','80–85% 1RM','3 min'],['Press militar','3×6','75–80% 1RM','2–3 min'],['Fondos lastrados','3×8','Moderada','2 min'],['Push-ups explosivos','3×10','Corporal','90s'],['Face pull','3×15','Ligera · control escapular','60s']],nota:null},
-    miercoles:{title:'Pierna + Core',warmup:['Hip circles','Sentadilla corporal 2×10','RDL corporal 2×8','Activación glúteo'],rows:[['Sentadilla','4×5','80–85% 1RM','3 min'],['Romanian Deadlift','3×8','70–75% 1RM','2 min'],['KB swings','4×15','Moderada · potencia de cadera','90s'],['Pallof press','3×12/lado','Control total','60s'],['Plancha RKC','3×45s','Máxima tensión','60s']],nota:null},
-    viernes:{title:'Pull + Integración',warmup:['Shoulder CARs','Band pull-apart 2×15','Remo con banda 2×12','Dead hang 2×20s'],rows:[['Dominadas lastradas','4×5','Máxima con técnica limpia','3 min'],['Remo barra','3×6','75–80% 1RM','2–3 min'],['KB swing 1 brazo','4×10/lado','Potencia de cadera','90s'],['Sprints 40m','6 rep','Velocidad máxima','90s'],['Curl bíceps','3×10','Moderada · excéntrico lento','60s']],nota:null}
-  }
+function showP(name,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+
+function toggleCard(id){
+  const card=document.getElementById('card-'+id);
+  const was=card.classList.contains('expanded');
+  document.querySelectorAll('.day-card').forEach(c=>c.classList.remove('expanded'));
+  if(!was) card.classList.add('expanded');
+}
+
+const DIAS = {
+  lunes:   {label:'Lunes',    tipo:'funcional', session:'Funcional A — Fuerza Superior + Core'},
+  martes:  {label:'Martes',   tipo:'activo',    session:'Descanso activo'},
+  miercoles:{label:'Miércoles',tipo:'sprints',   session:'Sprints 40 m × 8'},
+  jueves:  {label:'Jueves',   tipo:'activo',    session:'Descanso activo'},
+  viernes: {label:'Viernes',  tipo:'funcional', session:'Funcional B — Fuerza Inferior + Full Body'},
+  sabado:  {label:'Sábado',   tipo:'off',       session:'Descanso'},
+  domingo: {label:'Domingo',  tipo:'off',       session:'Descanso'}
 };
 
-let cicloActivo = localStorage.getItem('edurne_ciclo')||'B';
-let turnoActivo = 'libre';
-
-function showP(name,btn){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));document.getElementById('panel-'+name).classList.add('active');btn.classList.add('active');}
-function showT(name,btn){turnoActivo=name;document.querySelectorAll('[id^="t-"]').forEach(v=>v.style.display='none');document.querySelectorAll('.tb').forEach(b=>b.classList.remove('active'));const el=document.getElementById('t-'+name);if(el)el.style.display='block';btn.classList.add('active');}
-function setCiclo(c){cicloActivo=c;localStorage.setItem('edurne_ciclo',c);document.querySelectorAll('.ciclo-btn').forEach(b=>b.classList.remove('active'));document.getElementById('ciclo-btn-'+c).classList.add('active');}
-function toggleC(letter){const card=document.getElementById('card-'+letter);const was=card.classList.contains('expanded');document.querySelectorAll('.cc').forEach(c=>c.classList.remove('expanded'));if(!was)card.classList.add('expanded');}
+const MODAL_CONTENT = {
+  funcional_lunes: `
+    <span class="m-label">Funcional A · Fuerza Superior + Core</span>
+    <table class="m-table"><tr><th>Ejercicio</th><th>Series</th><th>Carga</th></tr>
+    <tr><td>Press de hombros · mancuernas</td><td class="mt-s">4 × 10</td><td class="mt-c">moderada</td></tr>
+    <tr><td>Remo un brazo · mancuerna</td><td class="mt-s">4 × 10/lado</td><td class="mt-c">espalda plana</td></tr>
+    <tr><td>Push-up progresivo</td><td class="mt-s">3 × 10</td><td class="mt-c">excéntrico 3s</td></tr>
+    <tr><td>Hip thrust</td><td class="mt-s">4 × 12</td><td class="mt-c">pausa arriba</td></tr></table>
+    <span class="m-label">Core · 3 rondas</span>
+    <ul class="m-wu"><li>Plancha con toque de hombro 30s</li><li>Dead bug 8/lado</li><li>Puente isométrico 30s</li></ul>`,
+  funcional_viernes: `
+    <span class="m-label">Funcional B · Fuerza Inferior + Full Body</span>
+    <table class="m-table"><tr><th>Ejercicio</th><th>Series</th><th>Carga</th></tr>
+    <tr><td>Sentadilla goblet</td><td class="mt-s">4 × 10</td><td class="mt-c">profundidad completa</td></tr>
+    <tr><td>Romanian Deadlift</td><td class="mt-s">4 × 10</td><td class="mt-c">isquios · espalda neutra</td></tr>
+    <tr><td>Zancadas caminando</td><td class="mt-s">3 × 10/lado</td><td class="mt-c">corporal → mancuernas</td></tr>
+    <tr><td>Remo TRX / invertido</td><td class="mt-s">4 × 10</td><td class="mt-c">escápulas activas</td></tr>
+    <tr><td>KB swing</td><td class="mt-s">3 × 15</td><td class="mt-c">potencia de cadera</td></tr></table>
+    <span class="m-label">Core · 2 rondas</span>
+    <ul class="m-wu"><li>Hollow hold 20–30s</li><li>Bird dog 8/lado</li><li>Puente isométrico 30s</li></ul>`
+};
 
 function openDay(dia){
-  const modal=document.getElementById('modal');
-  const dayEl=document.getElementById('modal-day');
-  const sessEl=document.getElementById('modal-sess');
-  const badgeEl=document.getElementById('modal-badge');
-  const bodyEl=document.getElementById('modal-body');
-  dayEl.textContent=DIAS_ES[dia];
-  if(dia==='martes'||dia==='jueves'){sessEl.textContent='16:00 – 17:00';badgeEl.innerHTML='';bodyEl.innerHTML='<div class="m-special"><div class="m-sp-icon">🏓</div><div class="m-sp-label">Tenis de Mesa</div><div class="m-sp-desc">Clases + partidos libres<br>No upper body este día</div></div>';}
-  else if(dia==='domingo'){sessEl.textContent='Descanso activo';badgeEl.innerHTML='';bodyEl.innerHTML='<div class="m-special"><div class="m-sp-icon">🛌</div><div class="m-sp-label">Descanso</div><div class="m-sp-desc">Domingo · 9.000 – 10.000 pasos</div></div>';}
-  else if(dia==='sabado'){const m=turnoActivo==='mananas';sessEl.textContent=m?'Descanso obligatorio':'Sesión opcional';badgeEl.innerHTML='';bodyEl.innerHTML=m?'<div class="m-special"><div class="m-sp-icon">😴</div><div class="m-sp-label">Descanso obligatorio</div><div class="m-sp-desc">Turno 06:00 – 18:00</div></div>':'<div class="modal-body"><span class="m-label" style="margin-top:0">Sesión opcional en casa</span><table class="m-table"><tr><th>Opción</th><th>Detalle</th></tr><tr><td>Sprints</td><td class="td-c">20–40m × 8 · 60s desc.</td></tr><tr><td>Tabata KB</td><td class="td-c">4–6 rondas completas</td></tr></table></div>';}
-  else{
-    const c=turnoActivo==='mananas'?'C':cicloActivo;
-    const s=DATA[c][dia];
-    sessEl.textContent=s.title;
-    const col={B:'modal-cb-b',C:'modal-cb-c',A:'modal-cb-a'};
-    const auto=turnoActivo==='mananas'?' · auto':'';
-    badgeEl.innerHTML=`<span class="modal-badge ${col[c]}">Ciclo ${c}${auto}</span>`;
-    bodyEl.innerHTML=renderSesion(s);
+  const info = DIAS[dia];
+  const modal = document.getElementById('modal');
+  document.getElementById('modal-day').textContent = info.label;
+  document.getElementById('modal-sess').textContent = info.session;
+  const body = document.getElementById('modal-body');
+
+  if(info.tipo === 'off'){
+    body.innerHTML = `<div class="m-special"><div class="m-sp-icon">🌿</div>
+      <div class="m-sp-label">Descanso</div>
+      <div class="m-sp-desc">Caminar · leer · respirar.<br>La recuperación es parte del entrenamiento.</div></div>`;
+  } else if(info.tipo === 'activo'){
+    body.innerHTML = `<div class="m-special"><div class="m-sp-icon">🚶</div>
+      <div class="m-sp-label">Descanso activo</div>
+      <div class="m-sp-desc">8.000–10.000 pasos · movilidad 10 min opcional.<br>No es un día de entrenamiento.</div></div>`;
+  } else if(info.tipo === 'sprints'){
+    body.innerHTML = `
+      <span class="m-label">Calentamiento obligatorio · 10 min</span>
+      <ul class="m-wu"><li>5 min trote suave</li><li>Movilidad dinámica cadera, rodillas</li><li>Skipping + aceleraciones suaves</li></ul>
+      <span class="m-label">Protocolo</span>
+      <table class="m-table"><tr><th>Ejercicio</th><th>Series</th><th>Descanso</th></tr>
+      <tr><td>Sprints 40 m</td><td class="mt-s">8 repeticiones</td><td class="mt-c">90 s completo entre cada una</td></tr></table>
+      <span class="m-label">Enfriamiento · 5 min</span>
+      <ul class="m-wu"><li>Caminar 3 min</li><li>Estirar isquiotibiales + cuádriceps</li></ul>
+      <div class="m-nota">Velocidad máxima absoluta en cada sprint. Si no puedes mantener el 90–95% de velocidad, el descanso fue insuficiente.</div>`;
+  } else if(dia === 'lunes'){
+    body.innerHTML = MODAL_CONTENT.funcional_lunes;
+  } else if(dia === 'viernes'){
+    body.innerHTML = MODAL_CONTENT.funcional_viernes;
   }
+
   modal.classList.add('open');
-}
-function renderSesion(s){
-  let h='';
-  if(s.warmup){h+='<span class="m-label">Calentamiento</span><ul class="m-wu">';s.warmup.forEach(w=>{h+=`<li>${w}</li>`;});h+='</ul>';}
-  if(s.tipo==='circuito'||s.tipo==='tabata'){
-    h+=`<span class="m-label">Estructura</span><div class="m-struct">${s.estructura}</div>`;
-    h+='<span class="m-label">Ejercicios</span><table class="m-table"><tr><th>#</th><th>Ejercicio</th></tr>';
-    const px=s.tipo==='tabata'?['B1','B2','B3','B4']:['1','2','3','4','5'];
-    s.items.forEach((item,i)=>{h+=`<tr><td class="td-s">${px[i]}</td><td style="color:var(--muted2)">${item}</td></tr>`;});
-    h+='</table>';
-  }else if(s.tipo==='bloques'){
-    s.bloques.forEach(b=>{h+=`<div class="m-blk"><div class="m-blk-title">${b.titulo}</div><table class="m-table"><tr><th>Ejercicio</th><th>Series</th><th>Desc.</th></tr>`;b.rows.forEach(r=>{h+=`<tr><td style="color:var(--muted2)">${r[0]}</td><td class="td-s">${r[1]}</td><td class="td-r">${r[2]}</td></tr>`;});h+='</table></div>';});
-  }else{
-    h+='<span class="m-label">Ejercicios</span><table class="m-table"><tr><th>Ejercicio</th><th>Series</th><th>Carga</th><th>Desc.</th></tr>';
-    s.rows.forEach(r=>{h+=`<tr><td style="color:var(--muted2)">${r[0]}</td><td class="td-s">${r[1]}</td><td class="td-c">${r[2]}</td><td class="td-r">${r[3]}</td></tr>`;});
-    h+='</table>';
-  }
-  if(s.nota)h+=`<div class="m-nota">${s.nota}</div>`;
-  return h;
 }
 function closeModal(){document.getElementById('modal').classList.remove('open');}
 function closeModalOv(e){if(e.target===document.getElementById('modal'))closeModal();}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
-window.addEventListener('load',()=>{setCiclo(cicloActivo);});
 </script>
 </body>
 </html>
