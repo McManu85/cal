@@ -114,18 +114,28 @@
     .btn-home.primary { background:var(--acc); color:#000; }
     .btn-home.secondary { background:var(--s2); color:var(--txt); border:1px solid var(--b); }
     .btn-home .bh-ico { flex-shrink:0; }
-    /* ── CICLO GROUPS ────────────────────────── */
-    .ciclo-group { margin:10px 12px 0; border:1px solid var(--b); border-radius:var(--r); overflow:hidden; }
-    .ciclo-group-hdr { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; cursor:pointer; background:var(--s2); }
-    .ciclo-group-hdr:active { background:var(--s3); }
-    .ciclo-group-badge { font-family:'DM Sans',sans-serif; font-size:9px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; color:var(--acc); margin-bottom:2px; }
-    .ciclo-group-name { font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:.04em; line-height:1; }
-    .ciclo-group-body { border-top:1px solid var(--b); }
-    .ciclo-day-row { display:flex; align-items:center; gap:12px; padding:13px 14px; border-bottom:1px solid var(--b); cursor:pointer; }
-    .ciclo-day-row:last-child { border-bottom:none; }
-    .ciclo-day-row:active { background:var(--s2); }
-    .cdr-dia { font-family:'DM Sans',sans-serif; font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--acc); min-width:68px; }
-    .cdr-name { flex:1; font-family:'Bebas Neue',sans-serif; font-size:17px; letter-spacing:.04em; }
+    /* ── RUTINAS SCREEN ──────────────────────── */
+    .rutina-card { margin:10px 12px 0; background:var(--s1); border:1px solid var(--b); border-radius:var(--r); overflow:hidden; }
+    .rutina-hdr { display:flex; align-items:center; gap:8px; padding:11px 14px; border-bottom:1px solid var(--b); background:var(--s2); }
+    .rutina-name { flex:1; font-family:'Bebas Neue',sans-serif; font-size:19px; letter-spacing:.04em; color:var(--txt); outline:none; min-width:0; border-bottom:1.5px solid transparent; padding-bottom:1px; }
+    .rutina-name:focus { border-bottom-color:var(--acc); }
+    .rutina-dia-row { display:flex; align-items:center; gap:10px; padding:11px 14px; border-bottom:1px solid var(--b); cursor:pointer; }
+    .rutina-dia-row:active { background:var(--s2); }
+    .rdr-day { font-family:'DM Sans',sans-serif; font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--acc); min-width:62px; }
+    .rdr-name { flex:1; font-family:'Bebas Neue',sans-serif; font-size:16px; letter-spacing:.04em; }
+    .rdr-count { font-family:'DM Sans',sans-serif; font-size:11px; color:var(--mut); white-space:nowrap; }
+    .btn-add-dia { width:100%; padding:10px 14px; background:none; border:none; border-top:1px dashed var(--b); color:var(--acc); cursor:pointer; font-family:'DM Sans',sans-serif; font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; display:flex; align-items:center; gap:8px; }
+    .btn-add-dia:active { background:var(--acc2); }
+    /* ── PICKER RUTINAS ───────────────────────── */
+    .pk-rutina { margin:0 12px 8px; border:1px solid var(--b); border-radius:var(--r); overflow:hidden; }
+    .pk-rutina-hdr { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; cursor:pointer; background:var(--s2); }
+    .pk-rutina-name { font-family:'Bebas Neue',sans-serif; font-size:16px; letter-spacing:.04em; }
+    .pk-rutina-body { border-top:1px solid var(--b); }
+    .pk-dia-row { display:flex; align-items:center; gap:10px; padding:11px 14px; border-bottom:1px solid var(--b); cursor:pointer; }
+    .pk-dia-row:last-child { border-bottom:none; }
+    .pk-dia-row:active { background:var(--s2); }
+    .pk-dia-day { font-family:'DM Sans',sans-serif; font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--acc); min-width:62px; }
+    .pk-dia-name { flex:1; font-family:'Bebas Neue',sans-serif; font-size:16px; letter-spacing:.04em; }
     .cg-chev { transition:transform .2s; color:var(--mut); flex-shrink:0; }
     .cg-chev.open { transform:rotate(90deg); }
     /* ── PLANTILLA CARDS (home) ──────────────── */
@@ -355,19 +365,19 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════ SCREEN: TEMPLATES ══════════════════════════ -->
-<div id="scr-templates" class="screen">
+<!-- ════════════════════════════ SCREEN: RUTINAS ═══════════════════════════ -->
+<div id="scr-rutinas" class="screen">
   <div class="hdr">
-    <button class="ico" id="tpl-screen-back">
+    <button class="ico" id="rutinas-back">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
     </button>
-    <div class="hdr-title" style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.06em">PLANTILLAS</div>
-    <button class="ico acc" id="tpl-screen-new">
+    <div class="hdr-title" style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.06em">RUTINAS</div>
+    <button class="ico acc" id="rutinas-new">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
     </button>
   </div>
   <div class="scroll">
-    <div id="tpl-screen-body"></div>
+    <div id="rutinas-body" style="padding-bottom:12px"></div>
   </div>
 </div>
 
@@ -411,21 +421,15 @@
   </div>
   <div class="tpl-meta">
     <div class="tpl-meta-row">
-      <span class="tpl-meta-lbl">Ciclo</span>
-      <div class="meta-pills" id="tpl-ciclo-pills">
-        <button class="meta-pill" data-ciclo="A">A</button>
-        <button class="meta-pill" data-ciclo="B">B</button>
-        <button class="meta-pill" data-ciclo="C">C</button>
-        <button class="meta-pill" data-ciclo="">—</button>
-      </div>
-    </div>
-    <div class="tpl-meta-row">
       <span class="tpl-meta-lbl">Día</span>
       <div class="meta-pills" id="tpl-dia-pills">
-        <button class="meta-pill" data-dia="Lunes">Lunes</button>
-        <button class="meta-pill" data-dia="Miércoles">Mié</button>
-        <button class="meta-pill" data-dia="Viernes">Viernes</button>
-        <button class="meta-pill" data-dia="">—</button>
+        <button class="meta-pill" data-dia="Lunes">L</button>
+        <button class="meta-pill" data-dia="Martes">M</button>
+        <button class="meta-pill" data-dia="Miércoles">X</button>
+        <button class="meta-pill" data-dia="Jueves">J</button>
+        <button class="meta-pill" data-dia="Viernes">V</button>
+        <button class="meta-pill" data-dia="Sábado">S</button>
+        <button class="meta-pill" data-dia="Domingo">D</button>
       </div>
     </div>
   </div>
@@ -553,6 +557,7 @@ const PRESET_TPLS = [
   { id:'pt-a-v', ciclo:'A', dia:'Viernes',   nombre:'A · Viernes — Pull + Integración',  ejercicios:['Dominadas lastradas','Remo barra','KB swing 1 brazo','Sprints 40m','Curl bíceps barra'] },
 ];
 let db = loadDB();
+initRutinas();
 let ses = null;      // sesión activa
 let sesIdx = -1;
 
@@ -587,7 +592,7 @@ function saveDB() { localStorage.setItem(LS, JSON.stringify(db)); }
 // NAVIGATION
 // ─────────────────────────────────────────────────────────────────────────────
 function showScreen(id) {
-  const all = ['scr-home','scr-session','scr-tpl-edit','scr-templates'];
+  const all = ['scr-home','scr-session','scr-tpl-edit','scr-rutinas'];
   all.forEach(sid => {
     const el = document.getElementById(sid);
     el.classList.remove('active','behind');
@@ -601,10 +606,10 @@ function showScreen(id) {
     const prevActive = document.querySelector('.screen.active');
     if (prevActive) prevActive.classList.add('behind');
     document.getElementById('scr-tpl-edit').classList.add('active');
-  } else if (id === 'scr-templates') {
+  } else if (id === 'scr-rutinas') {
     const prevActive = document.querySelector('.screen.active');
     if (prevActive) prevActive.classList.add('behind');
-    document.getElementById('scr-templates').classList.add('active');
+    document.getElementById('scr-rutinas').classList.add('active');
   } else {
     document.getElementById('scr-home').classList.add('active');
   }
@@ -619,89 +624,176 @@ function renderHome() { /* home is static — sessions/templates on demand */ }
 // ─────────────────────────────────────────────────────────────────────────────
 // CICLO GROUPS (shared renderer, mode: 'pick' | 'manage')
 // ─────────────────────────────────────────────────────────────────────────────
-function renderCicloGroups(containerId, mode) {
-  const el = document.getElementById(containerId);
-  if (!db.plantillas.length) {
-    el.innerHTML = '<div class="empty" style="padding:40px"><p>Sin plantillas.<br>Crea la primera.</p></div>';
+// ─────────────────────────────────────────────────────────────────────────────
+// RUTINAS SYSTEM
+// ─────────────────────────────────────────────────────────────────────────────
+let editingRutinaId = null;
+let editingDiaIdx   = -1;
+let pickerOpenRutinas = new Set();
+
+function initRutinas() {
+  if (db.rutinas) return;
+  db.rutinas = [];
+  const nameMap = { A:'Ciclo A — Fuerza Funcional', B:'Ciclo B — Potencia & Explosividad', C:'Ciclo C — Metabólico & Recomposición' };
+  const cicloMap = {};
+  (db.plantillas || []).forEach(p => {
+    if (!p.ciclo) return;
+    if (!cicloMap[p.ciclo]) cicloMap[p.ciclo] = { id:'r_'+p.ciclo, nombre:nameMap[p.ciclo]||'Ciclo '+p.ciclo, dias:[] };
+    const sesName = p.nombre.includes('—') ? p.nombre.split('—').slice(1).join('—').trim() : p.nombre;
+    cicloMap[p.ciclo].dias.push({ id:'d_'+p.id, dia:p.dia||'', nombre:sesName, ejercicios:p.ejercicios||[] });
+  });
+  ['B','C','A'].forEach(ciclo => { if (cicloMap[ciclo]) db.rutinas.push(cicloMap[ciclo]); });
+  saveDB();
+}
+
+function openRutinasScreen() {
+  renderRutinasScreen();
+  showScreen('scr-rutinas');
+}
+
+function renderRutinasScreen() {
+  const el = document.getElementById('rutinas-body');
+  if (!db.rutinas || !db.rutinas.length) {
+    el.innerHTML = `<div class="empty"><p>Sin rutinas todavía.<br>Crea la primera con +</p></div>`;
     return;
   }
-  const groups = { A:[], B:[], C:[], other:[] };
-  db.plantillas.forEach((t,i) => {
-    if (t.ciclo && groups[t.ciclo]) groups[t.ciclo].push({t,i});
-    else groups.other.push({t,i});
-  });
   let html = '';
-  ['B','C','A'].forEach(ciclo => {
-    if (!groups[ciclo].length) return;
-    const isOpen = openCiclos.has(ciclo);
-    const rowAction = mode === 'pick'
-      ? `onclick="sesFromTpl(IDX);closeOv('ov-session-picker')"`
-      : `onclick="openTplEdit(IDX)"`;
-    html += `<div class="ciclo-group">
-      <div class="ciclo-group-hdr" onclick="toggleCicloGroup('${ciclo}');renderCicloGroups('${containerId}','${mode}')">
-        <div>
-          <div class="ciclo-group-badge">CICLO ${ciclo}</div>
-          <div class="ciclo-group-name">${CICLO_NAMES[ciclo]}</div>
-        </div>
-        <svg class="cg-chev ${isOpen?'open':''}" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+  db.rutinas.forEach(rutina => {
+    html += `<div class="rutina-card">
+      <div class="rutina-hdr">
+        <div class="rutina-name" contenteditable="true"
+          onblur="renameRutina('${rutina.id}',this.textContent.trim())"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}"
+        >${esc(rutina.nombre)}</div>
+        <button class="ico red" style="width:36px;height:36px;flex-shrink:0" onclick="deleteRutina('${rutina.id}')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+        </button>
       </div>
-      ${isOpen ? `<div class="ciclo-group-body">${groups[ciclo].map(({t,i}) => {
-        const sesName = t.nombre.includes('—') ? t.nombre.split('—')[1].trim() : t.nombre;
-        const action = rowAction.replace(/IDX/g, i);
-        return `<div class="ciclo-day-row" ${action}>
-          <div class="cdr-dia">${t.dia||''}</div>
-          <div class="cdr-name">${esc(sesName)}</div>
-          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-            <button style="background:none;border:none;color:var(--mut);cursor:pointer;padding:4px;border-radius:4px;line-height:1" onclick="event.stopPropagation();openTplEdit(${i})" title="Editar">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            </button>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--mut)" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
-          </div>
-        </div>`;
-      }).join('')}</div>` : ''}
+      ${rutina.dias.map((dia,idx) => `
+        <div class="rutina-dia-row" onclick="openDiaEdit('${rutina.id}',${idx})">
+          <div class="rdr-day">${dia.dia||'—'}</div>
+          <div class="rdr-name">${esc(dia.nombre)}</div>
+          <div class="rdr-count">${dia.ejercicios.length} ej.</div>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--mut)" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+        </div>`).join('')}
+      <button class="btn-add-dia" onclick="openDiaEdit('${rutina.id}',-1)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        Añadir día
+      </button>
     </div>`;
   });
-  if (groups.other.length) {
-    html += `<div class="list-label" style="margin-top:10px">Mis plantillas</div><div class="tpl-grid">`;
-    groups.other.forEach(({t,i}) => {
-      html += `<div class="tpl-card">
-        <div class="tpl-card-use" data-use-tpl="${i}">
-          <div class="tpl-badge">PLANTILLA</div>
-          <div class="tpl-card-name">${esc(t.nombre)}</div>
-          <div class="tpl-card-meta">${t.ejercicios.length} ejercicio${t.ejercicios.length!==1?'s':''}</div>
-        </div>
-        <div class="tpl-card-foot">
-          <button class="tpl-card-edit" data-edit-tpl="${i}">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            EDITAR
-          </button>
-        </div>
-      </div>`;
-    });
-    html += '</div>';
-  }
   el.innerHTML = html;
-  // re-attach delegated click for 'other' tpl cards
-  el.querySelectorAll('[data-use-tpl]').forEach(el2 => {
-    el2.addEventListener('click', () => {
-      const idx = +el2.dataset.useTpl;
-      if (mode === 'pick') { closeOv('ov-session-picker'); }
-      sesFromTpl(idx);
-    });
-  });
-  el.querySelectorAll('[data-edit-tpl]').forEach(el2 => {
-    el2.addEventListener('click', e => { e.stopPropagation(); openTplEdit(+el2.dataset.editTpl); });
+}
+
+function addNewRutina() {
+  if (!db.rutinas) db.rutinas = [];
+  const r = { id:'r_'+Date.now(), nombre:'Nueva rutina', dias:[] };
+  db.rutinas.push(r);
+  saveDB();
+  renderRutinasScreen();
+  // Focus the new rutina name
+  setTimeout(() => {
+    const divs = document.querySelectorAll('.rutina-name');
+    if (divs.length) divs[divs.length-1].focus();
+    const sel = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(divs[divs.length-1]);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }, 50);
+}
+
+function renameRutina(id, nombre) {
+  const r = db.rutinas.find(r => r.id === id);
+  if (r && nombre) { r.nombre = nombre; saveDB(); }
+}
+
+function deleteRutina(id) {
+  openDelConfirm('Eliminar rutina', '¿Eliminar esta rutina? No se puede deshacer.', () => {
+    db.rutinas = db.rutinas.filter(r => r.id !== id);
+    saveDB(); renderRutinasScreen(); toast('Rutina eliminada');
   });
 }
 
+function openDiaEdit(rutinaId, diaIdx) {
+  editingRutinaId = rutinaId;
+  editingDiaIdx   = diaIdx;
+  const rutina = db.rutinas.find(r => r.id === rutinaId);
+  if (diaIdx === -1) {
+    tpl = { id:'d_'+Date.now(), dia:'', nombre:'Nueva sesión', ejercicios:[] };
+  } else {
+    tpl = JSON.parse(JSON.stringify(rutina.dias[diaIdx]));
+  }
+  const titleEl = document.getElementById('tpl-edit-title');
+  titleEl.textContent = tpl.nombre;
+  titleEl.contentEditable = 'true';
+  document.querySelectorAll('#tpl-dia-pills .meta-pill').forEach(b =>
+    b.classList.toggle('sel', b.dataset.dia === (tpl.dia||'')));
+  renderTplEdit();
+  showScreen('scr-tpl-edit');
+}
+
+function saveDia() {
+  if (!tpl || !editingRutinaId) return;
+  const titleEl = document.getElementById('tpl-edit-title');
+  tpl.nombre = titleEl.textContent.trim() || 'Sin nombre';
+  const diaBtn = document.querySelector('#tpl-dia-pills .meta-pill.sel');
+  if (diaBtn) tpl.dia = diaBtn.dataset.dia || tpl.dia;
+  const rutina = db.rutinas.find(r => r.id === editingRutinaId);
+  if (!rutina) return;
+  if (editingDiaIdx === -1) rutina.dias.push(tpl);
+  else rutina.dias[editingDiaIdx] = tpl;
+  saveDB();
+}
+
+function sesFromDia(rutinaId, diaIdx) {
+  const rutina = db.rutinas ? db.rutinas.find(r => r.id === rutinaId) : null;
+  if (!rutina || !rutina.dias[diaIdx]) return;
+  const dia = rutina.dias[diaIdx];
+  ses = { id:String(Date.now()), fecha:todayStr(), nombre:dia.nombre,
+    ejercicios:dia.ejercicios.map(n=>({nombre:n,series:[]})) };
+  sesIdx = -1;
+  startSesScreen();
+}
+
+// ─── SESSION PICKER ───────────────────────────────────────────────────────────
 function openSessionPicker() {
-  renderCicloGroups('sp-ciclos', 'pick');
+  renderSessionPicker();
   document.getElementById('ov-session-picker').classList.add('open');
 }
 
-function openTemplatesScreen() {
-  renderCicloGroups('tpl-screen-body', 'manage');
-  showScreen('scr-templates');
+function renderSessionPicker() {
+  const el = document.getElementById('sp-ciclos');
+  const rutinas = db.rutinas || [];
+  if (!rutinas.length) {
+    el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--mut);font-family:DM Sans,sans-serif;font-size:14px">Sin rutinas todavía.<br>Crea una en Gestionar Rutinas.</div>';
+    return;
+  }
+  // Show all expanded by default
+  if (!pickerOpenRutinas.size) rutinas.forEach(r => pickerOpenRutinas.add(r.id));
+  let html = '';
+  rutinas.forEach(rutina => {
+    const isOpen = pickerOpenRutinas.has(rutina.id);
+    html += `<div class="pk-rutina">
+      <div class="pk-rutina-hdr" onclick="togglePickerRutina('${rutina.id}')">
+        <div class="pk-rutina-name">${esc(rutina.nombre)}</div>
+        <svg class="cg-chev ${isOpen?'open':''}" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      ${isOpen ? `<div class="pk-rutina-body">${rutina.dias.map((dia,idx) =>
+        `<div class="pk-dia-row" onclick="sesFromDia('${rutina.id}',${idx});closeOv('ov-session-picker')">
+          <div class="pk-dia-day">${dia.dia||'—'}</div>
+          <div class="pk-dia-name">${esc(dia.nombre)}</div>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--acc)" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+        </div>`).join('')}</div>` : ''}
+    </div>`;
+  });
+  el.innerHTML = html;
+}
+
+function togglePickerRutina(id) {
+  if (pickerOpenRutinas.has(id)) pickerOpenRutinas.delete(id);
+  else pickerOpenRutinas.add(id);
+  renderSessionPicker();
 }
 
 function closeOv(id) { document.getElementById(id).classList.remove('open'); }
@@ -713,55 +805,19 @@ document.getElementById('ov-session-picker').addEventListener('click', e => {
   if (e.target === document.getElementById('ov-session-picker')) closeOv('ov-session-picker');
 });
 
-// Templates screen events
-document.getElementById('tpl-screen-back').addEventListener('click', () => showScreen('scr-home'));
-document.getElementById('tpl-screen-new').addEventListener('click', () => openTplEdit(-1));
+// Rutinas screen events
+document.getElementById('rutinas-back').addEventListener('click', () => showScreen('scr-home'));
+document.getElementById('rutinas-new').addEventListener('click', addNewRutina);
 
 // Home action buttons
 document.getElementById('btn-iniciar').addEventListener('click', openSessionPicker);
-document.getElementById('btn-plantillas').addEventListener('click', openTemplatesScreen);
-
-const CICLO_NAMES = { A:'Fuerza Funcional', B:'Potencia & Explosividad', C:'Metabólico & Recomposición' };
-let openCiclos = new Set(JSON.parse(localStorage.getItem('open_ciclos')||'["B","C","A"]'));
-
-function toggleCicloGroup(ciclo) {
-  if (openCiclos.has(ciclo)) openCiclos.delete(ciclo);
-  else openCiclos.add(ciclo);
-  localStorage.setItem('open_ciclos', JSON.stringify([...openCiclos]));
-  renderTplHome();
-}
+document.getElementById('btn-plantillas').addEventListener('click', openRutinasScreen);
 
 function renderTplHome() {
   const sec = document.getElementById('tpl-home-section');
-  if (!db.plantillas.length) { sec.innerHTML = ''; return; }
-  const groups = { A:[], B:[], C:[], other:[] };
-  db.plantillas.forEach((t,i) => {
-    if (t.ciclo && groups[t.ciclo]) groups[t.ciclo].push({t,i});
-    else groups.other.push({t,i});
-  });
-  let html = '';
-  ['B','C','A'].forEach(ciclo => {
-    if (!groups[ciclo].length) return;
-    const isOpen = openCiclos.has(ciclo);
-    html += `<div class="ciclo-group">
-      <div class="ciclo-group-hdr" onclick="toggleCicloGroup('${ciclo}')">
-        <div>
-          <div class="ciclo-group-badge">CICLO ${ciclo}</div>
-          <div class="ciclo-group-name">${CICLO_NAMES[ciclo]}</div>
-        </div>
-        <svg class="cg-chev ${isOpen?'open':''}" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
-      </div>
-      ${isOpen ? `<div class="ciclo-group-body">${groups[ciclo].map(({t,i}) => {
-        const sesName = t.nombre.includes('—') ? t.nombre.split('—')[1].trim() : t.nombre;
-        return `<div class="ciclo-day-row" onclick="sesFromTpl(${i})">
-          <div class="cdr-dia">${t.dia||''}</div>
-          <div class="cdr-name">${esc(sesName)}</div>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--mut)" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
-        </div>`;
-      }).join('')}</div>` : ''}
-    </div>`;
-  });
-  if (groups.other.length) {
+  if (!sec) return;
+  const dummy_groups_other = [];
+  if (dummy_groups_other.length) {
     html += `<div class="list-label" style="margin-top:10px">Mis plantillas</div><div class="tpl-grid">`;
     groups.other.forEach(({t,i}) => {
       html += `<div class="tpl-card">
@@ -1055,31 +1111,7 @@ function removeSet(ei,si) { ses.ejercicios[ei].series.splice(si,1); autosave(); 
 // ─────────────────────────────────────────────────────────────────────────────
 // PLANTILLA EDITOR (SCREEN)
 // ─────────────────────────────────────────────────────────────────────────────
-function openTplEdit(idx) {
-  tplOrigin = document.getElementById('scr-templates').classList.contains('active') ? 'templates' : 'home';
-  closeOverlay('tpl-list-overlay');
-  if (idx === -1) {
-    tpl = { id:String(Date.now()), nombre:'Nueva plantilla', ejercicios:[] };
-    tplIdx = -1;
-  } else {
-    tplIdx = idx;
-    tpl = JSON.parse(JSON.stringify(db.plantillas[idx]));
-  }
-  const titleEl = document.getElementById('tpl-edit-title');
-  // Show just the session title (strip ciclo·dia prefix)
-  let displayTitle = tpl.nombre || '';
-  if (displayTitle.includes('—')) displayTitle = displayTitle.split('—').slice(1).join('—').trim();
-  titleEl.textContent = displayTitle;
-  titleEl.contentEditable = 'true';
-  // Populate ciclo pills
-  document.querySelectorAll('#tpl-ciclo-pills .meta-pill').forEach(b =>
-    b.classList.toggle('sel', b.dataset.ciclo === (tpl.ciclo || '')));
-  // Populate dia pills
-  document.querySelectorAll('#tpl-dia-pills .meta-pill').forEach(b =>
-    b.classList.toggle('sel', b.dataset.dia === (tpl.dia || '')));
-  renderTplEdit();
-  showScreen('scr-tpl-edit');
-}
+function openTplEdit(idx) { /* legacy - not used in rutinas flow */ }
 
 function renderTplEdit() {
   const c = document.getElementById('tpl-edit-exercises');
@@ -1099,47 +1131,24 @@ function renderTplEdit() {
     </div>`).join('');
 }
 
-function saveTpl() {
-  const titleEl = document.getElementById('tpl-edit-title');
-  const sessionTitle = titleEl.textContent.trim() || 'Sin nombre';
-  // Read ciclo/dia from selected pills
-  const cicloBtn = document.querySelector('#tpl-ciclo-pills .meta-pill.sel');
-  const diaBtn   = document.querySelector('#tpl-dia-pills .meta-pill.sel');
-  tpl.ciclo = cicloBtn ? cicloBtn.dataset.ciclo : (tpl.ciclo || '');
-  tpl.dia   = diaBtn   ? diaBtn.dataset.dia     : (tpl.dia   || '');
-  // Build full nombre
-  if (tpl.ciclo && tpl.dia)  tpl.nombre = tpl.ciclo + ' · ' + tpl.dia + ' — ' + sessionTitle;
-  else if (tpl.ciclo)        tpl.nombre = tpl.ciclo + ' — ' + sessionTitle;
-  else                       tpl.nombre = sessionTitle;
-  if (tplIdx === -1) { db.plantillas.push(tpl); tplIdx = db.plantillas.length-1; }
-  else db.plantillas[tplIdx] = tpl;
-  saveDB();
-}
+function saveTpl() { saveDia(); } // alias for backward compat
 
 document.getElementById('tpl-edit-back').addEventListener('click', () => {
-  saveTpl();
-  if (tplOrigin === 'templates') { openTemplatesScreen(); } else { showScreen('scr-home'); renderHome(); }
-  toast('Plantilla guardada');
+  saveDia(); openRutinasScreen(); toast('Día guardado');
 });
 document.getElementById('tpl-edit-save').addEventListener('click', () => {
-  saveTpl(); toast('Plantilla guardada ✓');
+  saveDia(); toast('Día guardado ✓');
 });
 document.getElementById('tpl-edit-use').addEventListener('click', () => {
-  saveTpl();
-  const idx = tplIdx !== -1 ? tplIdx : db.plantillas.length - 1;
-  tplOrigin = 'home';
-  sesFromTpl(idx);
+  saveDia();
+  if (editingRutinaId) {
+    const ridx = editingDiaIdx !== -1 ? editingDiaIdx : (db.rutinas.find(r=>r.id===editingRutinaId)||{dias:[]}).dias.length-1;
+    sesFromDia(editingRutinaId, ridx);
+  }
 });
 
 
-// Template meta: ciclo + dia pill selectors
-document.getElementById('tpl-ciclo-pills').addEventListener('click', e => {
-  const pill = e.target.closest('.meta-pill');
-  if (!pill || !tpl) return;
-  tpl.ciclo = pill.dataset.ciclo;
-  document.querySelectorAll('#tpl-ciclo-pills .meta-pill').forEach(b => b.classList.remove('sel'));
-  pill.classList.add('sel');
-});
+// Día pill selector
 document.getElementById('tpl-dia-pills').addEventListener('click', e => {
   const pill = e.target.closest('.meta-pill');
   if (!pill || !tpl) return;
@@ -1166,11 +1175,13 @@ document.getElementById('tpl-edit-add-ex').addEventListener('click', () => {
 });
 
 document.getElementById('tpl-edit-del').addEventListener('click', () => {
-  openDelConfirm('Eliminar plantilla', '¿Eliminar esta plantilla? No se puede deshacer.', () => {
-    if (tplIdx !== -1) { db.plantillas.splice(tplIdx,1); saveDB(); }
-    tpl = null; tplIdx = -1;
-    if (tplOrigin === 'templates') { openTemplatesScreen(); } else { showScreen('scr-home'); renderHome(); }
-    toast('Plantilla eliminada');
+  openDelConfirm('Eliminar día', '¿Eliminar este día? No se puede deshacer.', () => {
+    if (editingRutinaId && editingDiaIdx !== -1) {
+      const r = db.rutinas.find(r => r.id === editingRutinaId);
+      if (r) { r.dias.splice(editingDiaIdx, 1); saveDB(); }
+    }
+    tpl = null; editingRutinaId = null; editingDiaIdx = -1;
+    openRutinasScreen(); toast('Día eliminado');
   });
 });
 
