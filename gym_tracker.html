@@ -525,6 +525,7 @@ const PRESET_TPLS = [
 
 
 let tpl = null;      // plantilla en edición
+let tplOrigin = 'home'; // which screen opened tpl editor
 let tplIdx = -1;
 
 // picker context: 'session' | 'tpl-edit'
@@ -598,7 +599,7 @@ function renderCicloGroups(containerId, mode) {
     const isOpen = openCiclos.has(ciclo);
     const rowAction = mode === 'pick'
       ? `onclick="sesFromTpl(IDX);closeOv('ov-session-picker')"`
-      : `onclick="sesFromTpl(IDX)"`;
+      : `onclick="openTplEdit(IDX)"`;
     html += `<div class="ciclo-group">
       <div class="ciclo-group-hdr" onclick="toggleCicloGroup('${ciclo}');renderCicloGroups('${containerId}','${mode}')">
         <div>
@@ -1012,6 +1013,7 @@ function removeSet(ei,si) { ses.ejercicios[ei].series.splice(si,1); autosave(); 
 // PLANTILLA EDITOR (SCREEN)
 // ─────────────────────────────────────────────────────────────────────────────
 function openTplEdit(idx) {
+  tplOrigin = document.getElementById('scr-templates').classList.contains('active') ? 'templates' : 'home';
   closeOverlay('tpl-list-overlay');
   if (idx === -1) {
     tpl = { id:String(Date.now()), nombre:'Nueva plantilla', ejercicios:[] };
@@ -1054,7 +1056,9 @@ function saveTpl() {
 }
 
 document.getElementById('tpl-edit-back').addEventListener('click', () => {
-  saveTpl(); showScreen('scr-home'); renderHome(); toast('Plantilla guardada');
+  saveTpl();
+  if (tplOrigin === 'templates') { openTemplatesScreen(); } else { showScreen('scr-home'); renderHome(); }
+  toast('Plantilla guardada');
 });
 document.getElementById('tpl-edit-save').addEventListener('click', () => {
   saveTpl(); toast('Plantilla guardada ✓');
@@ -1062,6 +1066,7 @@ document.getElementById('tpl-edit-save').addEventListener('click', () => {
 document.getElementById('tpl-edit-use').addEventListener('click', () => {
   saveTpl();
   const idx = tplIdx !== -1 ? tplIdx : db.plantillas.length - 1;
+  tplOrigin = 'home';
   sesFromTpl(idx);
 });
 
@@ -1087,7 +1092,8 @@ document.getElementById('tpl-edit-del').addEventListener('click', () => {
   openDelConfirm('Eliminar plantilla', '¿Eliminar esta plantilla? No se puede deshacer.', () => {
     if (tplIdx !== -1) { db.plantillas.splice(tplIdx,1); saveDB(); }
     tpl = null; tplIdx = -1;
-    showScreen('scr-home'); renderHome(); toast('Plantilla eliminada');
+    if (tplOrigin === 'templates') { openTemplatesScreen(); } else { showScreen('scr-home'); renderHome(); }
+    toast('Plantilla eliminada');
   });
 });
 
