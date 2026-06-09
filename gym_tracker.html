@@ -108,6 +108,21 @@
     .ciclo-filter-lbl { font-family:'DM Sans',sans-serif; font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--mut); margin-right:2px; }
     .cf-btn { height:28px; padding:0 14px; border-radius:20px; border:1px solid var(--b); background:none; color:var(--mut); font-family:'Bebas Neue',sans-serif; font-size:15px; letter-spacing:.06em; cursor:pointer; transition:all .2s; }
     .cf-btn.active { background:var(--acc); border-color:var(--acc); color:#000; }
+
+    /* ── CICLO GROUPS ────────────────────────── */
+    .ciclo-group { margin:10px 12px 0; border:1px solid var(--b); border-radius:var(--r); overflow:hidden; }
+    .ciclo-group-hdr { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; cursor:pointer; background:var(--s2); }
+    .ciclo-group-hdr:active { background:var(--s3); }
+    .ciclo-group-badge { font-family:'DM Sans',sans-serif; font-size:9px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; color:var(--acc); margin-bottom:2px; }
+    .ciclo-group-name { font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:.04em; line-height:1; }
+    .ciclo-group-body { border-top:1px solid var(--b); }
+    .ciclo-day-row { display:flex; align-items:center; gap:12px; padding:13px 14px; border-bottom:1px solid var(--b); cursor:pointer; }
+    .ciclo-day-row:last-child { border-bottom:none; }
+    .ciclo-day-row:active { background:var(--s2); }
+    .cdr-dia { font-family:'DM Sans',sans-serif; font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--acc); min-width:68px; }
+    .cdr-name { flex:1; font-family:'Bebas Neue',sans-serif; font-size:17px; letter-spacing:.04em; }
+    .cg-chev { transition:transform .2s; color:var(--mut); flex-shrink:0; }
+    .cg-chev.open { transform:rotate(90deg); }
     /* ── PLANTILLA CARDS (home) ──────────────── */
     .tpl-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:0 12px 4px; }
     .tpl-card { background:var(--s1); border:1px solid var(--b);
@@ -281,15 +296,15 @@
   <div class="hdr">
     <div class="hdr-logo">GYM</div>
     <div style="flex:1"></div>
-    <button class="ico" id="btn-import">
+    <button class="ico" id="btn-import" title="Importar">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
     </button>
-    <button class="ico" id="btn-drive" onclick="gdHandleTap()" style="position:relative">
-      <svg width="20" height="20" viewBox="0 0 87.3 78" fill="currentColor"><path d="M6.6 66.85l3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8H0a15.6 15.6 0 001.65 7.35z" fill="#0066da"/><path d="M43.65 25L29.9 1.2a15.4 15.4 0 00-3.3 3.3L1.65 45.5A15.6 15.6 0 000 52.85h27.5z" fill="#00ac47"/><path d="M73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25a15.6 15.6 0 001.65-7.35H60.1l5.85 11.2z" fill="#ea4335"/><path d="M43.65 25L57.4 1.2C56.05.43 54.5 0 52.85 0H34.45c-1.65 0-3.2.43-4.55 1.2z" fill="#00832d"/><path d="M59.8 52.85H27.5L13.75 76.65c1.35.77 2.9 1.2 4.55 1.2h50.7c1.65 0 3.2-.43 4.55-1.2z" fill="#2684fc"/><path d="M73.4 26.5l-13.1-22.7a15.4 15.4 0 00-2.9-2.6L43.65 25l16.45 27.85H87.3a15.6 15.6 0 00-1.65-7.35z" fill="#ffba00"/></svg>
-      <span id="gd-dot" style="display:none;position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--acc);border:1.5px solid var(--bg)"></span>
-    </button>
-    <button class="ico" id="btn-export">
+    <button class="ico" id="btn-export" title="Exportar">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    </button>
+    <button class="ico" id="btn-drive" onclick="gdHandleTap()" title="Cuenta" style="position:relative">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      <span id="gd-dot" style="display:none;position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--acc);border:1.5px solid var(--bg)"></span>
     </button>
   </div>
   <div class="scroll">
@@ -303,9 +318,6 @@
         DESDE PLANTILLA
       </button>
     </div>
-
-    <!-- Hoy -->
-    <div id="today-section"></div>
 
     <!-- Plantillas recientes -->
     <div id="tpl-home-section"></div>
@@ -477,7 +489,6 @@ const PRESET_TPLS = [
   { id:'pt-a-v', ciclo:'A', dia:'Viernes',   nombre:'A · Viernes — Pull + Integración',  ejercicios:['Dominadas lastradas','Remo barra','KB swing 1 brazo','Sprints 40m','Curl bíceps barra'] },
 ];
 
-let activeCiclo = localStorage.getItem('act_ciclo') || 'B';
 
 let tpl = null;      // plantilla en edición
 let tplIdx = -1;
@@ -528,77 +539,69 @@ function showScreen(id) {
 // HOME
 // ─────────────────────────────────────────────────────────────────────────────
 function renderHome() {
-  renderToday();
   renderTplHome();
   renderSessions();
 }
 
-function setCicloFilter(c) {
-  activeCiclo = c;
-  localStorage.setItem('act_ciclo', c);
-  renderToday();
-  renderTplHome();
-}
+const CICLO_NAMES = { A:'Fuerza Funcional', B:'Potencia & Explosividad', C:'Metabólico & Recomposición' };
+let openCiclos = new Set(JSON.parse(localStorage.getItem('open_ciclos')||'["B","C","A"]'));
 
-function renderToday() {
-  const sec = document.getElementById('today-section');
-  const day = new Date().getDay();
-  const dias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
-  const gymMap = {1:'Lunes', 3:'Miércoles', 5:'Viernes'};
-  const ttDays = {2:'Martes', 4:'Jueves'};
-  if (gymMap[day]) {
-    const diaGym = gymMap[day];
-    const tIdx = db.plantillas.findIndex(t => t.ciclo === activeCiclo && t.dia === diaGym);
-    if (tIdx !== -1) {
-      const t = db.plantillas[tIdx];
-      const sesName = t.nombre.includes('—') ? t.nombre.split('—')[1].trim() : t.nombre;
-      sec.innerHTML = `<div class="today-card">
-        <div class="today-hdr">
-          <div class="today-lbl">HOY · CICLO ${activeCiclo}</div>
-          <div class="today-dayname">${dias[day]}</div>
-        </div>
-        <div class="today-sesname">${sesName}</div>
-        <button class="today-btn" onclick="sesFromTpl(${tIdx})">EMPEZAR SESIÓN</button>
-      </div>`;
-    } else {
-      sec.innerHTML = `<div class="today-card"><div class="today-hdr"><div class="today-lbl">HOY · GYM</div><div class="today-dayname">${dias[day]}</div></div></div>`;
-    }
-  } else if (ttDays[day]) {
-    sec.innerHTML = `<div class="today-card"><div class="today-rest"><div class="today-rest-icon">🏓</div><div><div class="today-rest-day">Tenis de Mesa</div><div class="today-rest-sub">${ttDays[day]} · 16:00 – 17:00</div></div></div></div>`;
-  } else if (day === 6) {
-    sec.innerHTML = `<div class="today-card"><div class="today-rest"><div class="today-rest-icon">⚡</div><div><div class="today-rest-day">Sábado</div><div class="today-rest-sub">Opcional · Sprints o Tabata KB en casa</div></div></div></div>`;
-  } else {
-    sec.innerHTML = `<div class="today-card"><div class="today-rest"><div class="today-rest-icon">🛌</div><div><div class="today-rest-day">Descanso</div><div class="today-rest-sub">Domingo · 9.000 – 10.000 pasos</div></div></div></div>`;
-  }
+function toggleCicloGroup(ciclo) {
+  if (openCiclos.has(ciclo)) openCiclos.delete(ciclo);
+  else openCiclos.add(ciclo);
+  localStorage.setItem('open_ciclos', JSON.stringify([...openCiclos]));
+  renderTplHome();
 }
 
 function renderTplHome() {
   const sec = document.getElementById('tpl-home-section');
   if (!db.plantillas.length) { sec.innerHTML = ''; return; }
-  let html = `<div class="ciclo-filter">
-    <span class="ciclo-filter-lbl">Ciclo</span>
-    ${['A','B','C'].map(cv => `<button class="cf-btn ${activeCiclo===cv?'active':''}" onclick="setCicloFilter('${cv}')">${cv}</button>`).join('')}
-  </div>`;
-  const filtered = db.plantillas.map((t,i)=>({t,i})).filter(({t})=> !t.ciclo || t.ciclo === activeCiclo);
-  if (!filtered.length) { sec.innerHTML = html; return; }
-  html += `<div class="list-label">Plantillas</div><div class="tpl-grid">`;
-  filtered.forEach(({t, i}) => {
-    const dispName = t.nombre.includes('—') ? t.nombre.split('—')[1].trim() : t.nombre;
-    html += `<div class="tpl-card">
-      <div class="tpl-card-use" data-use-tpl="${i}">
-        <div class="tpl-badge">${t.ciclo ? 'CICLO ' + t.ciclo : 'PLANTILLA'}</div>
-        <div class="tpl-card-name">${esc(dispName)}</div>
-        <div class="tpl-card-meta">${t.ejercicios.length} ejercicio${t.ejercicios.length!==1?'s':''}</div>
+  const groups = { A:[], B:[], C:[], other:[] };
+  db.plantillas.forEach((t,i) => {
+    if (t.ciclo && groups[t.ciclo]) groups[t.ciclo].push({t,i});
+    else groups.other.push({t,i});
+  });
+  let html = '';
+  ['B','C','A'].forEach(ciclo => {
+    if (!groups[ciclo].length) return;
+    const isOpen = openCiclos.has(ciclo);
+    html += `<div class="ciclo-group">
+      <div class="ciclo-group-hdr" onclick="toggleCicloGroup('${ciclo}')">
+        <div>
+          <div class="ciclo-group-badge">CICLO ${ciclo}</div>
+          <div class="ciclo-group-name">${CICLO_NAMES[ciclo]}</div>
+        </div>
+        <svg class="cg-chev ${isOpen?'open':''}" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
       </div>
-      <div class="tpl-card-foot">
-        <button class="tpl-card-edit" data-edit-tpl="${i}">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          EDITAR
-        </button>
-      </div>
+      ${isOpen ? `<div class="ciclo-group-body">${groups[ciclo].map(({t,i}) => {
+        const sesName = t.nombre.includes('—') ? t.nombre.split('—')[1].trim() : t.nombre;
+        return `<div class="ciclo-day-row" onclick="sesFromTpl(${i})">
+          <div class="cdr-dia">${t.dia||''}</div>
+          <div class="cdr-name">${esc(sesName)}</div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--mut)" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+        </div>`;
+      }).join('')}</div>` : ''}
     </div>`;
   });
-  html += '</div>';
+  if (groups.other.length) {
+    html += `<div class="list-label" style="margin-top:10px">Mis plantillas</div><div class="tpl-grid">`;
+    groups.other.forEach(({t,i}) => {
+      html += `<div class="tpl-card">
+        <div class="tpl-card-use" data-use-tpl="${i}">
+          <div class="tpl-badge">PLANTILLA</div>
+          <div class="tpl-card-name">${esc(t.nombre)}</div>
+          <div class="tpl-card-meta">${t.ejercicios.length} ejercicio${t.ejercicios.length!==1?'s':''}</div>
+        </div>
+        <div class="tpl-card-foot">
+          <button class="tpl-card-edit" data-edit-tpl="${i}">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            EDITAR
+          </button>
+        </div>
+      </div>`;
+    });
+    html += '</div>';
+  }
   sec.innerHTML = html;
 }
 
