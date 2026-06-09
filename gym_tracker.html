@@ -9,6 +9,7 @@
   <meta name="apple-mobile-web-app-title" content="GYM">
   <title>GYM</title>
   <link rel="manifest" href="/cal/gym-manifest.json">
+  <script src="https://accounts.google.com/gsi/client" async></script>
   <link rel="apple-touch-icon" href="/cal/gym-icon.svg">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
@@ -266,6 +267,10 @@
     <button class="ico" id="btn-import">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
     </button>
+    <button class="ico" id="btn-drive" onclick="gdHandleTap()" style="position:relative">
+      <svg width="20" height="20" viewBox="0 0 87.3 78" fill="currentColor"><path d="M6.6 66.85l3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8H0a15.6 15.6 0 001.65 7.35z" fill="#0066da"/><path d="M43.65 25L29.9 1.2a15.4 15.4 0 00-3.3 3.3L1.65 45.5A15.6 15.6 0 000 52.85h27.5z" fill="#00ac47"/><path d="M73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25a15.6 15.6 0 001.65-7.35H60.1l5.85 11.2z" fill="#ea4335"/><path d="M43.65 25L57.4 1.2C56.05.43 54.5 0 52.85 0H34.45c-1.65 0-3.2.43-4.55 1.2z" fill="#00832d"/><path d="M59.8 52.85H27.5L13.75 76.65c1.35.77 2.9 1.2 4.55 1.2h50.7c1.65 0 3.2-.43 4.55-1.2z" fill="#2684fc"/><path d="M73.4 26.5l-13.1-22.7a15.4 15.4 0 00-2.9-2.6L43.65 25l16.45 27.85H87.3a15.6 15.6 0 00-1.65-7.35z" fill="#ffba00"/></svg>
+      <span id="gd-dot" style="display:none;position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--acc);border:1.5px solid var(--bg)"></span>
+    </button>
     <button class="ico" id="btn-export">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
     </button>
@@ -391,6 +396,19 @@
       <button class="btn-cancel" id="del-cancel">Cancelar</button>
       <button class="btn-danger" id="del-confirm">Eliminar</button>
     </div>
+  </div>
+</div>
+
+<!-- ═══ DRIVE SHEET ═══ -->
+<div class="overlay" id="ov-drive" style="display:none">
+  <div class="sheet" style="max-height:280px">
+    <div class="sheet-hdr">
+      <div class="sheet-hdr-title">Google Drive</div>
+      <button class="ico" onclick="closeOv('ov-drive')">✕</button>
+    </div>
+    <button class="sheet-btn" onclick="gdSave()">Guardar en Drive</button>
+    <button class="sheet-btn" onclick="gdLoad()">Cargar desde Drive</button>
+    <button class="sheet-btn" onclick="gdDisconnect()" style="background:var(--s2);color:var(--red);border:1px solid var(--b);margin-top:4px">Desconectar cuenta</button>
   </div>
 </div>
 
@@ -1023,6 +1041,166 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/cal/gym-sw.js', {scope:'/cal/'});
   });
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GOOGLE DRIVE
+// ─────────────────────────────────────────────────────────────────────────────
+const GD_CLIENT_ID = '165027269678-89l436h0ujttrr1kl2abmf2bklovln79.apps.googleusercontent.com';
+const GD_SCOPE     = 'https://www.googleapis.com/auth/drive.file';
+const GD_FOLDER    = 'GymTracker';
+const GD_FILE      = 'gym_sessions.json';
+const LS_TOKEN     = 'gd_token';
+const LS_EXP       = 'gd_exp';
+const LS_FID       = 'gd_fid';
+const LS_FXID      = 'gd_fxid';
+
+let gdTokenClient = null;
+let gdToken       = null;
+let gdFolderId    = localStorage.getItem(LS_FID)  || null;
+let gdFileId      = localStorage.getItem(LS_FXID) || null;
+
+function gdInitClient() {
+  if (typeof google === 'undefined' || !google.accounts) return;
+  gdTokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: GD_CLIENT_ID,
+    scope: GD_SCOPE,
+    callback: async (resp) => {
+      if (resp.error) { toast('Error al conectar Drive'); return; }
+      gdToken = resp.access_token;
+      const exp = Date.now() + (resp.expires_in - 60) * 1000;
+      localStorage.setItem(LS_TOKEN, gdToken);
+      localStorage.setItem(LS_EXP,   String(exp));
+      gdUpdateUI(true);
+      await gdEnsureFolder().catch(() => {});
+      toast('Drive conectado ✓');
+    }
+  });
+  // Restore token if still valid
+  const saved = localStorage.getItem(LS_TOKEN);
+  const exp   = parseInt(localStorage.getItem(LS_EXP) || '0');
+  if (saved && Date.now() < exp) {
+    gdToken = saved;
+    gdUpdateUI(true);
+  }
+}
+
+function gdHandleTap() {
+  const exp = parseInt(localStorage.getItem(LS_EXP) || '0');
+  if (!gdToken || Date.now() >= exp) {
+    if (!gdTokenClient) { toast('Cargando Google…'); return; }
+    gdToken = null;
+    gdTokenClient.requestAccessToken();
+  } else {
+    document.getElementById('ov-drive').style.display = 'flex';
+  }
+}
+
+function gdUpdateUI(on) {
+  document.getElementById('gd-dot').style.display = on ? 'block' : 'none';
+  document.getElementById('btn-drive').style.opacity = on ? '1' : '0.45';
+}
+
+function gdDisconnect() {
+  if (gdToken) try { google.accounts.oauth2.revoke(gdToken, () => {}); } catch(e) {}
+  gdToken = null; gdFolderId = null; gdFileId = null;
+  [LS_TOKEN, LS_EXP, LS_FID, LS_FXID].forEach(k => localStorage.removeItem(k));
+  gdUpdateUI(false);
+  closeOv('ov-drive');
+  toast('Drive desconectado');
+}
+
+async function gdFetch(url, opts = {}) {
+  const res = await fetch(url, {
+    ...opts,
+    headers: { Authorization: `Bearer ${gdToken}`, ...(opts.headers || {}) }
+  });
+  if (res.status === 401) {
+    gdToken = null; gdUpdateUI(false);
+    toast('Sesión Drive expirada — vuelve a conectar');
+    throw new Error('token_expired');
+  }
+  return res;
+}
+
+async function gdEnsureFolder() {
+  if (gdFolderId) return gdFolderId;
+  const res  = await gdFetch(`https://www.googleapis.com/drive/v3/files?q=name%3D%27${GD_FOLDER}%27+and+mimeType%3D%27application%2Fvnd.google-apps.folder%27+and+trashed%3Dfalse&fields=files(id)`);
+  const data = await res.json();
+  if (data.files && data.files.length > 0) {
+    gdFolderId = data.files[0].id;
+  } else {
+    const cr = await gdFetch('https://www.googleapis.com/drive/v3/files', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: GD_FOLDER, mimeType: 'application/vnd.google-apps.folder' })
+    });
+    const folder = await cr.json();
+    gdFolderId   = folder.id;
+  }
+  localStorage.setItem(LS_FID, gdFolderId);
+  return gdFolderId;
+}
+
+async function gdEnsureFileId() {
+  if (gdFileId) return gdFileId;
+  const fid  = await gdEnsureFolder();
+  const res  = await gdFetch(`https://www.googleapis.com/drive/v3/files?q=name%3D%27${GD_FILE}%27+and+%27${fid}%27+in+parents+and+trashed%3Dfalse&fields=files(id)`);
+  const data = await res.json();
+  if (data.files && data.files.length > 0) {
+    gdFileId = data.files[0].id;
+    localStorage.setItem(LS_FXID, gdFileId);
+  }
+  return gdFileId || null;
+}
+
+async function gdSave() {
+  closeOv('ov-drive');
+  const exp = parseInt(localStorage.getItem(LS_EXP) || '0');
+  if (!gdToken || Date.now() >= exp) { toast('Conecta Drive primero'); return; }
+  toast('Guardando en Drive…');
+  try {
+    const folderId = await gdEnsureFolder();
+    const fileId   = await gdEnsureFileId();
+    const content  = JSON.stringify(db, null, 2);
+    const blob     = new Blob([content], { type: 'application/json' });
+    const meta     = fileId ? { name: GD_FILE } : { name: GD_FILE, mimeType: 'application/json', parents: [folderId] };
+    const form     = new FormData();
+    form.append('metadata', new Blob([JSON.stringify(meta)], { type: 'application/json' }));
+    form.append('file', blob);
+    const url    = fileId ? `https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=multipart` : 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';
+    const method = fileId ? 'PATCH' : 'POST';
+    const res    = await gdFetch(url, { method, body: form });
+    const saved  = await res.json();
+    if (!gdFileId && saved.id) { gdFileId = saved.id; localStorage.setItem(LS_FXID, gdFileId); }
+    toast('Guardado en Drive ✓');
+  } catch(e) { if (e.message !== 'token_expired') toast('Error al guardar'); }
+}
+
+async function gdLoad() {
+  closeOv('ov-drive');
+  const exp = parseInt(localStorage.getItem(LS_EXP) || '0');
+  if (!gdToken || Date.now() >= exp) { toast('Conecta Drive primero'); return; }
+  toast('Cargando desde Drive…');
+  try {
+    const fileId = await gdEnsureFileId();
+    if (!fileId) { toast('Sin datos en Drive todavía'); return; }
+    const res  = await gdFetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`);
+    const data = await res.json();
+    if (data.sesiones) {
+      db = data;
+      db.ejercicios_predefinidos = [...new Set([...PREDEFINED, ...(db.ejercicios_predefinidos || [])])];
+      db.plantillas = db.plantillas || [];
+      saveDB(); renderHome();
+      toast('Cargado desde Drive ✓');
+    } else { toast('Archivo no reconocido'); }
+  } catch(e) { if (e.message !== 'token_expired') toast('Error al cargar'); }
+}
+
+// Init Drive when GIS is ready
+;(function waitGIS() {
+  if (typeof google !== 'undefined' && google.accounts) { gdInitClient(); }
+  else { setTimeout(waitGIS, 400); }
+})();
 </script>
 </body>
 </html>
