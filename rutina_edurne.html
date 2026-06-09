@@ -7,12 +7,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400;1,600&family=Jost:wght@300;400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0b0908; --s1:#131009; --s2:#1c1810; --s3:#242017;
-  --b:#2e2618; --b2:#3d3422;
-  --rose:#c8a090; --rose2:rgba(200,160,144,.12);
-  --gold:#d4ba8a; --gold2:rgba(212,186,138,.1);
-  --sage:#8a9e8c;
-  --text:#f2ece4; --muted:#7d7060; --muted2:#a89880;
+  --bg:#f6f1eb; --s1:#faf7f2; --s2:#ede7de; --s3:#e5ddd2;
+  --b:#ddd4c6; --b2:#cec4b2;
+  --rose:#9e5a52; --rose2:rgba(158,90,82,.08);
+  --gold:#8a6a3a; --gold2:rgba(138,106,58,.08);
+  --sage:#4a6e5a;
+  --text:#1e1a14; --muted:#7a6a56; --muted2:#4a3e30;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
@@ -88,8 +88,8 @@ body{background:var(--bg);color:var(--text);font-family:'Jost',sans-serif;font-w
 /* ─── CICLOS ─────────────────────────────────────────────────────────── */
 .ciclo-list{display:flex;flex-direction:column;gap:1px;border:1px solid var(--b);border-radius:2px;overflow:hidden;margin-bottom:2rem}
 .cc{background:var(--s1);cursor:pointer;overflow:hidden;transition:background .2s}
-.cc:hover{background:var(--s2)}
-.cc.expanded{background:var(--s1)}
+.cc:hover{background:var(--s3)}
+.cc.expanded{background:var(--bg)}
 .cc-hdr{display:flex;align-items:center;gap:1.2rem;padding:1.1rem 1.4rem;border-bottom:1px solid transparent}
 .cc.expanded .cc-hdr{border-bottom-color:var(--b)}
 .cl{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;font-size:2.4rem;line-height:1;width:2rem;text-align:center;flex-shrink:0}
@@ -120,7 +120,7 @@ body{background:var(--bg);color:var(--text);font-family:'Jost',sans-serif;font-w
 .cal-table{width:100%;border-collapse:collapse;font-size:.72rem}
 .cal-table th{text-align:left;padding:.45rem .7rem;font-size:.52rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--b2)}
 .cal-table td{padding:.5rem .7rem;border-bottom:1px solid var(--b);vertical-align:top}
-.cal-table tr:hover td{background:var(--s2)}
+.cal-table tr:hover td{background:var(--s3)}
 .cal-table .wn{font-family:'JetBrains Mono',monospace;color:var(--muted);font-size:.65rem}
 .cal-table .dates{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--muted2)}
 .tpill{display:inline-block;font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;padding:.12rem .45rem;border-radius:1px;border:1px solid}
@@ -128,7 +128,7 @@ body{background:var(--bg);color:var(--text);font-family:'Jost',sans-serif;font-w
 .pp{display:inline-block;font-size:.52rem;letter-spacing:.08em;text-transform:uppercase;padding:.12rem .45rem;border-radius:1px;margin-left:.3rem}
 .ph-b{background:rgba(200,160,144,.1);color:var(--rose)} .ph-c{background:rgba(138,158,140,.1);color:var(--sage)} .ph-a{background:rgba(212,186,138,.1);color:var(--gold)} .ph-dl{background:rgba(125,112,96,.1);color:var(--muted2)}
 .cal-note{font-size:.6rem;color:var(--muted);margin-top:.15rem}
-.auto-c{font-size:.55rem;color:var(--gold)}
+.auto-c{font-size:.55rem;color:var(--rose)}
 
 /* ─── AYUNO ──────────────────────────────────────────────────────────── */
 .ayuno-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-bottom:2rem}
@@ -144,9 +144,9 @@ body{background:var(--bg);color:var(--text);font-family:'Jost',sans-serif;font-w
 .ts-time{font-family:'JetBrains Mono',monospace;font-size:.52rem;color:var(--muted);margin-bottom:.15rem}
 .ts-label{font-size:.6rem;font-weight:400}
 .ts-note{font-size:.5rem;color:var(--muted);margin-top:.1rem}
-.tslot.ayuno-z{background:rgba(45,36,24,.3)}
-.tslot.eat-z{background:rgba(138,158,140,.06)}
-.tslot.train-z{background:rgba(200,160,144,.07)}
+.tslot.ayuno-z{background:rgba(158,90,82,.06)}
+.tslot.eat-z{background:rgba(74,110,90,.06)}
+.tslot.train-z{background:rgba(158,90,82,.07)}
 .ts-label.a{color:var(--muted2)} .ts-label.e{color:var(--sage)} .ts-label.t{color:var(--rose)}
 
 /* ─── PRINCIPIOS / HABITOS ───────────────────────────────────────────── */
@@ -162,9 +162,9 @@ body{background:var(--bg);color:var(--text);font-family:'Jost',sans-serif;font-w
 .note strong{color:var(--rose);font-weight:400}
 
 /* ─── MODAL ──────────────────────────────────────────────────────────── */
-.modal-ov{position:fixed;inset:0;background:rgba(11,9,8,.92);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .25s;padding:1rem}
+.modal-ov{position:fixed;inset:0;background:rgba(30,26,20,.6);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .25s;padding:1rem}
 .modal-ov.open{opacity:1;pointer-events:all}
-.modal-bx{background:var(--s1);border:1px solid var(--b2);border-radius:2px;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;transform:translateY(10px);transition:transform .3s;scrollbar-width:thin;scrollbar-color:var(--b2) transparent}
+.modal-bx{background:var(--s1);border:1px solid var(--b);box-shadow:0 8px 40px rgba(0,0,0,.12);border-radius:2px;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;transform:translateY(10px);transition:transform .3s;scrollbar-width:thin;scrollbar-color:var(--b2) transparent}
 .modal-ov.open .modal-bx{transform:translateY(0)}
 .modal-head{display:flex;align-items:flex-start;justify-content:space-between;padding:1.2rem 1.4rem 1rem;border-bottom:1px solid var(--b);position:sticky;top:0;background:var(--s1);z-index:1}
 .modal-day{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;font-size:1.6rem;line-height:1;color:var(--rose)}
