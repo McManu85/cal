@@ -778,19 +778,25 @@ function renderSessions() {
   el.innerHTML = html;
 }
 
-document.getElementById('tpl-home-section').addEventListener('click', e => {
-  const use  = e.target.closest('[data-use-tpl]');
-  const edit = e.target.closest('[data-edit-tpl]');
-  if (use)  { sesFromTpl(+use.dataset.useTpl); return; }
-  if (edit) { openTplEdit(+edit.dataset.editTpl); return; }
-});
+const tplHomeSection = document.getElementById('tpl-home-section');
+if (tplHomeSection) {
+  tplHomeSection.addEventListener('click', e => {
+    const use  = e.target.closest('[data-use-tpl]');
+    const edit = e.target.closest('[data-edit-tpl]');
+    if (use)  { sesFromTpl(+use.dataset.useTpl); return; }
+    if (edit) { openTplEdit(+edit.dataset.editTpl); return; }
+  });
+}
 
-document.getElementById('sessions-list').addEventListener('click', e => {
-  const open   = e.target.closest('[data-open-ses]');
-  const repeat = e.target.closest('[data-repeat-ses]');
-  if (open)   openSes(+open.dataset.openSes);
-  if (repeat) repeatSes(+repeat.dataset.repeatSes);
-});
+const sessionsList = document.getElementById('sessions-list');
+if (sessionsList) {
+  sessionsList.addEventListener('click', e => {
+    const open   = e.target.closest('[data-open-ses]');
+    const repeat = e.target.closest('[data-repeat-ses]');
+    if (open)   openSes(+open.dataset.openSes);
+    if (repeat) repeatSes(+repeat.dataset.repeatSes);
+  });
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SESSION LIFECYCLE
