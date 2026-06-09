@@ -91,6 +91,23 @@
     .card-repeat span { font-size:13px; font-weight:700; letter-spacing:.5px;
       text-transform:uppercase; color:var(--mut); }
 
+
+    /* ── HOY ──────────────────────────────────── */
+    .today-card { margin:12px 12px 4px; background:var(--s2); border:1px solid var(--b); border-radius:var(--r); overflow:hidden; }
+    .today-hdr { padding:10px 14px 4px; }
+    .today-lbl { font-family:'DM Sans',sans-serif; font-size:9px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; color:var(--acc); margin-bottom:2px; }
+    .today-dayname { font-family:'Bebas Neue',sans-serif; font-size:24px; letter-spacing:.04em; line-height:1; }
+    .today-sesname { font-family:'DM Sans',sans-serif; font-size:12px; color:var(--mut); padding:2px 14px 6px; }
+    .today-btn { width:calc(100% - 24px); margin:4px 12px 12px; height:46px; background:var(--acc); color:#000; border:none; border-radius:var(--r); font-family:'Bebas Neue',sans-serif; font-size:19px; letter-spacing:1.5px; cursor:pointer; }
+    .today-rest { padding:12px 14px; display:flex; align-items:center; gap:10px; }
+    .today-rest-icon { font-size:22px; }
+    .today-rest-day { font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:.04em; color:var(--mut); }
+    .today-rest-sub { font-family:'DM Sans',sans-serif; font-size:11px; color:var(--mut); margin-top:1px; }
+    /* ── CICLO FILTER ─────────────────────────── */
+    .ciclo-filter { display:flex; align-items:center; gap:6px; padding:12px 14px 2px; }
+    .ciclo-filter-lbl { font-family:'DM Sans',sans-serif; font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--mut); margin-right:2px; }
+    .cf-btn { height:28px; padding:0 14px; border-radius:20px; border:1px solid var(--b); background:none; color:var(--mut); font-family:'Bebas Neue',sans-serif; font-size:15px; letter-spacing:.06em; cursor:pointer; transition:all .2s; }
+    .cf-btn.active { background:var(--acc); border-color:var(--acc); color:#000; }
     /* ── PLANTILLA CARDS (home) ──────────────── */
     .tpl-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:0 12px 4px; }
     .tpl-card { background:var(--s1); border:1px solid var(--b);
@@ -287,6 +304,9 @@
       </button>
     </div>
 
+    <!-- Hoy -->
+    <div id="today-section"></div>
+
     <!-- Plantillas recientes -->
     <div id="tpl-home-section"></div>
 
@@ -444,6 +464,21 @@ const PREDEFINED = [
 let db = loadDB();
 let ses = null;      // sesión activa
 let sesIdx = -1;
+
+const PRESET_TPLS = [
+  { id:'pt-b-l', ciclo:'B', dia:'Lunes',     nombre:'B · Lunes — Potencia Superior',     ejercicios:['Push press','Plyo push-ups','KB press 1 brazo','Muscle-up progresión','Remo explosivo KB'] },
+  { id:'pt-b-m', ciclo:'B', dia:'Miércoles', nombre:'B · Miércoles — Potencia Inferior', ejercicios:['Box jump','KB swing 2 brazos','Bulgarian split squat explosivo','Pallof press','KB halos'] },
+  { id:'pt-b-v', ciclo:'B', dia:'Viernes',   nombre:'B · Viernes — Full Body Explosivo', ejercicios:['Sprints 20m','TRX row / KB row','CMJ','KB thruster','KB swing 1 brazo','Burpee explosivo'] },
+  { id:'pt-c-l', ciclo:'C', dia:'Lunes',     nombre:'C · Lunes — Circuito Full Body',    ejercicios:['Goblet squat','KB press bilateral','Remo KB','Push-ups explosivos','Mountain climbers'] },
+  { id:'pt-c-m', ciclo:'C', dia:'Miércoles', nombre:'C · Miércoles — Tabata Inferior',   ejercicios:['KB swing 2 brazos','Goblet squat','KB halos','Mountain climbers'] },
+  { id:'pt-c-v', ciclo:'C', dia:'Viernes',   nombre:'C · Viernes — HIIT Completo',       ejercicios:['Sprints 200m','KB thruster','Burpee','KB swing 2 brazos','Tabata burpees'] },
+  { id:'pt-a-l', ciclo:'A', dia:'Lunes',     nombre:'A · Lunes — Push',                  ejercicios:['Press banca','Press militar','Fondos lastrados','Push-ups explosivos','Face pull'] },
+  { id:'pt-a-m', ciclo:'A', dia:'Miércoles', nombre:'A · Miércoles — Pierna + Core',     ejercicios:['Sentadilla','Romanian Deadlift','KB swings','Pallof press','Plancha RKC'] },
+  { id:'pt-a-v', ciclo:'A', dia:'Viernes',   nombre:'A · Viernes — Pull + Integración',  ejercicios:['Dominadas lastradas','Remo barra','KB swing 1 brazo','Sprints 40m','Curl bíceps barra'] },
+];
+
+let activeCiclo = localStorage.getItem('act_ciclo') || 'B';
+
 let tpl = null;      // plantilla en edición
 let tplIdx = -1;
 
@@ -462,7 +497,8 @@ function loadDB() {
       return p;
     }
   } catch(e) {}
-  return { version:1, ejercicios_predefinidos:[...PREDEFINED], sesiones:[], plantillas:[] };
+  const fresh = { version:1, ejercicios_predefinidos:[...PREDEFINED], sesiones:[], plantillas: PRESET_TPLS.map(t=>({...t})) };
+  return fresh;
 }
 
 function saveDB() { localStorage.setItem(LS, JSON.stringify(db)); }
@@ -492,19 +528,66 @@ function showScreen(id) {
 // HOME
 // ─────────────────────────────────────────────────────────────────────────────
 function renderHome() {
+  renderToday();
   renderTplHome();
   renderSessions();
+}
+
+function setCicloFilter(c) {
+  activeCiclo = c;
+  localStorage.setItem('act_ciclo', c);
+  renderToday();
+  renderTplHome();
+}
+
+function renderToday() {
+  const sec = document.getElementById('today-section');
+  const day = new Date().getDay();
+  const dias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const gymMap = {1:'Lunes', 3:'Miércoles', 5:'Viernes'};
+  const ttDays = {2:'Martes', 4:'Jueves'};
+  if (gymMap[day]) {
+    const diaGym = gymMap[day];
+    const tIdx = db.plantillas.findIndex(t => t.ciclo === activeCiclo && t.dia === diaGym);
+    if (tIdx !== -1) {
+      const t = db.plantillas[tIdx];
+      const sesName = t.nombre.includes('—') ? t.nombre.split('—')[1].trim() : t.nombre;
+      sec.innerHTML = `<div class="today-card">
+        <div class="today-hdr">
+          <div class="today-lbl">HOY · CICLO ${activeCiclo}</div>
+          <div class="today-dayname">${dias[day]}</div>
+        </div>
+        <div class="today-sesname">${sesName}</div>
+        <button class="today-btn" onclick="sesFromTpl(${tIdx})">EMPEZAR SESIÓN</button>
+      </div>`;
+    } else {
+      sec.innerHTML = `<div class="today-card"><div class="today-hdr"><div class="today-lbl">HOY · GYM</div><div class="today-dayname">${dias[day]}</div></div></div>`;
+    }
+  } else if (ttDays[day]) {
+    sec.innerHTML = `<div class="today-card"><div class="today-rest"><div class="today-rest-icon">🏓</div><div><div class="today-rest-day">Tenis de Mesa</div><div class="today-rest-sub">${ttDays[day]} · 16:00 – 17:00</div></div></div></div>`;
+  } else if (day === 6) {
+    sec.innerHTML = `<div class="today-card"><div class="today-rest"><div class="today-rest-icon">⚡</div><div><div class="today-rest-day">Sábado</div><div class="today-rest-sub">Opcional · Sprints o Tabata KB en casa</div></div></div></div>`;
+  } else {
+    sec.innerHTML = `<div class="today-card"><div class="today-rest"><div class="today-rest-icon">🛌</div><div><div class="today-rest-day">Descanso</div><div class="today-rest-sub">Domingo · 9.000 – 10.000 pasos</div></div></div></div>`;
+  }
 }
 
 function renderTplHome() {
   const sec = document.getElementById('tpl-home-section');
   if (!db.plantillas.length) { sec.innerHTML = ''; return; }
-  let html = `<div class="list-label">Plantillas</div><div class="tpl-grid">`;
-  db.plantillas.forEach((t, i) => {
+  let html = `<div class="ciclo-filter">
+    <span class="ciclo-filter-lbl">Ciclo</span>
+    ${['A','B','C'].map(cv => `<button class="cf-btn ${activeCiclo===cv?'active':''}" onclick="setCicloFilter('${cv}')">${cv}</button>`).join('')}
+  </div>`;
+  const filtered = db.plantillas.map((t,i)=>({t,i})).filter(({t})=> !t.ciclo || t.ciclo === activeCiclo);
+  if (!filtered.length) { sec.innerHTML = html; return; }
+  html += `<div class="list-label">Plantillas</div><div class="tpl-grid">`;
+  filtered.forEach(({t, i}) => {
+    const dispName = t.nombre.includes('—') ? t.nombre.split('—')[1].trim() : t.nombre;
     html += `<div class="tpl-card">
       <div class="tpl-card-use" data-use-tpl="${i}">
-        <div class="tpl-badge">PLANTILLA</div>
-        <div class="tpl-card-name">${esc(t.nombre)}</div>
+        <div class="tpl-badge">${t.ciclo ? 'CICLO ' + t.ciclo : 'PLANTILLA'}</div>
+        <div class="tpl-card-name">${esc(dispName)}</div>
         <div class="tpl-card-meta">${t.ejercicios.length} ejercicio${t.ejercicios.length!==1?'s':''}</div>
       </div>
       <div class="tpl-card-foot">
