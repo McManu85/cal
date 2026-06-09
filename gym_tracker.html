@@ -102,6 +102,16 @@
     .cf-btn { height:28px; padding:0 14px; border-radius:20px; border:1px solid var(--b); background:none; color:var(--mut); font-family:'Bebas Neue',sans-serif; font-size:15px; letter-spacing:.06em; cursor:pointer; transition:all .2s; }
     .cf-btn.active { background:var(--acc); border-color:var(--acc); color:#000; }
 
+
+    /* ── HOME ACTIONS ──────────────────────────── */
+    .home-actions { display:flex; flex-direction:column; gap:10px; padding:20px 12px 8px; }
+    .btn-home { width:100%; height:72px; border-radius:var(--r); border:none; cursor:pointer;
+      display:flex; align-items:center; gap:16px; padding:0 22px;
+      font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:2px; transition:opacity .15s; }
+    .btn-home:active { opacity:.75; }
+    .btn-home.primary { background:var(--acc); color:#000; }
+    .btn-home.secondary { background:var(--s2); color:var(--txt); border:1px solid var(--b); }
+    .btn-home .bh-ico { flex-shrink:0; }
     /* ── CICLO GROUPS ────────────────────────── */
     .ciclo-group { margin:10px 12px 0; border:1px solid var(--b); border-radius:var(--r); overflow:hidden; }
     .ciclo-group-hdr { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; cursor:pointer; background:var(--s2); }
@@ -301,22 +311,49 @@
     </button>
   </div>
   <div class="scroll">
-    <div class="home-btns">
-      <button class="btn-start accent" id="btn-new">
-        <svg class="bs-ico" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-        <span class="bs-lbl">SESIÓN<br>EN BLANCO</span>
+    <div class="home-actions">
+      <button class="btn-home primary" id="btn-iniciar">
+        <svg class="bh-ico" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        INICIAR SESIÓN
       </button>
-      <button class="btn-start outline" id="btn-from-tpl">
-        <svg class="bs-ico" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-        <span class="bs-lbl">DESDE<br>PLANTILLA</span>
+      <button class="btn-home secondary" id="btn-plantillas">
+        <svg class="bh-ico" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        GESTIONAR PLANTILLAS
       </button>
     </div>
+  </div>
+</div>
 
-    <!-- Plantillas recientes -->
-    <div id="tpl-home-section"></div>
+<!-- ═══════════════════ OVERLAY: SESSION PICKER ═══════════════════════════ -->
+<div class="overlay" id="ov-session-picker">
+  <div class="sheet" style="max-height:88vh">
+    <div class="sheet-hdr">
+      <span class="sheet-hdr-title">Iniciar sesión</span>
+      <button class="ico" id="sp-close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <button class="sheet-btn" id="sp-blank">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" style="display:inline;margin-right:6px"><path d="M12 5v14M5 12h14"/></svg>
+      SESIÓN EN BLANCO
+    </button>
+    <div id="sp-ciclos" style="padding-bottom:12px"></div>
+  </div>
+</div>
 
-    <!-- Sesiones -->
-    <div id="sessions-list"></div>
+<!-- ═══════════════════════════ SCREEN: TEMPLATES ══════════════════════════ -->
+<div id="scr-templates" class="screen">
+  <div class="hdr">
+    <button class="ico" id="tpl-screen-back">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+    </button>
+    <div class="hdr-title" style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.06em">PLANTILLAS</div>
+    <button class="ico acc" id="tpl-screen-new">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+  </div>
+  <div class="scroll">
+    <div id="tpl-screen-body"></div>
   </div>
 </div>
 
@@ -515,7 +552,7 @@ function saveDB() { localStorage.setItem(LS, JSON.stringify(db)); }
 // NAVIGATION
 // ─────────────────────────────────────────────────────────────────────────────
 function showScreen(id) {
-  const all = ['scr-home','scr-session','scr-tpl-edit'];
+  const all = ['scr-home','scr-session','scr-tpl-edit','scr-templates'];
   all.forEach(sid => {
     const el = document.getElementById(sid);
     el.classList.remove('active','behind');
@@ -527,6 +564,9 @@ function showScreen(id) {
   } else if (id === 'scr-tpl-edit') {
     document.getElementById('scr-home').classList.add('behind');
     document.getElementById('scr-tpl-edit').classList.add('active');
+  } else if (id === 'scr-templates') {
+    document.getElementById('scr-home').classList.add('behind');
+    document.getElementById('scr-templates').classList.add('active');
   } else {
     document.getElementById('scr-home').classList.add('active');
   }
@@ -535,10 +575,113 @@ function showScreen(id) {
 // ─────────────────────────────────────────────────────────────────────────────
 // HOME
 // ─────────────────────────────────────────────────────────────────────────────
-function renderHome() {
-  renderTplHome();
-  renderSessions();
+function renderHome() { /* home is static — sessions/templates on demand */ }
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CICLO GROUPS (shared renderer, mode: 'pick' | 'manage')
+// ─────────────────────────────────────────────────────────────────────────────
+function renderCicloGroups(containerId, mode) {
+  const el = document.getElementById(containerId);
+  if (!db.plantillas.length) {
+    el.innerHTML = '<div class="empty" style="padding:40px"><p>Sin plantillas.<br>Crea la primera.</p></div>';
+    return;
+  }
+  const groups = { A:[], B:[], C:[], other:[] };
+  db.plantillas.forEach((t,i) => {
+    if (t.ciclo && groups[t.ciclo]) groups[t.ciclo].push({t,i});
+    else groups.other.push({t,i});
+  });
+  let html = '';
+  ['B','C','A'].forEach(ciclo => {
+    if (!groups[ciclo].length) return;
+    const isOpen = openCiclos.has(ciclo);
+    const rowAction = mode === 'pick'
+      ? `onclick="sesFromTpl(IDX);closeOv('ov-session-picker')"`
+      : `onclick="sesFromTpl(IDX)"`;
+    html += `<div class="ciclo-group">
+      <div class="ciclo-group-hdr" onclick="toggleCicloGroup('${ciclo}');renderCicloGroups('${containerId}','${mode}')">
+        <div>
+          <div class="ciclo-group-badge">CICLO ${ciclo}</div>
+          <div class="ciclo-group-name">${CICLO_NAMES[ciclo]}</div>
+        </div>
+        <svg class="cg-chev ${isOpen?'open':''}" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      ${isOpen ? `<div class="ciclo-group-body">${groups[ciclo].map(({t,i}) => {
+        const sesName = t.nombre.includes('—') ? t.nombre.split('—')[1].trim() : t.nombre;
+        const action = rowAction.replace(/IDX/g, i);
+        return `<div class="ciclo-day-row" ${action}>
+          <div class="cdr-dia">${t.dia||''}</div>
+          <div class="cdr-name">${esc(sesName)}</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+            <button style="background:none;border:none;color:var(--mut);cursor:pointer;padding:4px;border-radius:4px;line-height:1" onclick="event.stopPropagation();openTplEdit(${i})" title="Editar">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--mut)" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
+        </div>`;
+      }).join('')}</div>` : ''}
+    </div>`;
+  });
+  if (groups.other.length) {
+    html += `<div class="list-label" style="margin-top:10px">Mis plantillas</div><div class="tpl-grid">`;
+    groups.other.forEach(({t,i}) => {
+      html += `<div class="tpl-card">
+        <div class="tpl-card-use" data-use-tpl="${i}">
+          <div class="tpl-badge">PLANTILLA</div>
+          <div class="tpl-card-name">${esc(t.nombre)}</div>
+          <div class="tpl-card-meta">${t.ejercicios.length} ejercicio${t.ejercicios.length!==1?'s':''}</div>
+        </div>
+        <div class="tpl-card-foot">
+          <button class="tpl-card-edit" data-edit-tpl="${i}">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            EDITAR
+          </button>
+        </div>
+      </div>`;
+    });
+    html += '</div>';
+  }
+  el.innerHTML = html;
+  // re-attach delegated click for 'other' tpl cards
+  el.querySelectorAll('[data-use-tpl]').forEach(el2 => {
+    el2.addEventListener('click', () => {
+      const idx = +el2.dataset.useTpl;
+      if (mode === 'pick') { closeOv('ov-session-picker'); }
+      sesFromTpl(idx);
+    });
+  });
+  el.querySelectorAll('[data-edit-tpl]').forEach(el2 => {
+    el2.addEventListener('click', e => { e.stopPropagation(); openTplEdit(+el2.dataset.editTpl); });
+  });
 }
+
+function openSessionPicker() {
+  renderCicloGroups('sp-ciclos', 'pick');
+  document.getElementById('ov-session-picker').classList.add('open');
+}
+
+function openTemplatesScreen() {
+  renderCicloGroups('tpl-screen-body', 'manage');
+  showScreen('scr-templates');
+}
+
+function closeOv(id) { document.getElementById(id).classList.remove('open'); }
+
+// Session picker events
+document.getElementById('sp-close').addEventListener('click', () => closeOv('ov-session-picker'));
+document.getElementById('sp-blank').addEventListener('click', () => { closeOv('ov-session-picker'); newSes(); });
+document.getElementById('ov-session-picker').addEventListener('click', e => {
+  if (e.target === document.getElementById('ov-session-picker')) closeOv('ov-session-picker');
+});
+
+// Templates screen events
+document.getElementById('tpl-screen-back').addEventListener('click', () => showScreen('scr-home'));
+document.getElementById('tpl-screen-new').addEventListener('click', () => openTplEdit(-1));
+
+// Home action buttons
+document.getElementById('btn-iniciar').addEventListener('click', openSessionPicker);
+document.getElementById('btn-plantillas').addEventListener('click', openTemplatesScreen);
 
 const CICLO_NAMES = { A:'Fuerza Funcional', B:'Potencia & Explosividad', C:'Metabólico & Recomposición' };
 let openCiclos = new Set(JSON.parse(localStorage.getItem('open_ciclos')||'["B","C","A"]'));
@@ -1097,11 +1240,7 @@ document.getElementById('file-import').addEventListener('change', e => {
 // ─────────────────────────────────────────────────────────────────────────────
 function closeOverlay(id) { document.getElementById(id).classList.remove('open'); }
 
-document.getElementById('btn-new').addEventListener('click', newSes);
-document.getElementById('btn-from-tpl').addEventListener('click', () => {
-  if (!db.plantillas.length) { openTplEdit(-1); }
-  else openTplListOverlay();
-});
+// btn-new and btn-from-tpl replaced by btn-iniciar and btn-plantillas
 
 function todayStr() { return new Date().toISOString().slice(0,10); }
 function fmtDate(d) {
