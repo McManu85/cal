@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#080808">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="GYM">
@@ -25,10 +27,10 @@
 
     /* ── SCREENS ─────────────────────────────── */
     .screen { position:fixed; inset:0; display:flex; flex-direction:column;
-      background:var(--bg); transform:translateX(100%);
+      background:var(--bg); transform:translateX(100%); pointer-events:none;
       transition:transform .28s cubic-bezier(.4,0,.2,1); }
-    .screen.active { transform:translateX(0); }
-    .screen.behind { transform:translateX(-28%); }
+    .screen.active { transform:translateX(0); pointer-events:all; }
+    .screen.behind { transform:translateX(-28%); pointer-events:none; }
 
     /* ── HEADER ──────────────────────────────── */
     .hdr { display:flex; align-items:center; gap:10px; padding:14px 14px;
@@ -468,7 +470,7 @@
 </div>
 
 <!-- ═══ DRIVE SHEET ═══ -->
-<div class="overlay" id="ov-drive" style="display:none">
+<div class="overlay" id="ov-drive">
   <div class="sheet" style="max-height:280px">
     <div class="sheet-hdr">
       <div class="sheet-hdr-title">Google Drive</div>
@@ -562,13 +564,16 @@ function showScreen(id) {
   });
   // Stack: behind is whatever was active before
   if (id === 'scr-session') {
-    document.getElementById('scr-home').classList.add('behind');
+    const prevActive = document.querySelector('.screen.active');
+    if (prevActive) prevActive.classList.add('behind');
     document.getElementById('scr-session').classList.add('active');
   } else if (id === 'scr-tpl-edit') {
-    document.getElementById('scr-home').classList.add('behind');
+    const prevActive = document.querySelector('.screen.active');
+    if (prevActive) prevActive.classList.add('behind');
     document.getElementById('scr-tpl-edit').classList.add('active');
   } else if (id === 'scr-templates') {
-    document.getElementById('scr-home').classList.add('behind');
+    const prevActive = document.querySelector('.screen.active');
+    if (prevActive) prevActive.classList.add('behind');
     document.getElementById('scr-templates').classList.add('active');
   } else {
     document.getElementById('scr-home').classList.add('active');
@@ -1281,9 +1286,7 @@ function toast(msg) {
 renderHome();
 
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/cal/gym-sw.js', {scope:'/cal/'});
-  });
+  navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
