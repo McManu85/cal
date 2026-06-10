@@ -935,7 +935,8 @@ function startSesScreen() {
 }
 
 document.getElementById('btn-back').addEventListener('click', () => {
-  commitSave(); showScreen('scr-home'); renderHome(); toast('Sesión guardada ✓');
+  commitSave(); showScreen('scr-home'); renderHome();
+  gdAutoSave().catch(() => { toast('Sesión guardada ✓'); });
 });
 
 // autosave
@@ -1413,7 +1414,7 @@ function gdHandleTap() {
     gdToken = null;
     gdTokenClient.requestAccessToken();
   } else {
-    document.getElementById('ov-drive').style.display = 'flex';
+    document.getElementById('ov-drive').classList.add('open');
   }
 }
 
@@ -1498,6 +1499,27 @@ async function gdSave() {
   } catch(e) { if (e.message !== 'token_expired') toast('Error al guardar'); }
 }
 
+async function gdAutoSave() {
+  const exp = parseInt(localStorage.getItem(LS_EXP) || '0');
+  if (!gdToken || Date.now() >= exp) return; // not connected, skip silently
+  try {
+    const folderId = await gdEnsureFolder();
+    const fileId   = await gdEnsureFileId();
+    const content  = JSON.stringify(db, null, 2);
+    const blob     = new Blob([content], { type: 'application/json' });
+    const meta     = fileId ? { name: GD_FILE } : { name: GD_FILE, mimeType: 'application/json', parents: [folderId] };
+    const form     = new FormData();
+    form.append('metadata', new Blob([JSON.stringify(meta)], { type: 'application/json' }));
+    form.append('file', blob);
+    const url    = fileId ? `https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=multipart` : 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';
+    const method = fileId ? 'PATCH' : 'POST';
+    const res    = await gdFetch(url, { method, body: form });
+    const saved  = await res.json();
+    if (!gdFileId && saved.id) { gdFileId = saved.id; localStorage.setItem(LS_FXID, gdFileId); }
+    toast('Sesión guardada ✓  ☁');
+  } catch(e) { /* silent fail — local save already done */ }
+}
+
 async function gdLoad() {
   closeOv('ov-drive');
   const exp = parseInt(localStorage.getItem(LS_EXP) || '0');
@@ -1512,6 +1534,7 @@ async function gdLoad() {
       db = data;
       db.ejercicios_predefinidos = [...new Set([...PREDEFINED, ...(db.ejercicios_predefinidos || [])])];
       db.plantillas = db.plantillas || [];
+      if (!db.rutinas) initRutinas();
       saveDB(); renderHome();
       toast('Cargado desde Drive ✓');
     } else { toast('Archivo no reconocido'); }
