@@ -586,7 +586,7 @@ function loadDB() {
   return fresh;
 }
 
-function saveDB() { localStorage.setItem(LS, JSON.stringify(db)); }
+function saveDB() { db.last_modified = Date.now(); localStorage.setItem(LS, JSON.stringify(db)); }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // NAVIGATION
@@ -1404,6 +1404,7 @@ function gdInitClient() {
   if (saved && Date.now() < exp) {
     gdToken = saved;
     gdUpdateUI(true);
+    gdAutoLoad().catch(() => {});
   }
 }
 
@@ -1497,6 +1498,29 @@ async function gdSave() {
     if (!gdFileId && saved.id) { gdFileId = saved.id; localStorage.setItem(LS_FXID, gdFileId); }
     toast('Guardado en Drive ✓');
   } catch(e) { if (e.message !== 'token_expired') toast('Error al guardar'); }
+}
+
+
+async function gdAutoLoad() {
+  const exp = parseInt(localStorage.getItem(LS_EXP) || '0');
+  if (!gdToken || Date.now() >= exp) return;
+  try {
+    const fileId = await gdEnsureFileId();
+    if (!fileId) return;
+    const res  = await gdFetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`);
+    const data = await res.json();
+    if (!data.sesiones) return;
+    const driveTime = data.last_modified || 0;
+    const localTime = db.last_modified  || 0;
+    if (driveTime > localTime) {
+      db = data;
+      db.ejercicios_predefinidos = [...new Set([...PREDEFINED,...(db.ejercicios_predefinidos||[])])];
+      db.plantillas = db.plantillas || [];
+      if (!db.rutinas) initRutinas();
+      saveDB(); renderHome();
+      toast('☁ Sincronizado desde Drive');
+    }
+  } catch(e) { /* silent — local data kept */ }
 }
 
 async function gdAutoSave() {
