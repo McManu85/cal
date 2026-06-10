@@ -618,7 +618,7 @@ function showScreen(id) {
 // ─────────────────────────────────────────────────────────────────────────────
 // HOME
 // ─────────────────────────────────────────────────────────────────────────────
-function renderHome() { /* home is static — sessions/templates on demand */ }
+function renderHome() { renderSessions(); }
 
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -935,7 +935,7 @@ function startSesScreen() {
 }
 
 document.getElementById('btn-back').addEventListener('click', () => {
-  commitSave(); showScreen('scr-home'); renderHome();
+  commitSave(); showScreen('scr-home'); renderHome(); toast('Sesión guardada ✓');
 });
 
 // autosave
