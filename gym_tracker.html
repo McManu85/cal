@@ -327,10 +327,7 @@
     <button class="ico" id="btn-export" title="Exportar">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
     </button>
-    <button class="ico" id="btn-drive" onclick="gdHandleTap()" title="Cuenta" style="position:relative">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-      <span id="gd-dot" style="display:none;position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--acc);border:1.5px solid var(--bg)"></span>
-    </button>
+    <span id="gd-dot" style="display:none;width:7px;height:7px;border-radius:50%;background:var(--acc);flex-shrink:0"></span>
   </div>
   <div class="scroll">
     <div class="home-actions">
@@ -342,6 +339,34 @@
         <svg class="bh-ico" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
         GESTIONAR PLANTILLAS
       </button>
+    </div>
+    <div id="drive-strip" style="margin:4px 12px 0;border-radius:6px;overflow:hidden;border:1px solid var(--b)">
+      <div id="drive-off" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;cursor:pointer;background:var(--s1)" onclick="gdHandleTap()">
+        <div style="display:flex;align-items:center;gap:8px">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--mut)" stroke-width="2" stroke-linecap="round"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12s4.48 10 10 10 10-4.48 10-10z"/><path d="M8 12l2 2 4-4"/></svg>
+          <span style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--mut)">Conectar Google Drive</span>
+        </div>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--mut)" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div id="drive-on" style="display:none">
+        <div style="display:flex;align-items:center;gap:6px;padding:8px 14px 6px;border-bottom:1px solid var(--b)">
+          <span id="gd-dot-home" style="width:6px;height:6px;border-radius:50%;background:var(--acc);flex-shrink:0"></span>
+          <span style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--acc)">Drive conectado</span>
+        </div>
+        <div style="display:flex">
+          <button onclick="gdSave()" style="flex:1;padding:10px;background:none;border:none;border-right:1px solid var(--b);color:var(--txt);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Guardar
+          </button>
+          <button onclick="gdLoad()" style="flex:1;padding:10px;background:none;border:none;border-right:1px solid var(--b);color:var(--txt);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Cargar
+          </button>
+          <button onclick="gdDisconnect()" style="flex:1;padding:10px;background:none;border:none;color:var(--mut);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;cursor:pointer">
+            Salir
+          </button>
+        </div>
+      </div>
     </div>
     <div id="tpl-home-section"></div>
     <div id="sessions-list"></div>
@@ -1414,14 +1439,15 @@ function gdHandleTap() {
     if (!gdTokenClient) { toast('Cargando Google…'); return; }
     gdToken = null;
     gdTokenClient.requestAccessToken();
-  } else {
-    document.getElementById('ov-drive').classList.add('open');
   }
 }
 
 function gdUpdateUI(on) {
   document.getElementById('gd-dot').style.display = on ? 'block' : 'none';
-  document.getElementById('btn-drive').style.color = on ? 'var(--acc)' : '';
+  const driveOff = document.getElementById('drive-off');
+  const driveOn  = document.getElementById('drive-on');
+  if (driveOff) driveOff.style.display = on ? 'none' : 'flex';
+  if (driveOn)  driveOn.style.display  = on ? 'block' : 'none';
 }
 
 function gdDisconnect() {
