@@ -159,6 +159,39 @@
     .tpl-card-edit:active { background:var(--s2); color:var(--txt); }
 
 
+
+    /* ── ACTIVITY ─────────────────────────────── */
+    .act-pills { display:flex; gap:6px; flex-wrap:wrap; padding:10px 12px; }
+    .act-pill { display:flex; flex-direction:column; align-items:center; gap:3px;
+      background:var(--s2); border:1px solid var(--b); border-radius:8px;
+      padding:8px 10px; cursor:pointer; transition:all .2s; min-width:54px; }
+    .act-pill:active { background:var(--acc2); border-color:var(--acc); }
+    .act-pill-icon { font-size:18px; line-height:1; }
+    .act-pill-lbl { font-family:'DM Sans',sans-serif; font-size:9px; font-weight:700;
+      letter-spacing:.5px; text-transform:uppercase; color:var(--muted2); white-space:nowrap; }
+    .dur-ctrl { display:flex; align-items:center; justify-content:center; gap:16px; padding:8px 0 4px; }
+    .dur-btn { width:40px; height:40px; border-radius:50%; border:1.5px solid var(--b);
+      background:none; color:var(--txt); font-size:22px; line-height:1; cursor:pointer;
+      display:flex; align-items:center; justify-content:center; transition:all .15s; }
+    .dur-btn:active { background:var(--s2); border-color:var(--acc); }
+    .dur-val { font-family:'Bebas Neue',sans-serif; font-size:48px; letter-spacing:.02em;
+      color:var(--acc); line-height:1; min-width:80px; text-align:center; }
+    .dur-unit { font-family:'DM Sans',sans-serif; font-size:11px; letter-spacing:.15em;
+      text-transform:uppercase; color:var(--muted); }
+    .int-pills { display:flex; gap:8px; padding:0 0 4px; }
+    .int-pill { flex:1; padding:9px 4px; border-radius:6px; border:1.5px solid var(--b);
+      background:none; color:var(--muted); font-family:'DM Sans',sans-serif; font-size:11px;
+      font-weight:700; letter-spacing:.5px; text-transform:uppercase; cursor:pointer;
+      transition:all .2s; text-align:center; }
+    .int-pill.sel { border-color:var(--acc); color:#000; background:var(--acc); }
+    /* Activity in sessions list */
+    .ses-card.act { border-left-color:var(--sage); }
+    .ses-act-meta { font-size:11px; color:var(--muted); margin-top:2px; display:flex; gap:8px; }
+    .int-badge { font-size:9px; font-weight:700; letter-spacing:.5px; text-transform:uppercase;
+      padding:1px 5px; border-radius:3px; }
+    .int-suave { background:rgba(138,158,140,.15); color:var(--sage); }
+    .int-moderada { background:rgba(200,160,144,.15); color:var(--rose,#c8a090); }
+    .int-intensa { background:rgba(255,80,60,.15); color:#ff6b5b; }
     /* ── TEMPLATE META (ciclo + dia) ─────────── */
     .tpl-meta { padding:10px 14px 8px; border-bottom:1px solid var(--b); background:var(--s2); flex-shrink:0; }
     .tpl-meta-row { display:flex; align-items:center; gap:10px; margin-bottom:6px; }
@@ -468,6 +501,39 @@
   </div>
 </div>
 
+
+<!-- ═══════════════════════ OVERLAY: ACTIVITY LOG ═══════════════════════════ -->
+<div class="overlay" id="ov-activity">
+  <div class="sheet">
+    <div class="sheet-hdr">
+      <div id="act-title" style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.04em;color:var(--txt)"></div>
+      <button class="ico" onclick="closeOv('ov-activity')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div style="padding:14px 16px 8px">
+      <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Duración</div>
+      <div class="dur-ctrl">
+        <button class="dur-btn" onclick="adjustDur(-5)">−</button>
+        <div style="text-align:center">
+          <div class="dur-val" id="act-dur-val">60</div>
+          <div class="dur-unit">minutos</div>
+        </div>
+        <button class="dur-btn" onclick="adjustDur(5)">+</button>
+      </div>
+    </div>
+    <div style="padding:4px 16px 8px">
+      <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Intensidad</div>
+      <div class="int-pills">
+        <button class="int-pill" data-int="suave" onclick="setIntensidad('suave')">😌 Suave</button>
+        <button class="int-pill sel" data-int="moderada" onclick="setIntensidad('moderada')">💪 Moderada</button>
+        <button class="int-pill" data-int="intensa" onclick="setIntensidad('intensa')">🔥 Intensa</button>
+      </div>
+    </div>
+    <button class="sheet-btn" style="margin:6px 12px 8px;width:calc(100% - 24px)" onclick="saveActivity()">GUARDAR ACTIVIDAD</button>
+  </div>
+</div>
+
 <!-- ═══════════════════════ OVERLAY: EXERCISE PICKER ══════════════════════ -->
 <div class="overlay" id="picker-overlay">
   <div class="sheet">
@@ -649,6 +715,54 @@ function renderHome() { renderSessions(); }
 // ─────────────────────────────────────────────────────────────────────────────
 // CICLO GROUPS (shared renderer, mode: 'pick' | 'manage')
 // ─────────────────────────────────────────────────────────────────────────────
+
+// ─── ACTIVITY LOGGING ─────────────────────────────────────────────────────────
+let actNombre = '';
+let actDuracion = 60;
+let actIntensidad = 'moderada';
+const ACT_EMOJIS = {'Tenis de mesa':'🏓','Caminata':'🚶','Tenis':'🎾','Carrera':'🏃','Bicicleta':'🚴','Natación':'🏊'};
+
+function openActivityLog(nombre) {
+  actNombre = nombre;
+  actDuracion = nombre === 'Tenis de mesa' ? 60 : 45;
+  actIntensidad = 'moderada';
+  document.getElementById('act-title').textContent = (ACT_EMOJIS[nombre] || '⚡') + '  ' + nombre;
+  document.getElementById('act-dur-val').textContent = actDuracion;
+  document.querySelectorAll('.int-pill').forEach(b => b.classList.toggle('sel', b.dataset.int === actIntensidad));
+  closeOv('ov-session-picker');
+  document.getElementById('ov-activity').classList.add('open');
+}
+
+function openCustomActivity() {
+  const nombre = prompt('Nombre de la actividad:');
+  if (nombre && nombre.trim()) openActivityLog(nombre.trim());
+}
+
+function adjustDur(delta) {
+  actDuracion = Math.max(5, Math.min(300, actDuracion + delta));
+  document.getElementById('act-dur-val').textContent = actDuracion;
+}
+
+function setIntensidad(val) {
+  actIntensidad = val;
+  document.querySelectorAll('.int-pill').forEach(b => b.classList.toggle('sel', b.dataset.int === val));
+}
+
+function saveActivity() {
+  const session = {
+    id: String(Date.now()), fecha: todayStr(),
+    nombre: actNombre, tipo: 'actividad',
+    duracion: actDuracion, intensidad: actIntensidad,
+    ejercicios: []
+  };
+  db.sesiones.push(session);
+  saveDB();
+  closeOv('ov-activity');
+  renderHome();
+  gdAutoSave().catch(() => {});
+  toast((ACT_EMOJIS[actNombre] || '⚡') + ' ' + actNombre + ' guardado');
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // RUTINAS SYSTEM
 // ─────────────────────────────────────────────────────────────────────────────
@@ -876,6 +990,22 @@ function renderSessions() {
   const sorted = db.sesiones.map((s,i)=>({...s,_i:i})).reverse();
   let html = `<div class="list-label">Sesiones</div>`;
   sorted.forEach(s => {
+    if (s.tipo === 'actividad') {
+      const emoji = ACT_EMOJIS[s.nombre] || '⚡';
+      const intLabel = {'suave':'Suave','moderada':'Moderada','intensa':'Intensa'}[s.intensidad] || 'Moderada';
+      const intCls = 'int-' + (s.intensidad || 'moderada');
+      html += `<div class="card">
+        <div class="card-main" data-open-ses="${s._i}">
+          <div class="card-info">
+            <div class="card-date">${fmtDate(s.fecha)}</div>
+            <div class="card-name">${emoji} ${esc(s.nombre)}</div>
+            <div class="card-meta">${s.duracion || 0} min &nbsp;<span class="int-badge ${intCls}">${intLabel}</span></div>
+          </div>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--mut)" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+      </div>`;
+      return;
+    }
     const ex = s.ejercicios.length;
     const sets = s.ejercicios.reduce((a,e)=>a+e.series.length,0);
     html += `<div class="card">
