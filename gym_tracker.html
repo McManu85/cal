@@ -552,7 +552,8 @@
         <button class="int-pill" data-int="intensa" onclick="setIntensidad('intensa')">🔥 Intensa</button>
       </div>
     </div>
-    <button class="sheet-btn" style="margin:6px 12px 8px;width:calc(100% - 24px)" onclick="saveActivity()">GUARDAR ACTIVIDAD</button>
+    <button class="sheet-btn" style="margin:6px 12px 4px;width:calc(100% - 24px)" onclick="saveActivity()">GUARDAR ACTIVIDAD</button>
+    <button id="act-del-btn" style="display:none;margin:0 12px 8px;width:calc(100% - 24px);padding:11px;background:none;border:1px solid rgba(255,80,60,.35);border-radius:8px;color:#ff6b5b;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer" onclick="deleteActivity()">Eliminar actividad</button>
   </div>
 </div>
 
@@ -742,9 +743,39 @@ function renderHome() { renderSessions(); }
 let actNombre = '';
 let actDuracion = 60;
 let actIntensidad = 'moderada';
+let actEditIdx = -1;  // -1 = nueva, >=0 = editando sesión existente
 const ACT_EMOJIS = {'Tenis de mesa':'🏓','Caminata':'🚶','Tenis':'🎾','Carrera':'🏃','Bicicleta':'🚴','Natación':'🏊'};
 
+function openActivityEdit(idx) {
+  const s = db.sesiones[idx];
+  if (!s) return;
+  actEditIdx = idx;
+  actNombre = s.nombre;
+  actDuracion = s.duracion || 45;
+  actIntensidad = s.intensidad || 'moderada';
+  document.getElementById('act-title').textContent = (ACT_EMOJIS[s.nombre] || '⚡') + '  ' + s.nombre;
+  document.getElementById('act-dur-val').textContent = actDuracion;
+  document.getElementById('act-fecha').value = s.fecha || todayStr();
+  document.getElementById('act-pasos').value = s.pasos || '';
+  document.getElementById('act-pasos-block').style.display = s.nombre === 'Caminata' ? 'block' : 'none';
+  document.getElementById('act-del-btn').style.display = 'block';
+  document.querySelectorAll('.int-pill').forEach(b => b.classList.toggle('sel', b.dataset.int === actIntensidad));
+  document.getElementById('ov-activity').classList.add('open');
+}
+
+function deleteActivity() {
+  if (actEditIdx < 0) return;
+  db.sesiones.splice(actEditIdx, 1);
+  actEditIdx = -1;
+  saveDB();
+  closeOv('ov-activity');
+  renderHome();
+  gdAutoSave().catch(() => {});
+  toast('Actividad eliminada');
+}
+
 function openActivityLog(nombre) {
+  actEditIdx = -1;
   actNombre = nombre;
   actDuracion = nombre === 'Tenis de mesa' ? 60 : 45;
   actIntensidad = 'moderada';
@@ -753,6 +784,7 @@ function openActivityLog(nombre) {
   document.getElementById('act-fecha').value = todayStr();
   document.getElementById('act-pasos').value = '';
   document.getElementById('act-pasos-block').style.display = nombre === 'Caminata' ? 'block' : 'none';
+  document.getElementById('act-del-btn').style.display = 'none';
   document.querySelectorAll('.int-pill').forEach(b => b.classList.toggle('sel', b.dataset.int === actIntensidad));
   closeOv('ov-session-picker');
   document.getElementById('ov-activity').classList.add('open');
@@ -776,14 +808,23 @@ function setIntensidad(val) {
 function saveActivity() {
   const fecha = document.getElementById('act-fecha').value || todayStr();
   const pasos = parseInt(document.getElementById('act-pasos').value) || 0;
-  const session = {
-    id: String(Date.now()), fecha: fecha,
-    nombre: actNombre, tipo: 'actividad',
-    duracion: actDuracion, intensidad: actIntensidad,
-    ejercicios: []
-  };
-  if (actNombre === 'Caminata' && pasos > 0) session.pasos = pasos;
-  db.sesiones.push(session);
+  if (actEditIdx >= 0) {
+    const s = db.sesiones[actEditIdx];
+    s.fecha = fecha;
+    s.duracion = actDuracion;
+    s.intensidad = actIntensidad;
+    if (actNombre === 'Caminata') { if (pasos > 0) s.pasos = pasos; else delete s.pasos; }
+    actEditIdx = -1;
+  } else {
+    const session = {
+      id: String(Date.now()), fecha: fecha,
+      nombre: actNombre, tipo: 'actividad',
+      duracion: actDuracion, intensidad: actIntensidad,
+      ejercicios: []
+    };
+    if (actNombre === 'Caminata' && pasos > 0) session.pasos = pasos;
+    db.sesiones.push(session);
+  }
   db.sesiones.sort((a,b) => (a.fecha < b.fecha ? -1 : a.fecha > b.fecha ? 1 : 0));
   saveDB();
   closeOv('ov-activity');
@@ -1087,6 +1128,8 @@ function newSes() {
 }
 
 function openSes(idx) {
+  const s = db.sesiones[idx];
+  if (s && s.tipo === 'actividad') { openActivityEdit(idx); return; }
   sesIdx = idx;
   ses = JSON.parse(JSON.stringify(db.sesiones[idx]));
   startSesScreen();
