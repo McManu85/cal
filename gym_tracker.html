@@ -352,7 +352,7 @@
 <!-- ═══════════════════════════ SCREEN: HOME ═══════════════════════════════ -->
 <div id="scr-home" class="screen active">
   <div class="hdr">
-    <div class="hdr-logo">GYM <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--mut);letter-spacing:0;vertical-align:super">v6</span></div>
+    <div class="hdr-logo">GYM <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--mut);letter-spacing:0;vertical-align:super">v7</span></div>
     <div style="flex:1"></div>
     <button class="ico" id="btn-import" title="Importar">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -1164,7 +1164,7 @@ function startSesScreen() {
 }
 
 document.getElementById('btn-back').addEventListener('click', () => {
-  commitSave(); showScreen('scr-home'); renderHome();
+  commitSave(true); showScreen('scr-home'); renderHome();
   gdAutoSave().catch(() => { toast('Sesión guardada ✓'); });
 });
 
@@ -1177,8 +1177,19 @@ function autosave() {
 }
 function dot(on) { document.getElementById('save-dot').classList.toggle('on', on); }
 
-function commitSave() {
+function commitSave(exiting = false) {
   if (!ses) return;
+  const totalSeries = ses.ejercicios.reduce((a,e) => a + e.series.length, 0);
+  if (totalSeries === 0) {
+    // Sin series: el autosave no persiste nada; al salir se descarta del todo
+    if (exiting) {
+      if (sesIdx !== -1) db.sesiones.splice(sesIdx, 1);
+      ses = null; sesIdx = -1;
+      saveDB();
+      toast('Sesión vacía descartada');
+    }
+    return;
+  }
   const t = document.getElementById('ses-title');
   ses.nombre = t.textContent.trim() || ses.nombre;
   if (sesIdx === -1) { db.sesiones.push(ses); sesIdx = db.sesiones.length - 1; }
@@ -1204,7 +1215,7 @@ document.getElementById('btn-del-ses').addEventListener('click', () => {
 
 // Big bottom buttons — same actions, full visibility
 document.getElementById('btn-save-ses-big').addEventListener('click', () => {
-  commitSave(); showScreen('scr-home'); renderHome();
+  commitSave(true); showScreen('scr-home'); renderHome();
   gdAutoSave().catch(() => { toast('Sesión guardada ✓'); });
 });
 document.getElementById('btn-del-ses-big').addEventListener('click', () => {
