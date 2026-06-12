@@ -419,7 +419,19 @@
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" style="display:inline;margin-right:6px"><path d="M12 5v14M5 12h14"/></svg>
       SESIÓN EN BLANCO
     </button>
-    <div id="sp-ciclos" style="padding-bottom:12px"></div>
+    <div id="sp-ciclos" style="padding-bottom:4px"></div>
+    <div style="padding:8px 14px 2px;border-top:1px solid var(--b)">
+      <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--mut)">Registrar actividad</div>
+    </div>
+    <div class="act-pills">
+      <div class="act-pill" onclick="openActivityLog('Tenis de mesa')"><span class="act-pill-icon">🏓</span><span class="act-pill-lbl">TT</span></div>
+      <div class="act-pill" onclick="openActivityLog('Caminata')"><span class="act-pill-icon">🚶</span><span class="act-pill-lbl">Caminar</span></div>
+      <div class="act-pill" onclick="openActivityLog('Tenis')"><span class="act-pill-icon">🎾</span><span class="act-pill-lbl">Tenis</span></div>
+      <div class="act-pill" onclick="openActivityLog('Carrera')"><span class="act-pill-icon">🏃</span><span class="act-pill-lbl">Correr</span></div>
+      <div class="act-pill" onclick="openActivityLog('Bicicleta')"><span class="act-pill-icon">🚴</span><span class="act-pill-lbl">Bici</span></div>
+      <div class="act-pill" onclick="openActivityLog('Natación')"><span class="act-pill-icon">🏊</span><span class="act-pill-lbl">Nadar</span></div>
+      <div class="act-pill" onclick="openCustomActivity()"><span class="act-pill-icon">✚</span><span class="act-pill-lbl">Otra</span></div>
+    </div>
   </div>
 </div>
 
