@@ -352,7 +352,7 @@
 <!-- ═══════════════════════════ SCREEN: HOME ═══════════════════════════════ -->
 <div id="scr-home" class="screen active">
   <div class="hdr">
-    <div class="hdr-logo">GYM <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--mut);letter-spacing:0;vertical-align:super">v5</span></div>
+    <div class="hdr-logo">GYM <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--mut);letter-spacing:0;vertical-align:super">v6</span></div>
     <div style="flex:1"></div>
     <button class="ico" id="btn-import" title="Importar">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -474,6 +474,8 @@
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
       AÑADIR EJERCICIO
     </button>
+    <button class="sheet-btn" id="btn-save-ses-big" style="margin:14px 12px 4px;width:calc(100% - 24px)">GUARDAR SESIÓN</button>
+    <button id="btn-del-ses-big" style="margin:0 12px 16px;width:calc(100% - 24px);padding:11px;background:none;border:1px solid rgba(255,80,60,.35);border-radius:8px;color:#ff6b5b;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer">Eliminar sesión</button>
   </div>
 </div>
 
@@ -1197,6 +1199,21 @@ document.getElementById('btn-del-ses').addEventListener('click', () => {
     if (sesIdx !== -1) { db.sesiones.splice(sesIdx, 1); saveDB(); }
     ses = null; sesIdx = -1;
     showScreen('scr-home'); renderHome(); toast('Sesión eliminada');
+  });
+});
+
+// Big bottom buttons — same actions, full visibility
+document.getElementById('btn-save-ses-big').addEventListener('click', () => {
+  commitSave(); showScreen('scr-home'); renderHome();
+  gdAutoSave().catch(() => { toast('Sesión guardada ✓'); });
+});
+document.getElementById('btn-del-ses-big').addEventListener('click', () => {
+  openDelConfirm('Eliminar sesión', '¿Eliminar esta sesión? No se puede deshacer.', () => {
+    if (sesIdx !== -1) { db.sesiones.splice(sesIdx, 1); saveDB(); }
+    ses = null; sesIdx = -1;
+    showScreen('scr-home'); renderHome();
+    gdAutoSave().catch(() => {});
+    toast('Sesión eliminada');
   });
 });
 
