@@ -357,7 +357,7 @@
 <!-- ═══════════════════════════ SCREEN: HOME ═══════════════════════════════ -->
 <div id="scr-home" class="screen active">
   <div class="hdr">
-    <div class="hdr-logo">GYM <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--mut);letter-spacing:0;vertical-align:super">v8</span></div>
+    <div class="hdr-logo">GYM <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--mut);letter-spacing:0;vertical-align:super">v9</span></div>
     <div style="flex:1"></div>
     <button class="ico" id="btn-import" title="Importar">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -372,7 +372,7 @@
       <div id="drive-off" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;background:var(--s2);border-left:3px solid var(--acc)" onclick="gdHandleTap()">
         <div style="display:flex;align-items:center;gap:10px">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--acc)" stroke-width="2.5" stroke-linecap="round"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M12 8v4l3 3"/></svg>
-          <span style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--acc)">Conectar Google Drive</span>
+          <span id="drive-off-label" style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--acc)">Conectar Google Drive</span>
         </div>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--acc)" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
       </div>
@@ -1687,6 +1687,25 @@ let gdTokenClient = null;
 let gdToken       = null;
 let gdFolderId    = localStorage.getItem(LS_FID)  || null;
 let gdFileId      = localStorage.getItem(LS_FXID) || null;
+let gdRefreshTimer = null;
+let gdSilentTried  = false;
+
+function gdScheduleRefresh() {
+  clearTimeout(gdRefreshTimer);
+  const exp = parseInt(localStorage.getItem(LS_EXP) || '0');
+  if (!exp) return;
+  // Refresh 2 min before expiry, silently
+  const delay = Math.max(5000, exp - Date.now() - 120000);
+  gdRefreshTimer = setTimeout(() => gdSilentRefresh(), delay);
+}
+
+function gdSilentRefresh() {
+  if (!gdTokenClient) return;
+  try {
+    // prompt:'' asks Google for a fresh token WITHOUT showing any dialog
+    gdTokenClient.requestAccessToken({ prompt: '' });
+  } catch(e) { /* will fall back to manual reconnect button */ }
+}
 
 function gdInitClient() {
   if (typeof google === 'undefined' || !google.accounts) return;
@@ -1694,14 +1713,22 @@ function gdInitClient() {
     client_id: GD_CLIENT_ID,
     scope: GD_SCOPE,
     callback: async (resp) => {
-      if (resp.error) { toast('Error al conectar Drive'); return; }
+      if (resp.error) {
+        // Silent refresh failed (needs interaction) → show reconnect UI, don't nag
+        if (resp.error === 'interaction_required' || resp.error === 'access_denied') {
+          gdToken = null; gdUpdateUI(false);
+        } else {
+          toast('Error al conectar Drive');
+        }
+        return;
+      }
       gdToken = resp.access_token;
       const exp = Date.now() + (resp.expires_in - 60) * 1000;
       localStorage.setItem(LS_TOKEN, gdToken);
       localStorage.setItem(LS_EXP,   String(exp));
       gdUpdateUI(true);
+      gdScheduleRefresh();
       await gdEnsureFolder().catch(() => {});
-      toast('Drive conectado ✓');
     }
   });
   // Restore token if still valid
@@ -1710,7 +1737,11 @@ function gdInitClient() {
   if (saved && Date.now() < exp) {
     gdToken = saved;
     gdUpdateUI(true);
+    gdScheduleRefresh();
     gdAutoLoad().catch(() => {});
+  } else if (saved) {
+    // Had a token before but expired → try to renew silently, no dialog
+    gdSilentRefresh();
   }
 }
 
@@ -1719,7 +1750,8 @@ function gdHandleTap() {
   if (!gdToken || Date.now() >= exp) {
     if (!gdTokenClient) { toast('Cargando Google…'); return; }
     gdToken = null;
-    gdTokenClient.requestAccessToken();
+    // Explicit user tap: try silent first, but allow consent dialog if needed
+    gdTokenClient.requestAccessToken(localStorage.getItem(LS_TOKEN) ? { prompt: '' } : {});
   }
 }
 
@@ -1729,6 +1761,11 @@ function gdUpdateUI(on) {
   const driveOn  = document.getElementById('drive-on');
   if (driveOff) driveOff.style.display = on ? 'none' : 'flex';
   if (driveOn)  driveOn.style.display  = on ? 'block' : 'none';
+  // If we had a token before, show "Reconectar" instead of "Conectar"
+  const lbl = document.getElementById('drive-off-label');
+  if (lbl && !on) {
+    lbl.textContent = localStorage.getItem(LS_TOKEN) ? 'Reconectar Google Drive' : 'Conectar Google Drive';
+  }
 }
 
 function gdDisconnect() {
@@ -1746,8 +1783,9 @@ async function gdFetch(url, opts = {}) {
     headers: { Authorization: `Bearer ${gdToken}`, ...(opts.headers || {}) }
   });
   if (res.status === 401) {
-    gdToken = null; gdUpdateUI(false);
-    toast('Sesión Drive expirada — vuelve a conectar');
+    gdToken = null;
+    gdUpdateUI(false);
+    gdSilentRefresh(); // try to get a fresh token in background
     throw new Error('token_expired');
   }
   return res;
