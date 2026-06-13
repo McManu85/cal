@@ -357,38 +357,15 @@
 <!-- ═══════════════════════════ SCREEN: HOME ═══════════════════════════════ -->
 <div id="scr-home" class="screen active">
   <div class="hdr">
-    <div class="hdr-logo">GYM <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--mut);letter-spacing:0;vertical-align:super">v10</span></div>
+    <div class="hdr-logo">GYM <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--mut);letter-spacing:0;vertical-align:super">v11</span></div>
     <div style="flex:1"></div>
-    <span id="gd-dot" style="display:none;width:7px;height:7px;border-radius:50%;background:var(--acc);flex-shrink:0"></span>
+    <button id="btn-user" onclick="gdUserTap()" style="display:flex;align-items:center;gap:7px;padding:6px 12px 6px 10px;background:var(--s2);border:1px solid var(--b);border-radius:20px;cursor:pointer;transition:all .2s">
+      <svg id="user-ico" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--mut)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      <span id="user-name" style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;letter-spacing:.3px;color:var(--mut)">Entrar</span>
+    </button>
   </div>
   <div class="scroll">
-    <div id="drive-strip" style="margin:12px 12px 0;border-radius:6px;overflow:hidden;border:1px solid var(--b)">
-      <div id="drive-off" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;background:var(--s2);border-left:3px solid var(--acc)" onclick="gdHandleTap()">
-        <div style="display:flex;align-items:center;gap:10px">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--acc)" stroke-width="2.5" stroke-linecap="round"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M12 8v4l3 3"/></svg>
-          <span id="drive-off-label" style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--acc)">Conectar Google Drive</span>
-        </div>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--acc)" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
-      </div>
-      <div id="drive-on" style="display:none">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px">
-          <div style="display:flex;align-items:center;gap:8px">
-            <span id="gd-dot-home" style="width:6px;height:6px;border-radius:50%;background:var(--acc);flex-shrink:0"></span>
-            <span style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--acc)">Drive conectado</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:4px">
-            <button onclick="gdRefresh()" title="Actualizar" style="display:flex;align-items:center;gap:6px;padding:6px 12px;background:none;border:1px solid var(--b);border-radius:6px;color:var(--txt);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;cursor:pointer">
-              <svg id="gd-refresh-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
-              Actualizar
-            </button>
-            <button onclick="gdDisconnect()" title="Desconectar" style="padding:6px 8px;background:none;border:none;color:var(--mut);cursor:pointer">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18.36 6.64a9 9 0 11-12.73 0M12 2v10"/></svg>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="home-actions" style="margin-top:8px">
+    <div class="home-actions" style="margin-top:12px">
       <button class="btn-home primary" id="btn-iniciar">
         <svg class="bh-ico" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
         INICIAR SESIÓN
@@ -529,7 +506,25 @@
 </div>
 
 
-<!-- ═══════════════════════ OVERLAY: ACTIVITY LOG ═══════════════════════════ -->
+<!-- ═══ USER MENU ═══ -->
+<div id="user-menu" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:200" onclick="closeUserMenu(event)">
+  <div id="user-menu-box" style="position:absolute;top:58px;right:12px;background:var(--s1);border:1px solid var(--b2);border-radius:10px;overflow:hidden;min-width:180px;box-shadow:0 8px 30px rgba(0,0,0,.4)">
+    <div style="padding:12px 14px;border-bottom:1px solid var(--b);display:flex;align-items:center;gap:9px">
+      <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/><path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"/><path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/></svg>
+      <span id="menu-user-name" style="font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:var(--txt)">Usuario</span>
+    </div>
+    <button onclick="gdRefresh();closeUserMenu()" style="width:100%;display:flex;align-items:center;gap:10px;padding:12px 14px;background:none;border:none;border-bottom:1px solid var(--b);color:var(--txt);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;text-align:left">
+      <svg id="gd-refresh-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+      Actualizar
+    </button>
+    <button onclick="gdDisconnect();closeUserMenu()" style="width:100%;display:flex;align-items:center;gap:10px;padding:12px 14px;background:none;border:none;color:#ff6b5b;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;text-align:left">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      Cerrar sesión
+    </button>
+  </div>
+</div>
+
+
 <div class="overlay" id="ov-activity">
   <div class="sheet">
     <div class="sheet-hdr">
@@ -1668,13 +1663,14 @@ if ('serviceWorker' in navigator) {
 // GOOGLE DRIVE
 // ─────────────────────────────────────────────────────────────────────────────
 const GD_CLIENT_ID = '165027269678-89l436h0ujttrr1kl2abmf2bklovln79.apps.googleusercontent.com';
-const GD_SCOPE     = 'https://www.googleapis.com/auth/drive.file';
+const GD_SCOPE     = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.profile';
 const GD_FOLDER    = 'GymTracker';
 const GD_FILE      = 'gym_sessions.json';
 const LS_TOKEN     = 'gd_token';
 const LS_EXP       = 'gd_exp';
 const LS_FID       = 'gd_fid';
 const LS_FXID      = 'gd_fxid';
+const LS_NAME      = 'gd_name';
 
 let gdTokenClient = null;
 let gdToken       = null;
@@ -1755,6 +1751,7 @@ function gdInitClient() {
       localStorage.setItem(LS_EXP,   String(exp));
       gdUpdateUI(true);
       gdScheduleRefresh();
+      gdFetchUserName();
       await gdEnsureFolder().catch(() => {});
     }
   });
@@ -1772,36 +1769,67 @@ function gdInitClient() {
   }
 }
 
-function gdHandleTap() {
+async function gdFetchUserName() {
+  try {
+    const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${gdToken}` }
+    });
+    const data = await res.json();
+    const full = data.given_name || data.name || 'Usuario';
+    const first = full.split(' ')[0];
+    localStorage.setItem(LS_NAME, first);
+    gdUpdateUI(true);
+  } catch(e) { /* keep whatever name we had */ }
+}
+
+function gdUserTap() {
   const exp = parseInt(localStorage.getItem(LS_EXP) || '0');
-  if (!gdToken || Date.now() >= exp) {
+  const hasValidToken = (gdToken || localStorage.getItem(LS_TOKEN)) && Date.now() < exp;
+  if (!hasValidToken) {
+    // Not connected → login
     if (!gdTokenClient) { toast('Cargando Google…'); return; }
     gdToken = null;
-    // Explicit user tap: try silent first, but allow consent dialog if needed
     gdTokenClient.requestAccessToken(localStorage.getItem(LS_TOKEN) ? { prompt: '' } : {});
+  } else {
+    // Connected → open menu
+    document.getElementById('menu-user-name').textContent = localStorage.getItem(LS_NAME) || 'Conectado';
+    document.getElementById('user-menu').style.display = 'block';
   }
 }
 
+function closeUserMenu(e) {
+  if (e && e.target.closest && e.target.closest('#user-menu-box')) return;
+  document.getElementById('user-menu').style.display = 'none';
+}
+
+// Legacy alias (some code paths still call gdHandleTap)
+function gdHandleTap() { gdUserTap(); }
+
 function gdUpdateUI(on) {
-  document.getElementById('gd-dot').style.display = on ? 'block' : 'none';
-  const driveOff = document.getElementById('drive-off');
-  const driveOn  = document.getElementById('drive-on');
-  if (driveOff) driveOff.style.display = on ? 'none' : 'flex';
-  if (driveOn)  driveOn.style.display  = on ? 'block' : 'none';
-  // If we had a token before, show "Reconectar" instead of "Conectar"
-  const lbl = document.getElementById('drive-off-label');
-  if (lbl && !on) {
-    lbl.textContent = localStorage.getItem(LS_TOKEN) ? 'Reconectar Google Drive' : 'Conectar Google Drive';
+  const ico = document.getElementById('user-ico');
+  const nm  = document.getElementById('user-name');
+  const btn = document.getElementById('btn-user');
+  if (!ico || !nm) return;
+  if (on) {
+    const name = localStorage.getItem(LS_NAME) || 'Conectado';
+    nm.textContent = name;
+    nm.style.color = 'var(--acc)';
+    ico.setAttribute('stroke', 'var(--acc)');
+    if (btn) btn.style.borderColor = 'var(--acc)';
+  } else {
+    nm.textContent = 'Entrar';
+    nm.style.color = 'var(--mut)';
+    ico.setAttribute('stroke', 'var(--mut)');
+    if (btn) btn.style.borderColor = 'var(--b)';
   }
 }
 
 function gdDisconnect() {
   if (gdToken) try { google.accounts.oauth2.revoke(gdToken, () => {}); } catch(e) {}
   gdToken = null; gdFolderId = null; gdFileId = null;
-  [LS_TOKEN, LS_EXP, LS_FID, LS_FXID].forEach(k => localStorage.removeItem(k));
+  [LS_TOKEN, LS_EXP, LS_FID, LS_FXID, LS_NAME].forEach(k => localStorage.removeItem(k));
   gdUpdateUI(false);
-  closeOv('ov-drive');
-  toast('Drive desconectado');
+  toast('Sesión cerrada');
 }
 
 async function gdFetch(url, opts = {}) {
