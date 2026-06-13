@@ -357,14 +357,8 @@
 <!-- ═══════════════════════════ SCREEN: HOME ═══════════════════════════════ -->
 <div id="scr-home" class="screen active">
   <div class="hdr">
-    <div class="hdr-logo">GYM <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--mut);letter-spacing:0;vertical-align:super">v9</span></div>
+    <div class="hdr-logo">GYM <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--mut);letter-spacing:0;vertical-align:super">v10</span></div>
     <div style="flex:1"></div>
-    <button class="ico" id="btn-import" title="Importar">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-    </button>
-    <button class="ico" id="btn-export" title="Exportar">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-    </button>
     <span id="gd-dot" style="display:none;width:7px;height:7px;border-radius:50%;background:var(--acc);flex-shrink:0"></span>
   </div>
   <div class="scroll">
@@ -377,22 +371,20 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--acc)" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
       </div>
       <div id="drive-on" style="display:none">
-        <div style="display:flex;align-items:center;gap:6px;padding:8px 14px 6px;border-bottom:1px solid var(--b)">
-          <span id="gd-dot-home" style="width:6px;height:6px;border-radius:50%;background:var(--acc);flex-shrink:0"></span>
-          <span style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--acc)">Drive conectado</span>
-        </div>
-        <div style="display:flex">
-          <button onclick="gdSave()" style="flex:1;padding:10px;background:none;border:none;border-right:1px solid var(--b);color:var(--txt);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            Guardar
-          </button>
-          <button onclick="gdLoad()" style="flex:1;padding:10px;background:none;border:none;border-right:1px solid var(--b);color:var(--txt);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Cargar
-          </button>
-          <button onclick="gdDisconnect()" style="flex:1;padding:10px;background:none;border:none;color:var(--mut);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;cursor:pointer">
-            Salir
-          </button>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span id="gd-dot-home" style="width:6px;height:6px;border-radius:50%;background:var(--acc);flex-shrink:0"></span>
+            <span style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--acc)">Drive conectado</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px">
+            <button onclick="gdRefresh()" title="Actualizar" style="display:flex;align-items:center;gap:6px;padding:6px 12px;background:none;border:1px solid var(--b);border-radius:6px;color:var(--txt);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;cursor:pointer">
+              <svg id="gd-refresh-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+              Actualizar
+            </button>
+            <button onclick="gdDisconnect()" title="Desconectar" style="padding:6px 8px;background:none;border:none;color:var(--mut);cursor:pointer">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18.36 6.64a9 9 0 11-12.73 0M12 2v10"/></svg>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -455,6 +447,20 @@
   </div>
   <div class="scroll">
     <div id="rutinas-body" style="padding-bottom:12px"></div>
+    <div style="margin:8px 12px 20px;padding-top:16px;border-top:1px solid var(--b)">
+      <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--mut);margin-bottom:10px;padding-left:2px">Copia de seguridad</div>
+      <div style="display:flex;gap:8px">
+        <button id="btn-import" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:11px;background:var(--s1);border:1px solid var(--b);border-radius:8px;color:var(--txt);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;cursor:pointer">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Importar JSON
+        </button>
+        <button id="btn-export" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:11px;background:var(--s1);border:1px solid var(--b);border-radius:8px;color:var(--txt);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;cursor:pointer">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Exportar JSON
+        </button>
+      </div>
+      <div style="font-size:10px;color:var(--mut);margin-top:8px;padding-left:2px;line-height:1.5">El archivo JSON incluye rutinas, sesiones y actividades. Útil para mover datos entre dispositivos sin Google Drive.</div>
+    </div>
   </div>
 </div>
 
@@ -621,19 +627,6 @@
       <button class="btn-cancel" id="del-cancel">Cancelar</button>
       <button class="btn-danger" id="del-confirm">Eliminar</button>
     </div>
-  </div>
-</div>
-
-<!-- ═══ DRIVE SHEET ═══ -->
-<div class="overlay" id="ov-drive">
-  <div class="sheet" style="max-height:280px">
-    <div class="sheet-hdr">
-      <div class="sheet-hdr-title">Google Drive</div>
-      <button class="ico" onclick="closeOv('ov-drive')">✕</button>
-    </div>
-    <button class="sheet-btn" onclick="gdSave()">Guardar en Drive</button>
-    <button class="sheet-btn" onclick="gdLoad()">Cargar desde Drive</button>
-    <button class="sheet-btn" onclick="gdDisconnect()" style="background:var(--s2);color:var(--red);border:1px solid var(--b);margin-top:4px">Desconectar cuenta</button>
   </div>
 </div>
 
@@ -1011,7 +1004,7 @@ function togglePickerRutina(id) {
   renderSessionPicker();
 }
 
-function closeOv(id) { document.getElementById(id).classList.remove('open'); }
+function closeOv(id) { const el = document.getElementById(id); if (el) el.classList.remove('open'); }
 
 // Session picker events
 document.getElementById('sp-close').addEventListener('click', () => closeOv('ov-session-picker'));
@@ -1699,12 +1692,46 @@ function gdScheduleRefresh() {
   gdRefreshTimer = setTimeout(() => gdSilentRefresh(), delay);
 }
 
-function gdSilentRefresh() {
+async function gdSilentRefresh() {
   if (!gdTokenClient) return;
   try {
     // prompt:'' asks Google for a fresh token WITHOUT showing any dialog
     gdTokenClient.requestAccessToken({ prompt: '' });
   } catch(e) { /* will fall back to manual reconnect button */ }
+}
+
+async function gdRefresh() {
+  const exp = parseInt(localStorage.getItem(LS_EXP) || '0');
+  if (!gdToken || Date.now() >= exp) { gdSilentRefresh(); toast('Reconectando…'); return; }
+  const ico = document.getElementById('gd-refresh-ico');
+  if (ico) ico.style.transition = 'transform .6s', ico.style.transform = 'rotate(360deg)';
+  try {
+    const fileId = await gdEnsureFileId();
+    if (fileId) {
+      const res  = await gdFetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`);
+      const data = await res.json();
+      if (data.sesiones) {
+        const driveTime = data.last_modified || 0;
+        const localTime = db.last_modified  || 0;
+        if (driveTime > localTime) {
+          db = data;
+          db.ejercicios_predefinidos = [...new Set([...PREDEFINED,...(db.ejercicios_predefinidos||[])])];
+          db.plantillas = db.plantillas || [];
+          if (!db.rutinas) initRutinas();
+          saveDB(); renderHome();
+          toast('☁ Actualizado desde Drive');
+          if (ico) setTimeout(() => { ico.style.transform = 'rotate(0deg)'; }, 600);
+          return;
+        }
+      }
+    }
+    // Local is newer (or no remote file yet) → push up
+    await gdAutoSave();
+    toast('☁ Sincronizado');
+  } catch(e) {
+    toast('No se pudo sincronizar');
+  }
+  if (ico) setTimeout(() => { ico.style.transform = 'rotate(0deg)'; }, 600);
 }
 
 function gdInitClient() {
