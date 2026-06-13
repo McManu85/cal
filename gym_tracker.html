@@ -211,12 +211,17 @@
     .ex-block { margin:10px 12px 0; background:var(--s1);
       border:1px solid var(--b); border-radius:var(--r); overflow:hidden; }
     .ex-hdr { padding:11px 13px; display:flex; align-items:center; gap:10px;
-      border-bottom:1px solid var(--b); }
-    .ex-name { flex:1; font-family:'Bebas Neue',sans-serif; font-size:18px; font-weight:400; letter-spacing:.5px;
+      border-bottom:1px solid var(--b); flex-wrap:wrap; }
+    .ex-name { flex:1; min-width:140px; font-family:'Bebas Neue',sans-serif; font-size:18px; font-weight:400; letter-spacing:.5px;
       text-transform:uppercase; color:var(--txt); background:none; border:none;
       cursor:pointer; text-align:left; padding:0;
       display:flex; align-items:center; gap:6px; }
     .ex-name span { color:var(--acc); font-size:12px; }
+    .modo-toggle { display:flex; gap:0; border:1px solid var(--b); border-radius:6px; overflow:hidden; flex-shrink:0; }
+    .modo-btn { background:none; border:none; padding:5px 12px; font-family:'DM Sans',sans-serif;
+      font-size:10px; font-weight:700; letter-spacing:.5px; text-transform:uppercase;
+      color:var(--mut); cursor:pointer; transition:all .15s; }
+    .modo-btn.sel { background:var(--acc); color:#000; }
     .serie-row { display:flex; align-items:center; gap:7px;
       padding:8px 13px; border-bottom:1px solid var(--b); }
     .serie-n { font-family:'JetBrains Mono',monospace; font-size:12px;
@@ -352,7 +357,7 @@
 <!-- ═══════════════════════════ SCREEN: HOME ═══════════════════════════════ -->
 <div id="scr-home" class="screen active">
   <div class="hdr">
-    <div class="hdr-logo">GYM <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--mut);letter-spacing:0;vertical-align:super">v7</span></div>
+    <div class="hdr-logo">GYM <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--mut);letter-spacing:0;vertical-align:super">v8</span></div>
     <div style="flex:1"></div>
     <button class="ico" id="btn-import" title="Importar">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -1267,30 +1272,62 @@ function renderSession() {
 function buildExBlock(ex, ei) {
   const div = document.createElement('div');
   div.className = 'ex-block'; div.id = `ex${ei}`;
+  const isTabata = ex.modo === 'tabata';
   let serHTML = '';
   ex.series.forEach((s, si) => {
-    serHTML += `<div class="serie-row" id="sr${ei}-${si}">
-      <span class="serie-n">${si+1}</span>
-      <div class="serie-field">
-        <label>REPS</label>
-        <input class="serie-input" type="number" inputmode="numeric" min="0" max="99"
-          value="${s.reps!==''?s.reps:''}" placeholder="—"
-          data-ei="${ei}" data-si="${si}" data-f="reps">
-      </div>
-      <div class="serie-field">
-        <label>KG</label>
-        <input class="serie-input" type="number" inputmode="decimal" min="0" step="0.5"
-          value="${s.kg!==''?s.kg:''}" placeholder="—"
-          data-ei="${ei}" data-si="${si}" data-f="kg">
-      </div>
-      <button class="serie-del" data-del-serie="${ei}-${si}">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
-      </button>
-    </div>`;
+    if (isTabata) {
+      serHTML += `<div class="serie-row" id="sr${ei}-${si}">
+        <span class="serie-n">${si+1}</span>
+        <div class="serie-field">
+          <label>RONDAS</label>
+          <input class="serie-input" type="number" inputmode="numeric" min="0" max="99"
+            value="${s.rondas!==undefined&&s.rondas!==''?s.rondas:''}" placeholder="8"
+            data-ei="${ei}" data-si="${si}" data-f="rondas">
+        </div>
+        <div class="serie-field">
+          <label>SEG</label>
+          <input class="serie-input" type="number" inputmode="numeric" min="0" step="5"
+            value="${s.seg!==undefined&&s.seg!==''?s.seg:''}" placeholder="20"
+            data-ei="${ei}" data-si="${si}" data-f="seg">
+        </div>
+        <div class="serie-field">
+          <label>KG</label>
+          <input class="serie-input" type="number" inputmode="decimal" min="0" step="0.5"
+            value="${s.kg!==''&&s.kg!==undefined?s.kg:''}" placeholder="—"
+            data-ei="${ei}" data-si="${si}" data-f="kg">
+        </div>
+        <button class="serie-del" data-del-serie="${ei}-${si}">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>`;
+    } else {
+      serHTML += `<div class="serie-row" id="sr${ei}-${si}">
+        <span class="serie-n">${si+1}</span>
+        <div class="serie-field">
+          <label>REPS</label>
+          <input class="serie-input" type="number" inputmode="numeric" min="0" max="99"
+            value="${s.reps!==''&&s.reps!==undefined?s.reps:''}" placeholder="—"
+            data-ei="${ei}" data-si="${si}" data-f="reps">
+        </div>
+        <div class="serie-field">
+          <label>KG</label>
+          <input class="serie-input" type="number" inputmode="decimal" min="0" step="0.5"
+            value="${s.kg!==''&&s.kg!==undefined?s.kg:''}" placeholder="—"
+            data-ei="${ei}" data-si="${si}" data-f="kg">
+        </div>
+        <button class="serie-del" data-del-serie="${ei}-${si}">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>`;
+    }
   });
   div.innerHTML = `
     <div class="ex-hdr">
       <button class="ex-name" data-rename="${ei}">${esc(ex.nombre)} <span>▾</span></button>
+      <div class="modo-toggle">
+        <button class="modo-btn ${!isTabata?'sel':''}" data-modo="reps-${ei}">Reps</button>
+        <button class="modo-btn ${isTabata?'sel':''}" data-modo="tabata-${ei}">Tabata</button>
+      </div>
     </div>
     <div>${serHTML}</div>
     <div class="ex-foot">
@@ -1309,16 +1346,23 @@ function buildExBlock(ex, ei) {
 
 document.getElementById('ses-scroll').addEventListener('click', e => {
   const rename   = e.target.closest('[data-rename]');
+  const modoBtn  = e.target.closest('[data-modo]');
   const addSerie = e.target.closest('[data-add-serie]');
   const dupSerie = e.target.closest('[data-dup-serie]');
   const delSerie = e.target.closest('[data-del-serie]');
   const delEx    = e.target.closest('[data-del-ex]');
+  if (modoBtn)  { const [m,ei]=modoBtn.dataset.modo.split('-'); setExModo(+ei, m); return; }
   if (rename)   { pickerCtx='session'; openPicker(+rename.dataset.rename); return; }
   if (addSerie) { addSet(+addSerie.dataset.addSerie); return; }
   if (dupSerie) { dupLastSet(+dupSerie.dataset.dupSerie); return; }
   if (delEx)    { removeExSes(+delEx.dataset.delEx); return; }
   if (delSerie) { const [ei,si]=delSerie.dataset.delSerie.split('-').map(Number); removeSet(ei,si); }
 });
+
+function setExModo(ei, modo) {
+  ses.ejercicios[ei].modo = modo === 'tabata' ? 'tabata' : 'reps';
+  autosave(); renderSession();
+}
 
 document.getElementById('ses-scroll').addEventListener('change', e => {
   const inp = e.target.closest('.serie-input'); if (!inp) return;
@@ -1350,17 +1394,24 @@ function renameExSes(ei, nombre) {
 }
 function removeExSes(ei) { ses.ejercicios.splice(ei,1); autosave(); renderSession(); }
 function addSet(ei) {
-  ses.ejercicios[ei].series.push({reps:'',kg:''}); autosave(); renderSession();
+  const ex = ses.ejercicios[ei];
+  if (ex.modo === 'tabata') ex.series.push({rondas:'',seg:'',kg:''});
+  else ex.series.push({reps:'',kg:''});
+  autosave(); renderSession();
   setTimeout(() => {
     const inputs = document.querySelectorAll(`#ex${ei} .serie-input`);
-    if (inputs.length) inputs[inputs.length-2].focus();
+    const offset = ex.modo === 'tabata' ? 3 : 2;
+    if (inputs.length) inputs[inputs.length-offset].focus();
   }, 60);
 }
 function dupLastSet(ei) {
-  const series = ses.ejercicios[ei].series;
+  const ex = ses.ejercicios[ei];
+  const series = ex.series;
   if (!series.length) { addSet(ei); return; }
   const last = series[series.length-1];
-  series.push({reps:last.reps,kg:last.kg}); autosave(); renderSession(); toast('Serie duplicada');
+  if (ex.modo === 'tabata') series.push({rondas:last.rondas,seg:last.seg,kg:last.kg});
+  else series.push({reps:last.reps,kg:last.kg});
+  autosave(); renderSession(); toast('Serie duplicada');
 }
 function removeSet(ei,si) { ses.ejercicios[ei].series.splice(si,1); autosave(); renderSession(); }
 
