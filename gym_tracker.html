@@ -222,8 +222,11 @@
       font-size:10px; font-weight:700; letter-spacing:.5px; text-transform:uppercase;
       color:var(--mut); cursor:pointer; transition:all .15s; }
     .modo-btn.sel { background:var(--acc); color:#000; }
-    .serie-row { display:flex; align-items:center; gap:7px;
+    .serie-row { display:flex; align-items:center; gap:7px; flex-wrap:wrap;
       padding:8px 13px; border-bottom:1px solid var(--b); }
+    .prev-tag { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--mut);
+      background:var(--s2); padding:2px 6px; border-radius:4px; white-space:nowrap;
+      letter-spacing:.02em; flex-shrink:0; }
     .serie-n { font-family:'JetBrains Mono',monospace; font-size:12px;
       color:var(--mut); width:18px; flex-shrink:0; text-align:center; }
     .serie-field { display:flex; align-items:stretch; background:var(--s3);
@@ -360,7 +363,7 @@
     <div class="hdr-logo" style="display:flex;align-items:baseline;gap:8px">
       <span>INDAR<span style="color:var(--acc)">-BI</span></span>
       <span style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut)">Gym Tracker</span>
-      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:0">v12</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:0">v13</span>
     </div>
     <div style="flex:1"></div>
     <button id="btn-user" onclick="gdUserTap()" style="display:flex;align-items:center;gap:7px;padding:6px 12px 6px 10px;background:var(--s2);border:1px solid var(--b);border-radius:20px;cursor:pointer;transition:all .2s">
@@ -1138,7 +1141,14 @@ function repeatSes(idx) {
   const orig = db.sesiones[idx];
   ses = { id:String(Date.now()), fecha:todayStr(),
     nombre:orig.nombre,
-    ejercicios:orig.ejercicios.map(e=>({nombre:e.nombre,series:[]})) };
+    ejercicios:orig.ejercicios.map(e=>({
+      nombre:e.nombre,
+      modo:e.modo || 'reps',
+      // Pre-create empty series matching last time, each carrying a `prev` reference
+      series:(e.series||[]).map(s => e.modo === 'tabata'
+        ? { rondas:'', seg:'', kg:'', prev:{ rondas:s.rondas, seg:s.seg, kg:s.kg } }
+        : { reps:'', kg:'', prev:{ reps:s.reps, kg:s.kg } })
+    })) };
   sesIdx = -1;
   startSesScreen();
 }
@@ -1176,9 +1186,13 @@ function dot(on) { document.getElementById('save-dot').classList.toggle('on', on
 
 function commitSave(exiting = false) {
   if (!ses) return;
-  const totalSeries = ses.ejercicios.reduce((a,e) => a + e.series.length, 0);
-  if (totalSeries === 0) {
-    // Sin series: el autosave no persiste nada; al salir se descarta del todo
+  // A series counts as "real" only if it has actual logged values (not just prev refs)
+  const hasData = ses.ejercicios.some(e => (e.series||[]).some(s =>
+    (s.reps!==''&&s.reps!==undefined) || (s.kg!==''&&s.kg!==undefined) ||
+    (s.rondas!==''&&s.rondas!==undefined) || (s.seg!==''&&s.seg!==undefined)
+  ));
+  if (!hasData) {
+    // Nada anotado realmente; al salir se descarta del todo
     if (exiting) {
       if (sesIdx !== -1) db.sesiones.splice(sesIdx, 1);
       ses = null; sesIdx = -1;
@@ -1267,27 +1281,29 @@ function buildExBlock(ex, ei) {
   const isTabata = ex.modo === 'tabata';
   let serHTML = '';
   ex.series.forEach((s, si) => {
+    const p = s.prev || {};
     if (isTabata) {
       serHTML += `<div class="serie-row" id="sr${ei}-${si}">
         <span class="serie-n">${si+1}</span>
         <div class="serie-field">
           <label>RONDAS</label>
           <input class="serie-input" type="number" inputmode="numeric" min="0" max="99"
-            value="${s.rondas!==undefined&&s.rondas!==''?s.rondas:''}" placeholder="8"
+            value="${s.rondas!==undefined&&s.rondas!==''?s.rondas:''}" placeholder="${p.rondas!==undefined&&p.rondas!==''?p.rondas:'8'}"
             data-ei="${ei}" data-si="${si}" data-f="rondas">
         </div>
         <div class="serie-field">
           <label>SEG</label>
           <input class="serie-input" type="number" inputmode="numeric" min="0" step="5"
-            value="${s.seg!==undefined&&s.seg!==''?s.seg:''}" placeholder="20"
+            value="${s.seg!==undefined&&s.seg!==''?s.seg:''}" placeholder="${p.seg!==undefined&&p.seg!==''?p.seg:'20'}"
             data-ei="${ei}" data-si="${si}" data-f="seg">
         </div>
         <div class="serie-field">
           <label>KG</label>
           <input class="serie-input" type="number" inputmode="decimal" min="0" step="0.5"
-            value="${s.kg!==''&&s.kg!==undefined?s.kg:''}" placeholder="—"
+            value="${s.kg!==''&&s.kg!==undefined?s.kg:''}" placeholder="${p.kg!==undefined&&p.kg!==''?p.kg:'—'}"
             data-ei="${ei}" data-si="${si}" data-f="kg">
         </div>
+        ${(p.rondas||p.seg||p.kg)?`<span class="prev-tag">${p.rondas||'·'}×${p.seg||'·'}s${p.kg?' · '+p.kg+'kg':''}</span>`:''}
         <button class="serie-del" data-del-serie="${ei}-${si}">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
@@ -1298,15 +1314,16 @@ function buildExBlock(ex, ei) {
         <div class="serie-field">
           <label>REPS</label>
           <input class="serie-input" type="number" inputmode="numeric" min="0" max="99"
-            value="${s.reps!==''&&s.reps!==undefined?s.reps:''}" placeholder="—"
+            value="${s.reps!==''&&s.reps!==undefined?s.reps:''}" placeholder="${p.reps!==undefined&&p.reps!==''?p.reps:'—'}"
             data-ei="${ei}" data-si="${si}" data-f="reps">
         </div>
         <div class="serie-field">
           <label>KG</label>
           <input class="serie-input" type="number" inputmode="decimal" min="0" step="0.5"
-            value="${s.kg!==''&&s.kg!==undefined?s.kg:''}" placeholder="—"
+            value="${s.kg!==''&&s.kg!==undefined?s.kg:''}" placeholder="${p.kg!==undefined&&p.kg!==''?p.kg:'—'}"
             data-ei="${ei}" data-si="${si}" data-f="kg">
         </div>
+        ${(p.reps||p.kg)?`<span class="prev-tag">ant. ${p.reps||'·'}×${p.kg!==undefined&&p.kg!==''?p.kg+'kg':'·'}</span>`:''}
         <button class="serie-del" data-del-serie="${ei}-${si}">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
