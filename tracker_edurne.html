@@ -667,15 +667,8 @@ const PREDEFINED = [
 ];
 
 const PRESET_TPLS = [
-  { id:'pt-b-l', ciclo:'B', dia:'Lunes',     nombre:'B · Lunes — Potencia Superior',     ejercicios:['Push press','Plyo push-ups','KB press 1 brazo','Muscle-up progresión','Remo explosivo KB'] },
-  { id:'pt-b-m', ciclo:'B', dia:'Miércoles', nombre:'B · Miércoles — Potencia Inferior', ejercicios:['Box jump','KB swing 2 brazos','Bulgarian split squat explosivo','Pallof press','KB halos'] },
-  { id:'pt-b-v', ciclo:'B', dia:'Viernes',   nombre:'B · Viernes — Full Body Explosivo', ejercicios:['Sprints 20m','TRX row / KB row','CMJ','KB thruster','KB swing 1 brazo','Burpee explosivo'] },
-  { id:'pt-c-l', ciclo:'C', dia:'Lunes',     nombre:'C · Lunes — Circuito Full Body',    ejercicios:['Goblet squat','KB press bilateral','Remo KB','Push-ups explosivos','Mountain climbers'] },
-  { id:'pt-c-m', ciclo:'C', dia:'Miércoles', nombre:'C · Miércoles — Tabata Inferior',   ejercicios:['KB swing 2 brazos','Goblet squat','KB halos','Mountain climbers'] },
-  { id:'pt-c-v', ciclo:'C', dia:'Viernes',   nombre:'C · Viernes — HIIT Completo',       ejercicios:['Sprints 200m','KB thruster','Burpee','KB swing 2 brazos','Tabata burpees'] },
-  { id:'pt-a-l', ciclo:'A', dia:'Lunes',     nombre:'A · Lunes — Push',                  ejercicios:['Press banca','Press militar','Fondos lastrados','Push-ups explosivos','Face pull'] },
-  { id:'pt-a-m', ciclo:'A', dia:'Miércoles', nombre:'A · Miércoles — Pierna + Core',     ejercicios:['Sentadilla','Romanian Deadlift','KB swings','Pallof press','Plancha RKC'] },
-  { id:'pt-a-v', ciclo:'A', dia:'Viernes',   nombre:'A · Viernes — Pull + Integración',  ejercicios:['Dominadas lastradas','Remo barra','KB swing 1 brazo','Sprints 40m','Curl bíceps barra'] },
+  { id:'pt-fb-1', ciclo:'FB', dia:'Día 1', nombre:'Full Body — Día 1', ejercicios:['Sentadilla con peso corporal','Press mancuerna suave','Remo con mancuerna','Puente de glúteo','Plancha'] },
+  { id:'pt-fb-2', ciclo:'FB', dia:'Día 2', nombre:'Full Body — Día 2', ejercicios:['Zancadas suaves','Press hombro mancuerna ligero','Jalón / remo polea','Peso muerto rumano ligero','Elevación de talones'] },
 ];
 let db = loadDB();
 initRutinas();
@@ -700,6 +693,13 @@ function loadDB() {
       const p = JSON.parse(raw);
       p.ejercicios_predefinidos = [...new Set([...PREDEFINED, ...(p.ejercicios_predefinidos||[])])];
       p.plantillas = p.plantillas || [];
+      // Migración Edurne: si arrastra las plantillas antiguas (ciclos B/C/A) y no hay
+      // sesiones registradas, resetea a la rutina genérica full body suave.
+      const tieneViejas = p.plantillas.some(t => t.ciclo && t.ciclo !== 'FB');
+      if (tieneViejas && (!p.sesiones || !p.sesiones.length)) {
+        p.plantillas = PRESET_TPLS.map(t=>({...t}));
+        delete p.rutinas; // initRutinas la reconstruye desde las nuevas plantillas
+      }
       return p;
     }
   } catch(e) {}
@@ -739,7 +739,7 @@ function showScreen(id) {
 // ─────────────────────────────────────────────────────────────────────────────
 // HOME
 // ─────────────────────────────────────────────────────────────────────────────
-function renderHome() { renderSessions(); }
+function renderHome() { renderSessions(); if (typeof pintaFrase==='function') pintaFrase(); }
 
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -850,15 +850,10 @@ let pickerOpenRutinas = new Set();
 function initRutinas() {
   if (db.rutinas) return;
   db.rutinas = [];
-  const nameMap = { A:'Ciclo A — Fuerza Funcional', B:'Ciclo B — Potencia & Explosividad', C:'Ciclo C — Metabólico & Recomposición' };
-  const cicloMap = {};
-  (db.plantillas || []).forEach(p => {
-    if (!p.ciclo) return;
-    if (!cicloMap[p.ciclo]) cicloMap[p.ciclo] = { id:'r_'+p.ciclo, nombre:nameMap[p.ciclo]||'Ciclo '+p.ciclo, dias:[] };
-    const sesName = p.nombre.includes('—') ? p.nombre.split('—').slice(1).join('—').trim() : p.nombre;
-    cicloMap[p.ciclo].dias.push({ id:'d_'+p.id, dia:p.dia||'', nombre:sesName, ejercicios:p.ejercicios||[] });
-  });
-  ['B','C','A'].forEach(ciclo => { if (cicloMap[ciclo]) db.rutinas.push(cicloMap[ciclo]); });
+  const dias = (db.plantillas || []).map(p => ({
+    id:'d_'+p.id, dia:p.dia||'', nombre:p.nombre, ejercicios:p.ejercicios||[]
+  }));
+  if (dias.length) db.rutinas.push({ id:'r_fullbody', nombre:'Full Body — Mantenimiento', dias });
   saveDB();
 }
 
