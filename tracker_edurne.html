@@ -365,7 +365,7 @@
     <div class="hdr-logo" style="display:flex;align-items:baseline;gap:8px">
       <span>TRACK<span style="color:var(--acc)">ER</span></span>
       <span style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut)">Edurne</span>
-      <span id="app-ver" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:0">v6</span>
+      <span id="app-ver" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:0">v7</span>
     </div>
     <div style="flex:1"></div>
     <button id="btn-user" onclick="gdUserTap()" style="display:flex;align-items:center;gap:7px;padding:6px 12px 6px 10px;background:var(--s2);border:1px solid var(--b);border-radius:20px;cursor:pointer;transition:all .2s">
@@ -376,7 +376,6 @@
   <div class="scroll">
     <div id="frase-campeona" style="margin:14px 12px 2px;padding:16px 18px;background:linear-gradient(135deg,var(--acc2),transparent);border:1px solid var(--b);border-left:3px solid var(--acc);border-radius:var(--r)">
       <p id="frase-txt" style="font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;line-height:1.4;color:var(--txt)"></p>
-      <p style="font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:.18em;color:var(--acc);margin-top:6px">PARA EDURNE</p>
     </div>
     <div class="home-actions" style="margin-top:12px">
       <button class="btn-home primary" id="btn-iniciar">
@@ -645,7 +644,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // VERSIÓN
 // ─────────────────────────────────────────────────────────────────────────────
-const APP_VERSION = 6;  // ← subir este número en cada cambio
+const APP_VERSION = 7;  // ← subir este número en cada cambio
 (function setVer(){ const e=document.getElementById('app-ver'); if(e) e.textContent='v'+APP_VERSION; })();
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1999,20 +1998,20 @@ async function gdLoad() {
 
 // Frase de campeona — rotativa al abrir
 const FRASES_CAMPEONA = [
-  "Levantas peso igual que levantas tu proyecto: una repetición disciplinada a la vez.",
-  "La constancia es la forma más elegante de la ambición, en el gym y en el negocio.",
-  "Quien aguanta una serie más también aguanta un trimestre difícil. Es el mismo músculo.",
-  "Tu cuerpo y tu empresa crecen igual: con carga progresiva y descanso bien planificado.",
-  "No esperas a tener ganas para entrenar ni para emprender. Apareces, y eso te distingue.",
-  "Cada sesión completada es capital invertido en la mujer que dirige su propia vida.",
-  "La disciplina de hoy es la libertad que firmarás mañana, con tu nombre.",
-  "Fracasar una repetición no es caer: es descubrir exactamente dónde está tu siguiente límite.",
-  "Construir un cuerpo fuerte enseña lo mismo que construir un negocio: paciencia y técnica.",
-  "El progreso rara vez es ruidoso. Ocurre en los días que nadie ve, dentro y fuera del gym.",
-  "Eres la fundadora de tu propio cuerpo. Lidera ese proyecto como el más importante.",
-  "Los resultados llegan a quien vuelve, no a quien empieza con más ganas. Tú vuelves.",
-  "Hoy no compites con nadie del gym ni del mercado: solo con la versión que ayer dudó.",
-  "Lo que se entrena con intención se convierte en carácter. Y el carácter lo gana todo."
+  "Edurne, levantas peso igual que levantas tu proyecto: una repetición disciplinada a la vez.",
+  "Edurne, la constancia es la forma más elegante de la ambición, en el gym y en el negocio.",
+  "Edurne, quien aguanta una serie más también aguanta un trimestre difícil. Es el mismo músculo.",
+  "Edurne, tu cuerpo y tu empresa crecen igual: con carga progresiva y descanso bien planificado.",
+  "Edurne, no esperas a tener ganas para entrenar ni para emprender. Apareces, y eso te distingue.",
+  "Edurne, cada sesión completada es capital invertido en la mujer que dirige su propia vida.",
+  "Edurne, la disciplina de hoy es la libertad que firmarás mañana, con tu nombre.",
+  "Edurne, fallar una repetición no es caer: es descubrir dónde está tu siguiente límite.",
+  "Edurne, construir un cuerpo fuerte enseña lo mismo que un negocio: paciencia y técnica.",
+  "Edurne, el progreso rara vez es ruidoso: ocurre en los días que nadie ve.",
+  "Edurne, eres la fundadora de tu propio cuerpo. Lidéralo como tu proyecto más importante.",
+  "Edurne, los resultados llegan a quien vuelve, no a quien empieza con más ganas. Y tú vuelves.",
+  "Edurne, hoy no compites con nadie del gym ni del mercado: solo con la que ayer dudó.",
+  "Edurne, lo que se entrena con intención se vuelve carácter. Y el carácter lo gana todo."
 ];
 function pintaFrase() {
   try {
