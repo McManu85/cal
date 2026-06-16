@@ -365,7 +365,7 @@
     <div class="hdr-logo" style="display:flex;align-items:baseline;gap:8px">
       <span>TRACK<span style="color:var(--acc)">ER</span></span>
       <span style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut)">Edurne</span>
-      <span id="app-ver" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:0">v4</span>
+      <span id="app-ver" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:0">v5</span>
     </div>
     <div style="flex:1"></div>
     <button id="btn-user" onclick="gdUserTap()" style="display:flex;align-items:center;gap:7px;padding:6px 12px 6px 10px;background:var(--s2);border:1px solid var(--b);border-radius:20px;cursor:pointer;transition:all .2s">
@@ -645,7 +645,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // VERSIÓN + AUTO-ACTUALIZACIÓN
 // ─────────────────────────────────────────────────────────────────────────────
-const APP_VERSION = 4;  // ← subir este número en cada cambio
+const APP_VERSION = 5;  // ← subir este número en cada cambio
 (function setVer(){ const e=document.getElementById('app-ver'); if(e) e.textContent='v'+APP_VERSION; })();
 
 // Comprueba si el servidor tiene una versión más nueva y recarga limpio una sola vez.
@@ -2031,10 +2031,14 @@ const FRASES_CAMPEONA = [
   "Lo que se entrena con intención se convierte en carácter. Y el carácter lo gana todo."
 ];
 function pintaFrase() {
-  const el = document.getElementById('frase-txt');
-  if (el) el.textContent = FRASES_CAMPEONA[Math.floor(Math.random()*FRASES_CAMPEONA.length)];
+  try {
+    const el = document.getElementById('frase-txt');
+    if (el) el.textContent = FRASES_CAMPEONA[Math.floor(Math.random()*FRASES_CAMPEONA.length)];
+  } catch(e) {}
 }
 pintaFrase();
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', pintaFrase);
+window.addEventListener('load', pintaFrase);
 
 // Init Drive when GIS is ready
 ;(function waitGIS() {
