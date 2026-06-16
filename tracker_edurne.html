@@ -365,7 +365,7 @@
     <div class="hdr-logo" style="display:flex;align-items:baseline;gap:8px">
       <span>TRACK<span style="color:var(--acc)">ER</span></span>
       <span style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut)">Edurne</span>
-      <span id="app-ver" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:0">v5</span>
+      <span id="app-ver" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:0">v6</span>
     </div>
     <div style="flex:1"></div>
     <button id="btn-user" onclick="gdUserTap()" style="display:flex;align-items:center;gap:7px;padding:6px 12px 6px 10px;background:var(--s2);border:1px solid var(--b);border-radius:20px;cursor:pointer;transition:all .2s">
@@ -643,29 +643,10 @@
 
 <script>
 // ─────────────────────────────────────────────────────────────────────────────
-// VERSIÓN + AUTO-ACTUALIZACIÓN
+// VERSIÓN
 // ─────────────────────────────────────────────────────────────────────────────
-const APP_VERSION = 5;  // ← subir este número en cada cambio
+const APP_VERSION = 6;  // ← subir este número en cada cambio
 (function setVer(){ const e=document.getElementById('app-ver'); if(e) e.textContent='v'+APP_VERSION; })();
-
-// Comprueba si el servidor tiene una versión más nueva y recarga limpio una sola vez.
-(async function autoUpdate(){
-  try {
-    const url = location.pathname + '?cb=' + Date.now();   // evita caché en la comprobación
-    const res = await fetch(url, { cache: 'no-store' });
-    if (!res.ok) return;
-    const txt = await res.text();
-    const m = txt.match(/APP_VERSION\s*=\s*(\d+)/);
-    if (!m) return;
-    const serverVer = parseInt(m[1], 10);
-    if (serverVer > APP_VERSION) {
-      // recarga forzando la versión nueva en la URL (rompe-caché real)
-      const u = new URL(location.href);
-      u.searchParams.set('v', serverVer);
-      location.replace(u.toString());
-    }
-  } catch(e) { /* sin red: seguimos con lo que hay */ }
-})();
 
 // ─────────────────────────────────────────────────────────────────────────────
 // DATA
@@ -1705,6 +1686,9 @@ renderHome();
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
+}
+if (window.caches && caches.keys) {
+  caches.keys().then(keys => keys.forEach(k => caches.delete(k))).catch(()=>{});
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
