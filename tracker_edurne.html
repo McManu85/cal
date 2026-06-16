@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#080808">
+  <meta name="theme-color" content="#7b1e3b">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="Tracker">
@@ -364,7 +365,7 @@
     <div class="hdr-logo" style="display:flex;align-items:baseline;gap:8px">
       <span>TRACK<span style="color:var(--acc)">ER</span></span>
       <span style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut)">Edurne</span>
-      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:0">v3</span>
+      <span id="app-ver" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:0">v4</span>
     </div>
     <div style="flex:1"></div>
     <button id="btn-user" onclick="gdUserTap()" style="display:flex;align-items:center;gap:7px;padding:6px 12px 6px 10px;background:var(--s2);border:1px solid var(--b);border-radius:20px;cursor:pointer;transition:all .2s">
@@ -641,6 +642,31 @@
 <div class="toast" id="toast"></div>
 
 <script>
+// ─────────────────────────────────────────────────────────────────────────────
+// VERSIÓN + AUTO-ACTUALIZACIÓN
+// ─────────────────────────────────────────────────────────────────────────────
+const APP_VERSION = 4;  // ← subir este número en cada cambio
+(function setVer(){ const e=document.getElementById('app-ver'); if(e) e.textContent='v'+APP_VERSION; })();
+
+// Comprueba si el servidor tiene una versión más nueva y recarga limpio una sola vez.
+(async function autoUpdate(){
+  try {
+    const url = location.pathname + '?cb=' + Date.now();   // evita caché en la comprobación
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) return;
+    const txt = await res.text();
+    const m = txt.match(/APP_VERSION\s*=\s*(\d+)/);
+    if (!m) return;
+    const serverVer = parseInt(m[1], 10);
+    if (serverVer > APP_VERSION) {
+      // recarga forzando la versión nueva en la URL (rompe-caché real)
+      const u = new URL(location.href);
+      u.searchParams.set('v', serverVer);
+      location.replace(u.toString());
+    }
+  } catch(e) { /* sin red: seguimos con lo que hay */ }
+})();
+
 // ─────────────────────────────────────────────────────────────────────────────
 // DATA
 // ─────────────────────────────────────────────────────────────────────────────
