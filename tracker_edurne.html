@@ -667,8 +667,8 @@ const PREDEFINED = [
 ];
 
 const PRESET_TPLS = [
-  { id:'pt-fb-1', ciclo:'FB', dia:'Día 1', nombre:'Full Body — Día 1', ejercicios:['Sentadilla con peso corporal','Press mancuerna suave','Remo con mancuerna','Puente de glúteo','Plancha'] },
-  { id:'pt-fb-2', ciclo:'FB', dia:'Día 2', nombre:'Full Body — Día 2', ejercicios:['Zancadas suaves','Press hombro mancuerna ligero','Jalón / remo polea','Peso muerto rumano ligero','Elevación de talones'] },
+  { id:'pt-fb-1', ciclo:'FB', dia:'Martes',  nombre:'Full Body — Martes',  ejercicios:['Sentadilla con peso corporal','Press mancuerna suave','Remo con mancuerna','Puente de glúteo','Plancha'] },
+  { id:'pt-fb-2', ciclo:'FB', dia:'Viernes', nombre:'Full Body — Viernes', ejercicios:['Zancadas suaves','Press hombro mancuerna ligero','Jalón / remo polea','Peso muerto rumano ligero','Elevación de talones'] },
 ];
 let db = loadDB();
 initRutinas();
@@ -695,7 +695,7 @@ function loadDB() {
       p.plantillas = p.plantillas || [];
       // Migración Edurne: si arrastra las plantillas antiguas (ciclos B/C/A) y no hay
       // sesiones registradas, resetea a la rutina genérica full body suave.
-      const tieneViejas = p.plantillas.some(t => t.ciclo && t.ciclo !== 'FB');
+      const tieneViejas = p.plantillas.some(t => (t.ciclo && t.ciclo !== 'FB') || t.dia === 'Día 1' || t.dia === 'Día 2');
       if (tieneViejas && (!p.sesiones || !p.sesiones.length)) {
         p.plantillas = PRESET_TPLS.map(t=>({...t}));
         delete p.rutinas; // initRutinas la reconstruye desde las nuevas plantillas
