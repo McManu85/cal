@@ -18,9 +18,9 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --bg:#ffffff; --s1:#fafafa; --s2:#f3f3f3; --s3:#ececec;
-      --b:#e3e3e3; --b2:#d4d4d4; --acc:#e8607d; --acc2:rgba(232,96,125,.1);
+      --b:#e3e3e3; --b2:#d4d4d4; --acc:#7b1e3b; --acc2:rgba(123,30,59,.08);
       --txt:#111111; --mut:#8a8a8a; --muted:#8a8a8a; --red:#e0483c; --r:8px;
-      --sage:#c8607d; --rose:#c8607d;
+      --sage:#7b1e3b; --rose:#7b1e3b;
     }
     html,body { height:100%; background:var(--bg); color:var(--txt);
       font-family:'DM Sans',sans-serif; overflow:hidden;
@@ -364,7 +364,7 @@
     <div class="hdr-logo" style="display:flex;align-items:baseline;gap:8px">
       <span>TRACK<span style="color:var(--acc)">ER</span></span>
       <span style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut)">Edurne</span>
-      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:0">v1</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:0">v2</span>
     </div>
     <div style="flex:1"></div>
     <button id="btn-user" onclick="gdUserTap()" style="display:flex;align-items:center;gap:7px;padding:6px 12px 6px 10px;background:var(--s2);border:1px solid var(--b);border-radius:20px;cursor:pointer;transition:all .2s">
@@ -375,7 +375,7 @@
   <div class="scroll">
     <div id="frase-campeona" style="margin:14px 12px 2px;padding:16px 18px;background:linear-gradient(135deg,var(--acc2),transparent);border:1px solid var(--b);border-left:3px solid var(--acc);border-radius:var(--r)">
       <p id="frase-txt" style="font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;line-height:1.4;color:var(--txt)"></p>
-      <p style="font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:.12em;color:var(--acc);margin-top:6px">— EDURNE, CAMPEONA</p>
+      <p style="font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:.18em;color:var(--acc);margin-top:6px">PARA EDURNE</p>
     </div>
     <div class="home-actions" style="margin-top:12px">
       <button class="btn-home primary" id="btn-iniciar">
@@ -1988,18 +1988,20 @@ async function gdLoad() {
 
 // Frase de campeona — rotativa al abrir
 const FRASES_CAMPEONA = [
-  "Cada serie que terminas es una versión tuya un poco más fuerte que la de ayer.",
-  "Las campeonas no esperan a tener ganas: aparecen, entrenan y se van más grandes.",
-  "El peso que hoy te cuesta, mañana será tu calentamiento.",
-  "Tu cuerpo escucha todo lo que tu constancia le dice. Háblale fuerte.",
-  "No compites contra nadie del gym. Compites contra la Edurne que dudó en venir.",
-  "La que se queda una repetición más es la que se convierte en otra liga.",
-  "Disciplina hoy, libertad mañana. Así se construye una campeona.",
-  "Cada gota de sudor es una promesa que te cumples a ti misma.",
-  "El músculo se rompe para crecer. Tú también: cae, repite, vuelve más fuerte.",
-  "No es el día perfecto, es el día que decides ir. Y hoy decidiste ir.",
-  "Eres tu propio proyecto más importante. Entrénate como tal.",
-  "La mejor versión de ti no está en el espejo de hoy: la estás levantando ahora."
+  "La fuerza no se exhibe, se cultiva en silencio. Hoy le dedicas otra hora.",
+  "La constancia es la forma más elegante de la ambición.",
+  "No persigues un cuerpo distinto, sino una versión más fiel a quien decides ser.",
+  "El esfuerzo de hoy es una conversación íntima entre tú y la mujer que serás.",
+  "Lo que se repite con intención termina convertido en carácter.",
+  "La disciplina es libertad aplazada; la recoges entera más adelante.",
+  "Cada gesto cuidado en el presente es una promesa cumplida al futuro.",
+  "La excelencia no es un acto, sino el hábito discreto de volver.",
+  "Entrenar el cuerpo es, en el fondo, una manera de afilar la voluntad.",
+  "El progreso rara vez es ruidoso: ocurre en los días que nadie aplaude.",
+  "No buscas perfección, buscas coherencia entre lo que quieres y lo que haces.",
+  "La elegancia última es hacer lo difícil con serenidad y sin testigos.",
+  "Hoy no compites con nadie: solo honras el compromiso que adquiriste contigo.",
+  "Lo que construyes con paciencia, el tiempo no te lo podrá quitar."
 ];
 function pintaFrase() {
   const el = document.getElementById('frase-txt');
