@@ -231,12 +231,10 @@
       color:var(--mut); width:18px; flex-shrink:0; text-align:center; }
     .serie-field { display:flex; align-items:stretch; background:var(--s3);
       border:1px solid var(--b); border-radius:5px; overflow:hidden; flex:1; }
-    .iv-pills { display:flex; gap:4px; flex-wrap:wrap; flex:1; }
-    .iv-pill { height:30px; padding:0 9px; border-radius:7px; border:1px solid var(--b);
-      background:var(--s3); color:var(--mut); font-family:'JetBrains Mono',monospace;
-      font-size:12px; font-weight:700; cursor:pointer; transition:all .15s; white-space:nowrap; }
-    .iv-pill.sel { background:var(--acc); border-color:var(--acc); color:#000; }
-    .iv-pill:active { opacity:.7; }
+    .iv-select { flex:1; height:auto; border:1px solid var(--b); border-radius:5px;
+      background:var(--s3); color:var(--txt); font-family:'JetBrains Mono',monospace;
+      font-size:15px; font-weight:700; text-align:center; text-align-last:center;
+      padding:7px 4px; outline:none; cursor:pointer; -webkit-appearance:none; appearance:none; }
     .serie-field label { font-size:10px; font-weight:700; letter-spacing:1.5px;
       text-transform:uppercase; color:var(--mut);
       padding:0 7px; display:flex; align-items:center;
@@ -369,7 +367,7 @@
     <div class="hdr-logo" style="display:flex;align-items:baseline;gap:8px">
       <span>INDAR<span style="color:var(--acc)">-BI</span></span>
       <span style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut)">Gym Tracker</span>
-      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:0">v16</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:0">v17</span>
     </div>
     <div style="flex:1"></div>
     <button id="btn-user" onclick="gdUserTap()" style="display:flex;align-items:center;gap:7px;padding:6px 12px 6px 10px;background:var(--s2);border:1px solid var(--b);border-radius:20px;cursor:pointer;transition:all .2s">
@@ -1317,18 +1315,19 @@ function buildExBlock(ex, ei) {
       const curOff = s.off!==undefined&&s.off!==''?+s.off:null;
       const isPreset = PRESETS.some(([a,b])=>a===curSeg&&b===curOff);
       const manual = s.ivManual || ((curSeg!==null||curOff!==null) && !isPreset);
-      const pills = PRESETS.map(([a,b])=>
-        `<button class="iv-pill ${curSeg===a&&curOff===b?'sel':''}" data-iv="${ei}-${si}-${a}-${b}">${a}/${b}</button>`
-      ).join('') + `<button class="iv-pill ${manual?'sel':''}" data-iv="${ei}-${si}-m-m">Manual</button>`;
+      const opts = PRESETS.map(([a,b])=>
+        `<option value="${a}-${b}" ${curSeg===a&&curOff===b?'selected':''}>${a}/${b}</option>`
+      ).join('') + `<option value="m-m" ${manual?'selected':''}>Manual</option>`;
       serHTML += `<div class="serie-row" id="sr${ei}-${si}">
         <span class="serie-n">${si+1}</span>
-        <div class="serie-field" style="max-width:90px">
-          <label>RONDAS</label>
+        <div class="serie-field" style="max-width:78px">
+          <label>RND</label>
           <input class="serie-input" type="number" inputmode="numeric" min="0" max="99"
             value="${s.rondas!==undefined&&s.rondas!==''?s.rondas:''}" placeholder="${p.rondas!==undefined&&p.rondas!==''?p.rondas:'8'}"
             data-ei="${ei}" data-si="${si}" data-f="rondas">
         </div>
-        <div class="serie-field" style="max-width:90px">
+        <select class="iv-select" data-iv-sel="${ei}-${si}">${opts}</select>
+        <div class="serie-field" style="max-width:78px">
           <label>KG</label>
           <input class="serie-input" type="number" inputmode="decimal" min="0" step="0.5"
             value="${s.kg!==''&&s.kg!==undefined?s.kg:''}" placeholder="${p.kg!==undefined&&p.kg!==''?p.kg:'—'}"
@@ -1337,7 +1336,6 @@ function buildExBlock(ex, ei) {
         <button class="serie-del" data-del-serie="${ei}-${si}">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
-        <div class="iv-pills" style="width:100%;margin-top:6px">${pills}</div>
         ${manual?`<div style="display:flex;gap:7px;width:100%;margin-top:6px">
           <div class="serie-field"><label>ON</label>
             <input class="serie-input" type="number" inputmode="numeric" min="0" step="5"
@@ -1401,8 +1399,6 @@ document.getElementById('ses-scroll').addEventListener('click', e => {
   const dupSerie = e.target.closest('[data-dup-serie]');
   const delSerie = e.target.closest('[data-del-serie]');
   const delEx    = e.target.closest('[data-del-ex]');
-  const ivPill   = e.target.closest('[data-iv]');
-  if (ivPill)   { const [ei,si,a,b]=ivPill.dataset.iv.split('-'); setIntervalo(+ei,+si,a,b); return; }
   if (modoBtn)  { const [m,ei]=modoBtn.dataset.modo.split('-'); setExModo(+ei, m); return; }
   if (rename)   { pickerCtx='session'; openPicker(+rename.dataset.rename); return; }
   if (addSerie) { addSet(+addSerie.dataset.addSerie); return; }
@@ -1427,6 +1423,8 @@ function setIntervalo(ei, si, a, b) {
 }
 
 document.getElementById('ses-scroll').addEventListener('change', e => {
+  const sel = e.target.closest('[data-iv-sel]');
+  if (sel) { const [ei,si]=sel.dataset.ivSel.split('-'); const [a,b]=sel.value.split('-'); setIntervalo(+ei,+si,a,b); return; }
   const inp = e.target.closest('.serie-input'); if (!inp) return;
   const {ei,si,f} = inp.dataset;
   ses.ejercicios[+ei].series[+si][f] = inp.value===''?'':parseFloat(inp.value);
