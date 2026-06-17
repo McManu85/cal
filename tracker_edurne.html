@@ -233,6 +233,12 @@
       color:var(--mut); width:18px; flex-shrink:0; text-align:center; }
     .serie-field { display:flex; align-items:stretch; background:var(--s3);
       border:1px solid var(--b); border-radius:5px; overflow:hidden; flex:1; }
+    .iv-pills { display:flex; gap:4px; flex-wrap:wrap; flex:1; }
+    .iv-pill { height:30px; padding:0 9px; border-radius:7px; border:1px solid var(--b);
+      background:var(--s3); color:var(--mut); font-family:'JetBrains Mono',monospace;
+      font-size:12px; font-weight:700; cursor:pointer; transition:all .15s; white-space:nowrap; }
+    .iv-pill.sel { background:var(--acc); border-color:var(--acc); color:#fff; }
+    .iv-pill:active { opacity:.7; }
     .serie-field label { font-size:10px; font-weight:700; letter-spacing:1.5px;
       text-transform:uppercase; color:var(--mut);
       padding:0 7px; display:flex; align-items:center;
@@ -365,7 +371,7 @@
     <div class="hdr-logo" style="display:flex;align-items:baseline;gap:8px">
       <span>TRACK<span style="color:var(--acc)">ER</span></span>
       <span style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut)">Edurne</span>
-      <span id="app-ver" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:0">v10</span>
+      <span id="app-ver" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:0">v11</span>
     </div>
     <div style="flex:1"></div>
     <button id="btn-user" onclick="gdUserTap()" style="display:flex;align-items:center;gap:7px;padding:6px 12px 6px 10px;background:var(--s2);border:1px solid var(--b);border-radius:20px;cursor:pointer;transition:all .2s">
@@ -644,7 +650,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // VERSIÓN
 // ─────────────────────────────────────────────────────────────────────────────
-const APP_VERSION = 10;  // ← subir este número en cada cambio
+const APP_VERSION = 11;  // ← subir este número en cada cambio
 (function setVer(){ const e=document.getElementById('app-ver'); if(e) e.textContent='v'+APP_VERSION; })();
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1313,36 +1319,41 @@ function buildExBlock(ex, ei) {
         </button>
       </div>`;
     } else if (isTabata) {
+      const PRESETS = [[20,10],[30,15],[40,20],[60,30]];
+      const curSeg = s.seg!==undefined&&s.seg!==''?+s.seg:null;
+      const curOff = s.off!==undefined&&s.off!==''?+s.off:null;
+      const isPreset = PRESETS.some(([a,b])=>a===curSeg&&b===curOff);
+      const manual = s.ivManual || ((curSeg!==null||curOff!==null) && !isPreset);
+      const pills = PRESETS.map(([a,b])=>
+        `<button class="iv-pill ${curSeg===a&&curOff===b?'sel':''}" data-iv="${ei}-${si}-${a}-${b}">${a}/${b}</button>`
+      ).join('') + `<button class="iv-pill ${manual?'sel':''}" data-iv="${ei}-${si}-m-m">Manual</button>`;
       serHTML += `<div class="serie-row" id="sr${ei}-${si}">
         <span class="serie-n">${si+1}</span>
-        <div class="serie-field">
+        <div class="serie-field" style="max-width:90px">
           <label>RONDAS</label>
           <input class="serie-input" type="number" inputmode="numeric" min="0" max="99"
             value="${s.rondas!==undefined&&s.rondas!==''?s.rondas:''}" placeholder="${p.rondas!==undefined&&p.rondas!==''?p.rondas:'8'}"
             data-ei="${ei}" data-si="${si}" data-f="rondas">
         </div>
-        <div class="serie-field">
-          <label>ON</label>
-          <input class="serie-input" type="number" inputmode="numeric" min="0" step="5"
-            value="${s.seg!==undefined&&s.seg!==''?s.seg:''}" placeholder="${p.seg!==undefined&&p.seg!==''?p.seg:'20'}"
-            data-ei="${ei}" data-si="${si}" data-f="seg">
-        </div>
-        <div class="serie-field">
-          <label>OFF</label>
-          <input class="serie-input" type="number" inputmode="numeric" min="0" step="5"
-            value="${s.off!==undefined&&s.off!==''?s.off:''}" placeholder="${p.off!==undefined&&p.off!==''?p.off:'10'}"
-            data-ei="${ei}" data-si="${si}" data-f="off">
-        </div>
-        <div class="serie-field">
+        <div class="serie-field" style="max-width:90px">
           <label>KG</label>
           <input class="serie-input" type="number" inputmode="decimal" min="0" step="0.5"
             value="${s.kg!==''&&s.kg!==undefined?s.kg:''}" placeholder="${p.kg!==undefined&&p.kg!==''?p.kg:'—'}"
             data-ei="${ei}" data-si="${si}" data-f="kg">
         </div>
-        ${(p.rondas||p.seg||p.off||p.kg)?`<span class="prev-tag">${p.rondas||'·'}×${p.seg||'·'}/${p.off||'·'}s${p.kg?' · '+p.kg+'kg':''}</span>`:''}
         <button class="serie-del" data-del-serie="${ei}-${si}">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
+        <div class="iv-pills" style="width:100%;margin-top:6px">${pills}</div>
+        ${manual?`<div style="display:flex;gap:7px;width:100%;margin-top:6px">
+          <div class="serie-field"><label>ON</label>
+            <input class="serie-input" type="number" inputmode="numeric" min="0" step="5"
+              value="${curSeg!==null?curSeg:''}" placeholder="seg" data-ei="${ei}" data-si="${si}" data-f="seg"></div>
+          <div class="serie-field"><label>OFF</label>
+            <input class="serie-input" type="number" inputmode="numeric" min="0" step="5"
+              value="${curOff!==null?curOff:''}" placeholder="seg" data-ei="${ei}" data-si="${si}" data-f="off"></div>
+        </div>`:''}
+        ${(p.rondas||p.seg||p.off||p.kg)?`<span class="prev-tag" style="width:100%;margin-top:4px">ant. ${p.rondas||'·'}×${p.seg||'·'}/${p.off||'·'}s${p.kg?' · '+p.kg+'kg':''}</span>`:''}
       </div>`;
     } else {
       serHTML += `<div class="serie-row" id="sr${ei}-${si}">
@@ -1397,6 +1408,8 @@ document.getElementById('ses-scroll').addEventListener('click', e => {
   const dupSerie = e.target.closest('[data-dup-serie]');
   const delSerie = e.target.closest('[data-del-serie]');
   const delEx    = e.target.closest('[data-del-ex]');
+  const ivPill   = e.target.closest('[data-iv]');
+  if (ivPill)   { const [ei,si,a,b]=ivPill.dataset.iv.split('-'); setIntervalo(+ei,+si,a,b); return; }
   if (modoBtn)  { const [m,ei]=modoBtn.dataset.modo.split('-'); setExModo(+ei, m); return; }
   if (rename)   { pickerCtx='session'; openPicker(+rename.dataset.rename); return; }
   if (addSerie) { addSet(+addSerie.dataset.addSerie); return; }
@@ -1407,6 +1420,16 @@ document.getElementById('ses-scroll').addEventListener('click', e => {
 
 function setExModo(ei, modo) {
   ses.ejercicios[ei].modo = (modo === 'tabata' || modo === 'tiempo') ? modo : 'reps';
+  autosave(); renderSession();
+}
+
+function setIntervalo(ei, si, a, b) {
+  const s = ses.ejercicios[ei].series[si];
+  if (a === 'm') {
+    s.ivManual = true;
+  } else {
+    s.seg = +a; s.off = +b; s.ivManual = false;
+  }
   autosave(); renderSession();
 }
 
