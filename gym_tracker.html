@@ -367,7 +367,7 @@
     <div class="hdr-logo" style="display:flex;align-items:baseline;gap:8px">
       <span>INDAR<span style="color:var(--acc)">-BI</span></span>
       <span style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut)">Gym Tracker</span>
-      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:0">v17</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:0">v18</span>
     </div>
     <div style="flex:1"></div>
     <button id="btn-user" onclick="gdUserTap()" style="display:flex;align-items:center;gap:7px;padding:6px 12px 6px 10px;background:var(--s2);border:1px solid var(--b);border-radius:20px;cursor:pointer;transition:all .2s">
@@ -468,6 +468,10 @@
     </button>
   </div>
   <div class="scroll" id="ses-scroll">
+    <div style="display:flex;align-items:center;gap:8px;padding:10px 12px 2px">
+      <label style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--mut)">Fecha</label>
+      <input type="date" id="ses-fecha" style="flex:1;padding:8px 12px;background:var(--s2);border:1px solid var(--b);border-radius:6px;color:var(--txt);font-family:'JetBrains Mono',monospace;font-size:14px;color-scheme:dark">
+    </div>
     <div id="exercises"></div>
     <button class="btn-add-ex" id="btn-add-ex">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
@@ -1062,7 +1066,8 @@ function renderSessions() {
     </div>`;
     return;
   }
-  const sorted = db.sesiones.map((s,i)=>({...s,_i:i})).reverse();
+  const sorted = db.sesiones.map((s,i)=>({...s,_i:i}))
+    .sort((a,b) => (a.fecha < b.fecha ? 1 : a.fecha > b.fecha ? -1 : a._i - b._i));
   let html = `<div class="list-label">Sesiones</div>`;
   sorted.forEach(s => {
     if (s.tipo === 'actividad') {
@@ -1172,9 +1177,17 @@ function startSesScreen() {
   const titleEl = document.getElementById('ses-title');
   titleEl.textContent = ses.nombre;
   titleEl.contentEditable = 'true';
+  const fechaEl = document.getElementById('ses-fecha');
+  if (fechaEl) fechaEl.value = ses.fecha || todayStr();
   renderSession();
   showScreen('scr-session');
 }
+
+document.getElementById('ses-fecha').addEventListener('change', e => {
+  if (!ses) return;
+  ses.fecha = e.target.value || todayStr();
+  autosave();
+});
 
 document.getElementById('btn-back').addEventListener('click', () => {
   commitSave(true); showScreen('scr-home'); renderHome();
