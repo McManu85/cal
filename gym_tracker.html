@@ -231,10 +231,6 @@
       color:var(--mut); width:18px; flex-shrink:0; text-align:center; }
     .serie-field { display:flex; align-items:stretch; background:var(--s3);
       border:1px solid var(--b); border-radius:5px; overflow:hidden; flex:1; }
-    .iv-select { flex:1; height:auto; border:1px solid var(--b); border-radius:5px;
-      background:var(--s3); color:var(--txt); font-family:'JetBrains Mono',monospace;
-      font-size:15px; font-weight:700; text-align:center; text-align-last:center;
-      padding:7px 4px; outline:none; cursor:pointer; -webkit-appearance:none; appearance:none; }
     .serie-field label { font-size:10px; font-weight:700; letter-spacing:1.5px;
       text-transform:uppercase; color:var(--mut);
       padding:0 7px; display:flex; align-items:center;
@@ -367,7 +363,7 @@
     <div class="hdr-logo" style="display:flex;align-items:baseline;gap:8px">
       <span>INDAR<span style="color:var(--acc)">-BI</span></span>
       <span style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut)">Gym Tracker</span>
-      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:0">v18</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:0">v14</span>
     </div>
     <div style="flex:1"></div>
     <button id="btn-user" onclick="gdUserTap()" style="display:flex;align-items:center;gap:7px;padding:6px 12px 6px 10px;background:var(--s2);border:1px solid var(--b);border-radius:20px;cursor:pointer;transition:all .2s">
@@ -468,10 +464,6 @@
     </button>
   </div>
   <div class="scroll" id="ses-scroll">
-    <div style="display:flex;align-items:center;gap:8px;padding:10px 12px 2px">
-      <label style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--mut)">Fecha</label>
-      <input type="date" id="ses-fecha" style="flex:1;padding:8px 12px;background:var(--s2);border:1px solid var(--b);border-radius:6px;color:var(--txt);font-family:'JetBrains Mono',monospace;font-size:14px;color-scheme:dark">
-    </div>
     <div id="exercises"></div>
     <button class="btn-add-ex" id="btn-add-ex">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
@@ -670,7 +662,7 @@ const PREDEFINED = [
 ];
 
 const PRESET_TPLS = [
-  { id:'pt-b-l', ciclo:'B', dia:'Lunes',     nombre:'B · Lunes — Potencia Superior',     ejercicios:['Push press','Plyo push-ups','KB press 1 brazo','Muscle-up progresión','Remo explosivo KB'] },
+  { id:'pt-b-l', ciclo:'B', dia:'Lunes',     nombre:'B · Lunes — Potencia Superior',     ejercicios:['Push press','Plyo push-ups','Face pull','Muscle-up progresión','Remo explosivo KB'] },
   { id:'pt-b-m', ciclo:'B', dia:'Miércoles', nombre:'B · Miércoles — Potencia Inferior', ejercicios:['Box jump','KB swing 2 brazos','Bulgarian split squat explosivo','Pallof press','KB halos'] },
   { id:'pt-b-v', ciclo:'B', dia:'Viernes',   nombre:'B · Viernes — Full Body Explosivo', ejercicios:['Sprints 20m','TRX row / KB row','CMJ','KB thruster','KB swing 1 brazo','Burpee explosivo'] },
   { id:'pt-c-l', ciclo:'C', dia:'Lunes',     nombre:'C · Lunes — Circuito Full Body',    ejercicios:['Goblet squat','KB press bilateral','Remo KB','Push-ups explosivos','Mountain climbers'] },
@@ -1066,8 +1058,7 @@ function renderSessions() {
     </div>`;
     return;
   }
-  const sorted = db.sesiones.map((s,i)=>({...s,_i:i}))
-    .sort((a,b) => (a.fecha < b.fecha ? 1 : a.fecha > b.fecha ? -1 : a._i - b._i));
+  const sorted = db.sesiones.map((s,i)=>({...s,_i:i})).reverse();
   let html = `<div class="list-label">Sesiones</div>`;
   sorted.forEach(s => {
     if (s.tipo === 'actividad') {
@@ -1155,9 +1146,7 @@ function repeatSes(idx) {
       modo:e.modo || 'reps',
       // Pre-create empty series matching last time, each carrying a `prev` reference
       series:(e.series||[]).map(s => e.modo === 'tabata'
-        ? { rondas:'', seg:'', off:'', kg:'', prev:{ rondas:s.rondas, seg:s.seg, off:s.off, kg:s.kg } }
-        : e.modo === 'tiempo'
-        ? { seg:'', kg:'', prev:{ seg:s.seg, kg:s.kg } }
+        ? { rondas:'', seg:'', kg:'', prev:{ rondas:s.rondas, seg:s.seg, kg:s.kg } }
         : { reps:'', kg:'', prev:{ reps:s.reps, kg:s.kg } })
     })) };
   sesIdx = -1;
@@ -1177,17 +1166,9 @@ function startSesScreen() {
   const titleEl = document.getElementById('ses-title');
   titleEl.textContent = ses.nombre;
   titleEl.contentEditable = 'true';
-  const fechaEl = document.getElementById('ses-fecha');
-  if (fechaEl) fechaEl.value = ses.fecha || todayStr();
   renderSession();
   showScreen('scr-session');
 }
-
-document.getElementById('ses-fecha').addEventListener('change', e => {
-  if (!ses) return;
-  ses.fecha = e.target.value || todayStr();
-  autosave();
-});
 
 document.getElementById('btn-back').addEventListener('click', () => {
   commitSave(true); showScreen('scr-home'); renderHome();
@@ -1298,17 +1279,22 @@ function buildExBlock(ex, ei) {
   const div = document.createElement('div');
   div.className = 'ex-block'; div.id = `ex${ei}`;
   const isTabata = ex.modo === 'tabata';
-  const isTiempo = ex.modo === 'tiempo';
   let serHTML = '';
   ex.series.forEach((s, si) => {
     const p = s.prev || {};
-    if (isTiempo) {
+    if (isTabata) {
       serHTML += `<div class="serie-row" id="sr${ei}-${si}">
         <span class="serie-n">${si+1}</span>
         <div class="serie-field">
+          <label>RONDAS</label>
+          <input class="serie-input" type="number" inputmode="numeric" min="0" max="99"
+            value="${s.rondas!==undefined&&s.rondas!==''?s.rondas:''}" placeholder="${p.rondas!==undefined&&p.rondas!==''?p.rondas:'8'}"
+            data-ei="${ei}" data-si="${si}" data-f="rondas">
+        </div>
+        <div class="serie-field">
           <label>SEG</label>
           <input class="serie-input" type="number" inputmode="numeric" min="0" step="5"
-            value="${s.seg!==undefined&&s.seg!==''?s.seg:''}" placeholder="${p.seg!==undefined&&p.seg!==''?p.seg:'30'}"
+            value="${s.seg!==undefined&&s.seg!==''?s.seg:''}" placeholder="${p.seg!==undefined&&p.seg!==''?p.seg:'20'}"
             data-ei="${ei}" data-si="${si}" data-f="seg">
         </div>
         <div class="serie-field">
@@ -1317,47 +1303,10 @@ function buildExBlock(ex, ei) {
             value="${s.kg!==''&&s.kg!==undefined?s.kg:''}" placeholder="${p.kg!==undefined&&p.kg!==''?p.kg:'—'}"
             data-ei="${ei}" data-si="${si}" data-f="kg">
         </div>
-        ${(p.seg||p.kg)?`<span class="prev-tag">ant. ${p.seg||'·'}s${p.kg!==undefined&&p.kg!==''?' · '+p.kg+'kg':''}</span>`:''}
+        ${(p.rondas||p.seg||p.kg)?`<span class="prev-tag">${p.rondas||'·'}×${p.seg||'·'}s${p.kg?' · '+p.kg+'kg':''}</span>`:''}
         <button class="serie-del" data-del-serie="${ei}-${si}">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
-      </div>`;
-    } else if (isTabata) {
-      const PRESETS = [[20,10],[30,15],[40,20],[60,30]];
-      const curSeg = s.seg!==undefined&&s.seg!==''?+s.seg:null;
-      const curOff = s.off!==undefined&&s.off!==''?+s.off:null;
-      const isPreset = PRESETS.some(([a,b])=>a===curSeg&&b===curOff);
-      const manual = s.ivManual || ((curSeg!==null||curOff!==null) && !isPreset);
-      const opts = PRESETS.map(([a,b])=>
-        `<option value="${a}-${b}" ${curSeg===a&&curOff===b?'selected':''}>${a}/${b}</option>`
-      ).join('') + `<option value="m-m" ${manual?'selected':''}>Manual</option>`;
-      serHTML += `<div class="serie-row" id="sr${ei}-${si}">
-        <span class="serie-n">${si+1}</span>
-        <div class="serie-field" style="max-width:78px">
-          <label>RND</label>
-          <input class="serie-input" type="number" inputmode="numeric" min="0" max="99"
-            value="${s.rondas!==undefined&&s.rondas!==''?s.rondas:''}" placeholder="${p.rondas!==undefined&&p.rondas!==''?p.rondas:'8'}"
-            data-ei="${ei}" data-si="${si}" data-f="rondas">
-        </div>
-        <select class="iv-select" data-iv-sel="${ei}-${si}">${opts}</select>
-        <div class="serie-field" style="max-width:78px">
-          <label>KG</label>
-          <input class="serie-input" type="number" inputmode="decimal" min="0" step="0.5"
-            value="${s.kg!==''&&s.kg!==undefined?s.kg:''}" placeholder="${p.kg!==undefined&&p.kg!==''?p.kg:'—'}"
-            data-ei="${ei}" data-si="${si}" data-f="kg">
-        </div>
-        <button class="serie-del" data-del-serie="${ei}-${si}">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
-        </button>
-        ${manual?`<div style="display:flex;gap:7px;width:100%;margin-top:6px">
-          <div class="serie-field"><label>ON</label>
-            <input class="serie-input" type="number" inputmode="numeric" min="0" step="5"
-              value="${curSeg!==null?curSeg:''}" placeholder="seg" data-ei="${ei}" data-si="${si}" data-f="seg"></div>
-          <div class="serie-field"><label>OFF</label>
-            <input class="serie-input" type="number" inputmode="numeric" min="0" step="5"
-              value="${curOff!==null?curOff:''}" placeholder="seg" data-ei="${ei}" data-si="${si}" data-f="off"></div>
-        </div>`:''}
-        ${(p.rondas||p.seg||p.off||p.kg)?`<span class="prev-tag" style="width:100%;margin-top:4px">ant. ${p.rondas||'·'}×${p.seg||'·'}/${p.off||'·'}s${p.kg?' · '+p.kg+'kg':''}</span>`:''}
       </div>`;
     } else {
       serHTML += `<div class="serie-row" id="sr${ei}-${si}">
@@ -1385,9 +1334,8 @@ function buildExBlock(ex, ei) {
     <div class="ex-hdr">
       <button class="ex-name" data-rename="${ei}">${esc(ex.nombre)} <span>▾</span></button>
       <div class="modo-toggle">
-        <button class="modo-btn ${(!isTabata&&!isTiempo)?'sel':''}" data-modo="reps-${ei}">Reps</button>
-        <button class="modo-btn ${isTiempo?'sel':''}" data-modo="tiempo-${ei}">Tiempo</button>
-        <button class="modo-btn ${isTabata?'sel':''}" data-modo="tabata-${ei}">HIIT</button>
+        <button class="modo-btn ${!isTabata?'sel':''}" data-modo="reps-${ei}">Reps</button>
+        <button class="modo-btn ${isTabata?'sel':''}" data-modo="tabata-${ei}">Tabata</button>
       </div>
     </div>
     <div>${serHTML}</div>
@@ -1421,23 +1369,11 @@ document.getElementById('ses-scroll').addEventListener('click', e => {
 });
 
 function setExModo(ei, modo) {
-  ses.ejercicios[ei].modo = (modo === 'tabata' || modo === 'tiempo') ? modo : 'reps';
-  autosave(); renderSession();
-}
-
-function setIntervalo(ei, si, a, b) {
-  const s = ses.ejercicios[ei].series[si];
-  if (a === 'm') {
-    s.ivManual = true;
-  } else {
-    s.seg = +a; s.off = +b; s.ivManual = false;
-  }
+  ses.ejercicios[ei].modo = modo === 'tabata' ? 'tabata' : 'reps';
   autosave(); renderSession();
 }
 
 document.getElementById('ses-scroll').addEventListener('change', e => {
-  const sel = e.target.closest('[data-iv-sel]');
-  if (sel) { const [ei,si]=sel.dataset.ivSel.split('-'); const [a,b]=sel.value.split('-'); setIntervalo(+ei,+si,a,b); return; }
   const inp = e.target.closest('.serie-input'); if (!inp) return;
   const {ei,si,f} = inp.dataset;
   ses.ejercicios[+ei].series[+si][f] = inp.value===''?'':parseFloat(inp.value);
@@ -1468,13 +1404,12 @@ function renameExSes(ei, nombre) {
 function removeExSes(ei) { ses.ejercicios.splice(ei,1); autosave(); renderSession(); }
 function addSet(ei) {
   const ex = ses.ejercicios[ei];
-  if (ex.modo === 'tabata') ex.series.push({rondas:'',seg:'',off:'',kg:''});
-  else if (ex.modo === 'tiempo') ex.series.push({seg:'',kg:''});
+  if (ex.modo === 'tabata') ex.series.push({rondas:'',seg:'',kg:''});
   else ex.series.push({reps:'',kg:''});
   autosave(); renderSession();
   setTimeout(() => {
     const inputs = document.querySelectorAll(`#ex${ei} .serie-input`);
-    const offset = ex.modo === 'tabata' ? 4 : 2;
+    const offset = ex.modo === 'tabata' ? 3 : 2;
     if (inputs.length) inputs[inputs.length-offset].focus();
   }, 60);
 }
@@ -1483,8 +1418,7 @@ function dupLastSet(ei) {
   const series = ex.series;
   if (!series.length) { addSet(ei); return; }
   const last = series[series.length-1];
-  if (ex.modo === 'tabata') series.push({rondas:last.rondas,seg:last.seg,off:last.off,kg:last.kg});
-  else if (ex.modo === 'tiempo') series.push({seg:last.seg,kg:last.kg});
+  if (ex.modo === 'tabata') series.push({rondas:last.rondas,seg:last.seg,kg:last.kg});
   else series.push({reps:last.reps,kg:last.kg});
   autosave(); renderSession(); toast('Serie duplicada');
 }
