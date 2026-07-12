@@ -221,6 +221,21 @@
       background:var(--s3); color:var(--txt); font-family:'JetBrains Mono',monospace;
       font-size:15px; font-weight:700; text-align:center; text-align-last:center;
       padding:7px 4px; outline:none; cursor:pointer; -webkit-appearance:none; appearance:none; }
+    .hiit-cfg { display:flex; gap:8px; padding:11px 13px 6px; flex-wrap:wrap; align-items:flex-end; }
+    .hiit-movs { padding:2px 13px 4px; }
+    .hiit-mov { display:flex; align-items:center; gap:9px; padding:9px 0; border-bottom:1px solid var(--b); }
+    .hiit-mov:last-child { border-bottom:none; }
+    .hiit-mov-dot { width:5px; height:5px; border-radius:50%; background:var(--acc); flex-shrink:0; }
+    .hiit-mov-name { flex:1; font-family:'DM Sans',sans-serif; font-size:14px; color:var(--txt); }
+    .hiit-mov-del { width:28px; height:28px; border:none; background:none; color:var(--mut);
+      cursor:pointer; display:flex; align-items:center; justify-content:center; border-radius:5px; flex-shrink:0; }
+    .hiit-mov-del:active { background:rgba(255,59,48,.15); color:var(--red); }
+    .hiit-empty { font-family:'DM Sans',sans-serif; font-size:12px; color:var(--mut); padding:8px 0; font-style:italic; }
+    .hiit-add { display:flex; align-items:center; justify-content:center; gap:7px; width:calc(100% - 26px);
+      margin:4px 13px 11px; padding:9px; background:var(--acc2); border:1px dashed var(--acc);
+      border-radius:7px; color:var(--acc); font-family:'DM Sans',sans-serif; font-size:11px;
+      font-weight:700; letter-spacing:.5px; text-transform:uppercase; cursor:pointer; }
+    .hiit-add:active { background:var(--s3); }
     .modo-toggle { display:flex; gap:0; border:1px solid var(--b); border-radius:6px; overflow:hidden; flex-shrink:0; }
     .modo-btn { background:none; border:none; padding:5px 12px; font-family:'DM Sans',sans-serif;
       font-size:10px; font-weight:700; letter-spacing:.5px; text-transform:uppercase;
@@ -367,7 +382,7 @@
     <div class="hdr-logo" style="display:flex;align-items:baseline;gap:8px">
       <span>INDAR<span style="color:var(--acc)">-BI</span></span>
       <span style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut)">Gym Tracker</span>
-      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:0">v16</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:0">v17</span>
     </div>
     <div style="flex:1"></div>
     <button id="btn-user" onclick="gdUserTap()" style="display:flex;align-items:center;gap:7px;padding:6px 12px 6px 10px;background:var(--s2);border:1px solid var(--b);border-radius:20px;cursor:pointer;transition:all .2s">
@@ -1203,10 +1218,13 @@ function dot(on) { document.getElementById('save-dot').classList.toggle('on', on
 function commitSave(exiting = false) {
   if (!ses) return;
   // A series counts as "real" only if it has actual logged values (not just prev refs)
-  const hasData = ses.ejercicios.some(e => (e.series||[]).some(s =>
-    (s.reps!==''&&s.reps!==undefined) || (s.kg!==''&&s.kg!==undefined) ||
-    (s.rondas!==''&&s.rondas!==undefined) || (s.seg!==''&&s.seg!==undefined)
-  ));
+  const hasData = ses.ejercicios.some(e => {
+    if (e.modo === 'tabata') return (e.movimientos && e.movimientos.length > 0);
+    return (e.series||[]).some(s =>
+      (s.reps!==''&&s.reps!==undefined) || (s.kg!==''&&s.kg!==undefined) ||
+      (s.rondas!==''&&s.rondas!==undefined) || (s.seg!==''&&s.seg!==undefined)
+    );
+  });
   if (!hasData) {
     // Nada anotado realmente; al salir se descarta del todo
     if (exiting) {
@@ -1298,88 +1316,112 @@ function buildExBlock(ex, ei) {
   div.className = 'ex-block'; div.id = `ex${ei}`;
   const isTabata = ex.modo === 'tabata';
   const isTiempo = ex.modo === 'tiempo';
-  let serHTML = '';
-  ex.series.forEach((s, si) => {
-    const p = s.prev || {};
-    if (isTiempo) {
-      serHTML += `<div class="serie-row" id="sr${ei}-${si}">
-        <span class="serie-n">${si+1}</span>
-        <div class="serie-field">
-          <label>SEG</label>
+  let bodyHTML = '';
+
+  if (isTabata) {
+    // ── HIIT BLOCK: intervalo + rondas comunes + lista de movimientos ──
+    const PRESETS = [[20,10],[30,15],[40,20],[60,30]];
+    const curSeg = ex.ivOn!==undefined&&ex.ivOn!==''?+ex.ivOn:null;
+    const curOff = ex.ivOff!==undefined&&ex.ivOff!==''?+ex.ivOff:null;
+    const isPreset = PRESETS.some(([a,b])=>a===curSeg&&b===curOff);
+    const manual = ex.ivManual || ((curSeg!==null||curOff!==null) && !isPreset);
+    const opts = PRESETS.map(([a,b])=>
+      `<option value="${a}-${b}" ${curSeg===a&&curOff===b?'selected':''}>${a}/${b}</option>`
+    ).join('') + `<option value="m-m" ${manual?'selected':''}>Manual</option>`;
+    const movs = (ex.movimientos||[]).map((mv,mi)=>
+      `<div class="hiit-mov">
+        <span class="hiit-mov-dot"></span>
+        <span class="hiit-mov-name">${esc(mv)}</span>
+        <button class="hiit-mov-del" data-del-mov="${ei}-${mi}">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>`
+    ).join('');
+    bodyHTML = `
+      <div class="hiit-cfg">
+        <div class="serie-field" style="max-width:96px">
+          <label>Intervalo</label>
+          <select class="iv-select" data-iv-block="${ei}" style="font-size:14px">${opts}</select>
+        </div>
+        <div class="serie-field" style="max-width:78px">
+          <label>Rondas</label>
+          <input class="serie-input" type="number" inputmode="numeric" min="0" max="99"
+            value="${ex.rondas!==undefined&&ex.rondas!==''?ex.rondas:''}" placeholder="8"
+            data-block-rondas="${ei}">
+        </div>
+        ${manual?`<div class="serie-field" style="max-width:64px"><label>ON</label>
           <input class="serie-input" type="number" inputmode="numeric" min="0" step="5"
-            value="${s.seg!==undefined&&s.seg!==''?s.seg:''}" placeholder="${p.seg!==undefined&&p.seg!==''?p.seg:'30'}"
-            data-ei="${ei}" data-si="${si}" data-f="seg">
-        </div>
-        <div class="serie-field">
-          <label>KG</label>
-          <input class="serie-input" type="number" inputmode="decimal" min="0" step="0.5"
-            value="${s.kg!==''&&s.kg!==undefined?s.kg:''}" placeholder="${p.kg!==undefined&&p.kg!==''?p.kg:'—'}"
-            data-ei="${ei}" data-si="${si}" data-f="kg">
-        </div>
-        ${(p.seg||p.kg)?`<span class="prev-tag">ant. ${p.seg||'·'}s${p.kg!==undefined&&p.kg!==''?' · '+p.kg+'kg':''}</span>`:''}
-        <button class="serie-del" data-del-serie="${ei}-${si}">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
-        </button>
-      </div>`;
-    } else if (isTabata) {
-      const PRESETS = [[20,10],[30,15],[40,20],[60,30]];
-      const curSeg = s.seg!==undefined&&s.seg!==''?+s.seg:null;
-      const curOff = s.off!==undefined&&s.off!==''?+s.off:null;
-      const isPreset = PRESETS.some(([a,b])=>a===curSeg&&b===curOff);
-      const manual = s.ivManual || ((curSeg!==null||curOff!==null) && !isPreset);
-      const opts = PRESETS.map(([a,b])=>
-        `<option value="${a}-${b}" ${curSeg===a&&curOff===b?'selected':''}>${a}/${b}</option>`
-      ).join('') + `<option value="m-m" ${manual?'selected':''}>Manual</option>`;
-      serHTML += `<div class="serie-row" id="sr${ei}-${si}">
-        <span class="serie-n">${si+1}</span>
-        <div class="serie-field" style="max-width:78px">
-          <label>RND</label>
-          <input class="serie-input" type="number" inputmode="numeric" min="0" max="99"
-            value="${s.rondas!==undefined&&s.rondas!==''?s.rondas:''}" placeholder="${p.rondas!==undefined&&p.rondas!==''?p.rondas:'8'}"
-            data-ei="${ei}" data-si="${si}" data-f="rondas">
-        </div>
-        <select class="iv-select" data-iv-sel="${ei}-${si}">${opts}</select>
-        <div class="serie-field" style="max-width:78px">
-          <label>KG</label>
-          <input class="serie-input" type="number" inputmode="decimal" min="0" step="0.5"
-            value="${s.kg!==''&&s.kg!==undefined?s.kg:''}" placeholder="${p.kg!==undefined&&p.kg!==''?p.kg:'—'}"
-            data-ei="${ei}" data-si="${si}" data-f="kg">
-        </div>
-        <button class="serie-del" data-del-serie="${ei}-${si}">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
-        </button>
-        ${manual?`<div style="display:flex;gap:7px;width:100%;margin-top:6px">
-          <div class="serie-field"><label>ON</label>
+            value="${curSeg!==null?curSeg:''}" placeholder="seg" data-block-on="${ei}"></div>
+        <div class="serie-field" style="max-width:64px"><label>OFF</label>
+          <input class="serie-input" type="number" inputmode="numeric" min="0" step="5"
+            value="${curOff!==null?curOff:''}" placeholder="seg" data-block-off="${ei}"></div>`:''}
+      </div>
+      <div class="hiit-movs">${movs || '<div class="hiit-empty">Añade los ejercicios del bloque</div>'}</div>
+      <button class="hiit-add" data-add-mov="${ei}">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        Añadir ejercicio al bloque
+      </button>`;
+  } else {
+    // ── REPS / TIEMPO: series normales ──
+    let serHTML = '';
+    ex.series.forEach((s, si) => {
+      const p = s.prev || {};
+      if (isTiempo) {
+        serHTML += `<div class="serie-row" id="sr${ei}-${si}">
+          <span class="serie-n">${si+1}</span>
+          <div class="serie-field">
+            <label>SEG</label>
             <input class="serie-input" type="number" inputmode="numeric" min="0" step="5"
-              value="${curSeg!==null?curSeg:''}" placeholder="seg" data-ei="${ei}" data-si="${si}" data-f="seg"></div>
-          <div class="serie-field"><label>OFF</label>
-            <input class="serie-input" type="number" inputmode="numeric" min="0" step="5"
-              value="${curOff!==null?curOff:''}" placeholder="seg" data-ei="${ei}" data-si="${si}" data-f="off"></div>
-        </div>`:''}
-        ${(p.rondas||p.seg||p.off||p.kg)?`<span class="prev-tag" style="width:100%;margin-top:4px">ant. ${p.rondas||'·'}×${p.seg||'·'}/${p.off||'·'}s${p.kg?' · '+p.kg+'kg':''}</span>`:''}
-      </div>`;
-    } else {
-      serHTML += `<div class="serie-row" id="sr${ei}-${si}">
-        <span class="serie-n">${si+1}</span>
-        <div class="serie-field">
-          <label>REPS</label>
-          <input class="serie-input" type="number" inputmode="numeric" min="0" max="99"
-            value="${s.reps!==''&&s.reps!==undefined?s.reps:''}" placeholder="${p.reps!==undefined&&p.reps!==''?p.reps:'—'}"
-            data-ei="${ei}" data-si="${si}" data-f="reps">
-        </div>
-        <div class="serie-field">
-          <label>KG</label>
-          <input class="serie-input" type="number" inputmode="decimal" min="0" step="0.5"
-            value="${s.kg!==''&&s.kg!==undefined?s.kg:''}" placeholder="${p.kg!==undefined&&p.kg!==''?p.kg:'—'}"
-            data-ei="${ei}" data-si="${si}" data-f="kg">
-        </div>
-        ${(p.reps||p.kg)?`<span class="prev-tag">ant. ${p.reps||'·'}×${p.kg!==undefined&&p.kg!==''?p.kg+'kg':'·'}</span>`:''}
-        <button class="serie-del" data-del-serie="${ei}-${si}">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+              value="${s.seg!==undefined&&s.seg!==''?s.seg:''}" placeholder="${p.seg!==undefined&&p.seg!==''?p.seg:'30'}"
+              data-ei="${ei}" data-si="${si}" data-f="seg">
+          </div>
+          <div class="serie-field">
+            <label>KG</label>
+            <input class="serie-input" type="number" inputmode="decimal" min="0" step="0.5"
+              value="${s.kg!==''&&s.kg!==undefined?s.kg:''}" placeholder="${p.kg!==undefined&&p.kg!==''?p.kg:'—'}"
+              data-ei="${ei}" data-si="${si}" data-f="kg">
+          </div>
+          ${(p.seg||p.kg)?`<span class="prev-tag">ant. ${p.seg||'·'}s${p.kg!==undefined&&p.kg!==''?' · '+p.kg+'kg':''}</span>`:''}
+          <button class="serie-del" data-del-serie="${ei}-${si}">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>`;
+      } else {
+        serHTML += `<div class="serie-row" id="sr${ei}-${si}">
+          <span class="serie-n">${si+1}</span>
+          <div class="serie-field">
+            <label>REPS</label>
+            <input class="serie-input" type="number" inputmode="numeric" min="0" max="99"
+              value="${s.reps!==''&&s.reps!==undefined?s.reps:''}" placeholder="${p.reps!==undefined&&p.reps!==''?p.reps:'—'}"
+              data-ei="${ei}" data-si="${si}" data-f="reps">
+          </div>
+          <div class="serie-field">
+            <label>KG</label>
+            <input class="serie-input" type="number" inputmode="decimal" min="0" step="0.5"
+              value="${s.kg!==''&&s.kg!==undefined?s.kg:''}" placeholder="${p.kg!==undefined&&p.kg!==''?p.kg:'—'}"
+              data-ei="${ei}" data-si="${si}" data-f="kg">
+          </div>
+          ${(p.reps||p.kg)?`<span class="prev-tag">ant. ${p.reps||'·'}×${p.kg!==undefined&&p.kg!==''?p.kg+'kg':'·'}</span>`:''}
+          <button class="serie-del" data-del-serie="${ei}-${si}">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>`;
+      }
+    });
+    bodyHTML = `<div>${serHTML}</div>
+      <div class="ex-foot">
+        <button class="ex-foot-btn" data-add-serie="${ei}">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>SERIE
+        </button>
+        <button class="ex-foot-btn" data-dup-serie="${ei}">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>IGUAL
+        </button>
+        <button class="ex-foot-btn del" data-del-ex="${ei}">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>QUITAR
         </button>
       </div>`;
-    }
-  });
+  }
+
   div.innerHTML = `
     <div class="ex-hdr">
       <button class="ex-name" data-rename="${ei}">${esc(ex.nombre)} <span>▾</span></button>
@@ -1389,18 +1431,10 @@ function buildExBlock(ex, ei) {
         <button class="modo-btn ${isTabata?'sel':''}" data-modo="tabata-${ei}">HIIT</button>
       </div>
     </div>
-    <div>${serHTML}</div>
-    <div class="ex-foot">
-      <button class="ex-foot-btn" data-add-serie="${ei}">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>SERIE
-      </button>
-      <button class="ex-foot-btn" data-dup-serie="${ei}">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>IGUAL
-      </button>
-      <button class="ex-foot-btn del" data-del-ex="${ei}">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>QUITAR
-      </button>
-    </div>`;
+    ${bodyHTML}
+    ${isTabata?`<div class="ex-foot"><button class="ex-foot-btn del" data-del-ex="${ei}" style="flex:1">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>QUITAR BLOQUE
+    </button></div>`:''}`;
   return div;
 }
 
@@ -1411,7 +1445,11 @@ document.getElementById('ses-scroll').addEventListener('click', e => {
   const dupSerie = e.target.closest('[data-dup-serie]');
   const delSerie = e.target.closest('[data-del-serie]');
   const delEx    = e.target.closest('[data-del-ex]');
+  const addMov   = e.target.closest('[data-add-mov]');
+  const delMov   = e.target.closest('[data-del-mov]');
   if (modoBtn)  { const [m,ei]=modoBtn.dataset.modo.split('-'); setExModo(+ei, m); return; }
+  if (addMov)   { pickerCtx='hiit-mov'; pickerHiitEi=+addMov.dataset.addMov; openPicker(null); return; }
+  if (delMov)   { const [ei,mi]=delMov.dataset.delMov.split('-').map(Number); removeMov(ei,mi); return; }
   if (rename)   { pickerCtx='session'; openPicker(+rename.dataset.rename); return; }
   if (addSerie) { addSet(+addSerie.dataset.addSerie); return; }
   if (dupSerie) { dupLastSet(+dupSerie.dataset.dupSerie); return; }
@@ -1419,8 +1457,40 @@ document.getElementById('ses-scroll').addEventListener('click', e => {
   if (delSerie) { const [ei,si]=delSerie.dataset.delSerie.split('-').map(Number); removeSet(ei,si); }
 });
 
+let pickerHiitEi = null;
+
 function setExModo(ei, modo) {
-  ses.ejercicios[ei].modo = (modo === 'tabata' || modo === 'tiempo') ? modo : 'reps';
+  const ex = ses.ejercicios[ei];
+  ex.modo = (modo === 'tabata' || modo === 'tiempo') ? modo : 'reps';
+  if (ex.modo === 'tabata' && !ex.movimientos) {
+    // Initialize HIIT block; migrate old-style series if any
+    ex.movimientos = [];
+    ex.rondas = ex.rondas || '';
+    ex.ivOn = ex.ivOn || '';
+    ex.ivOff = ex.ivOff || '';
+  }
+  autosave(); renderSession();
+}
+
+function removeMov(ei, mi) {
+  ses.ejercicios[ei].movimientos.splice(mi, 1);
+  autosave(); renderSession();
+}
+
+function addMovToBlock(ei, nombre) {
+  const ex = ses.ejercicios[ei];
+  if (!ex.movimientos) ex.movimientos = [];
+  ex.movimientos.push(nombre);
+  autosave(); renderSession();
+}
+
+function setBlockInterval(ei, a, b) {
+  const ex = ses.ejercicios[ei];
+  if (a === 'm') {
+    ex.ivManual = true;
+  } else {
+    ex.ivOn = +a; ex.ivOff = +b; ex.ivManual = false;
+  }
   autosave(); renderSession();
 }
 
@@ -1435,10 +1505,20 @@ function setIntervalo(ei, si, a, b) {
 }
 
 document.getElementById('ses-scroll').addEventListener('change', e => {
+  const blockSel = e.target.closest('[data-iv-block]');
+  if (blockSel) { const ei=+blockSel.dataset.ivBlock; const [a,b]=blockSel.value.split('-'); setBlockInterval(ei,a,b); return; }
   const sel = e.target.closest('[data-iv-sel]');
   if (sel) { const [ei,si]=sel.dataset.ivSel.split('-'); const [a,b]=sel.value.split('-'); setIntervalo(+ei,+si,a,b); return; }
+  // HIIT block rondas / on / off fields
+  const bRondas = e.target.closest('[data-block-rondas]');
+  if (bRondas) { ses.ejercicios[+bRondas.dataset.blockRondas].rondas = bRondas.value===''?'':parseFloat(bRondas.value); autosave(); return; }
+  const bOn = e.target.closest('[data-block-on]');
+  if (bOn) { ses.ejercicios[+bOn.dataset.blockOn].ivOn = bOn.value===''?'':parseFloat(bOn.value); autosave(); return; }
+  const bOff = e.target.closest('[data-block-off]');
+  if (bOff) { ses.ejercicios[+bOff.dataset.blockOff].ivOff = bOff.value===''?'':parseFloat(bOff.value); autosave(); return; }
   const inp = e.target.closest('.serie-input'); if (!inp) return;
   const {ei,si,f} = inp.dataset;
+  if (ei===undefined||si===undefined) return;
   ses.ejercicios[+ei].series[+si][f] = inp.value===''?'':parseFloat(inp.value);
   autosave();
 });
@@ -1654,7 +1734,10 @@ document.getElementById('picker-items').addEventListener('click', e => {
 
 function selectEx(nombre) {
   closePicker();
-  if (pickerCtx === 'session') {
+  if (pickerCtx === 'hiit-mov') {
+    if (pickerHiitEi !== null) addMovToBlock(pickerHiitEi, nombre);
+    pickerHiitEi = null;
+  } else if (pickerCtx === 'session') {
     if (pickerFor === null) addExSes(nombre);
     else renameExSes(pickerFor, nombre);
   } else { // tpl-edit
