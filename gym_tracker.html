@@ -358,6 +358,11 @@
       display:flex; align-items:center; gap:10px; }
     .picker-item:active { background:var(--s3); }
     .picker-item.new { color:var(--acc); font-weight:700; }
+    .picker-item.blk { color:var(--acc); font-weight:700; border:1px dashed var(--acc); background:var(--acc2); margin-bottom:4px; }
+    .picker-item.blk .blk-tag { margin-left:auto; font-family:'DM Sans',sans-serif; font-size:9px;
+      letter-spacing:.8px; text-transform:uppercase; color:var(--acc); opacity:.75; }
+    .picker-sep { padding:10px 12px 4px; font-family:'DM Sans',sans-serif; font-size:9px;
+      font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:var(--mut); }
 
     /* ── SAVE-AS-TEMPLATE MINI SHEET ─────────── */
     .mini-input-wrap { margin:14px 14px 6px;
@@ -726,7 +731,16 @@
 // ─────────────────────────────────────────────────────────────────────────────
 const LS = 'gym_manu_v1';
 
+const BLOCK_EXERCISES = ['HIIT / Tabata','Circuito HIIT'];
+const isBlockEx = n => BLOCK_EXERCISES.some(b => b.toLowerCase() === String(n||'').trim().toLowerCase());
+function mkEx(nombre) {
+  return isBlockEx(nombre)
+    ? { nombre, series:[], modo:'tabata', movimientos:[], rondas:'', ivOn:'', ivOff:'' }
+    : { nombre, series:[] };
+}
+
 const PREDEFINED = [
+  ...BLOCK_EXERCISES,
   'Press banca','Press inclinado','Press declinado','Aperturas cable','Fondos pecho','Fondos lastrados',
   'Press militar','Press Arnold','Push press','Elevaciones laterales','Elevaciones frontales',
   'Pájaros','Face pulls',
@@ -1200,7 +1214,7 @@ function sesFromDia(rutinaId, diaIdx) {
   if (!rutina || !rutina.dias[diaIdx]) return;
   const dia = rutina.dias[diaIdx];
   ses = { id:String(Date.now()), fecha:todayStr(), nombre:dia.nombre,
-    ejercicios:dia.ejercicios.map(n=>({nombre:n,series:[]})) };
+    ejercicios:dia.ejercicios.map(mkEx) };
   sesIdx = -1;
   startSesScreen();
 }
@@ -1398,16 +1412,26 @@ function repeatSes(idx) {
   const orig = db.sesiones[idx];
   ses = { id:String(Date.now()), fecha:todayStr(),
     nombre:orig.nombre,
-    ejercicios:orig.ejercicios.map(e=>({
-      nombre:e.nombre,
-      modo:e.modo || 'reps',
-      // Pre-create empty series matching last time, each carrying a `prev` reference
-      series:(e.series||[]).map(s => e.modo === 'tabata'
-        ? { rondas:'', seg:'', off:'', kg:'', prev:{ rondas:s.rondas, seg:s.seg, off:s.off, kg:s.kg } }
-        : e.modo === 'tiempo'
-        ? { seg:'', kg:'', prev:{ seg:s.seg, kg:s.kg } }
-        : { reps:'', kg:'', prev:{ reps:s.reps, kg:s.kg } })
-    })) };
+    ejercicios:orig.ejercicios.map(e=>{
+      const n = {
+        nombre:e.nombre,
+        modo:e.modo || 'reps',
+        // Pre-create empty series matching last time, each carrying a `prev` reference
+        series:(e.series||[]).map(s => e.modo === 'tabata'
+          ? { rondas:'', seg:'', off:'', kg:'', prev:{ rondas:s.rondas, seg:s.seg, off:s.off, kg:s.kg } }
+          : e.modo === 'tiempo'
+          ? { seg:'', kg:'', prev:{ seg:s.seg, kg:s.kg } }
+          : { reps:'', kg:'', prev:{ reps:s.reps, kg:s.kg } })
+      };
+      if (n.modo === 'tabata') {
+        n.movimientos = [...(e.movimientos||[])];
+        n.rondas = e.rondas!==undefined ? e.rondas : '';
+        n.ivOn   = e.ivOn!==undefined ? e.ivOn : '';
+        n.ivOff  = e.ivOff!==undefined ? e.ivOff : '';
+        n.ivManual = !!e.ivManual;
+      }
+      return n;
+    }) };
   sesIdx = -1;
   startSesScreen();
 }
@@ -1416,7 +1440,7 @@ function sesFromTpl(idx) {
   const t = db.plantillas[idx];
   ses = { id:String(Date.now()), fecha:todayStr(),
     nombre:t.nombre,
-    ejercicios:t.ejercicios.map(n=>({nombre:n,series:[]})) };
+    ejercicios:t.ejercicios.map(mkEx) };
   sesIdx = -1;
   startSesScreen();
 }
@@ -1769,12 +1793,19 @@ document.getElementById('btn-add-ex').addEventListener('click', () => {
 // SESSION EXERCISE OPS
 // ─────────────────────────────────────────────────────────────────────────────
 function addExSes(nombre) {
-  ses.ejercicios.push({nombre,series:[]});
+  ses.ejercicios.push(mkEx(nombre));
   autosave(); renderSession();
   setTimeout(() => document.getElementById('ses-scroll').scrollTo({top:99999,behavior:'smooth'}), 60);
 }
 function renameExSes(ei, nombre) {
-  ses.ejercicios[ei].nombre = nombre; autosave();
+  const ex = ses.ejercicios[ei];
+  ex.nombre = nombre;
+  if (isBlockEx(nombre) && ex.modo !== 'tabata') {
+    ex.modo='tabata'; ex.movimientos = ex.movimientos || [];
+    ex.rondas = ex.rondas||''; ex.ivOn = ex.ivOn||''; ex.ivOff = ex.ivOff||'';
+    autosave(); renderSession(); return;
+  }
+  autosave();
   const btn = document.querySelector(`#ex${ei} .ex-name`);
   if (btn) btn.innerHTML = `${esc(nombre)} <span>▾</span>`;
 }
@@ -1933,9 +1964,11 @@ function closePicker() {
 }
 function renderPicker(q) {
   const qn = q.trim().toLowerCase();
-  const matches = db.ejercicios_predefinidos
-    .filter(n => !qn || n.toLowerCase().includes(qn))
-    .sort((a,b) => a.localeCompare(b,'es'));
+  const inBlock = pickerCtx === 'hiit-mov';
+  const all = db.ejercicios_predefinidos.filter(n => !qn || n.toLowerCase().includes(qn));
+  // Los bloques no pueden anidarse dentro de otro bloque
+  const blocks = inBlock ? [] : all.filter(isBlockEx);
+  const matches = all.filter(n => !isBlockEx(n)).sort((a,b) => a.localeCompare(b,'es'));
   let html = '';
   const exact = db.ejercicios_predefinidos.some(n => n.toLowerCase()===qn);
   if (qn && !exact) {
@@ -1943,6 +1976,13 @@ function renderPicker(q) {
     html += `<div class="picker-item new" data-new="${esc(cap)}">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
       Añadir "${esc(cap)}"</div>`;
+  }
+  if (blocks.length) {
+    html += `<div class="picker-sep">Bloques</div>`;
+    blocks.forEach(n => { html += `<div class="picker-item blk" data-pick="${esc(n)}">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"/></svg>
+      ${esc(n)}<span class="blk-tag">Varios ejercicios</span></div>`; });
+    if (matches.length) html += `<div class="picker-sep">Ejercicios</div>`;
   }
   matches.forEach(n => { html += `<div class="picker-item" data-pick="${esc(n)}">${esc(n)}</div>`; });
   if (!html) html = `<div style="padding:28px;text-align:center;color:var(--mut);font-size:16px">Sin resultados</div>`;
