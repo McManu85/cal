@@ -259,6 +259,16 @@
     .hiit-mov:last-child { border-bottom:none; }
     .hiit-mov-dot { width:5px; height:5px; border-radius:50%; background:var(--acc); flex-shrink:0; }
     .hiit-mov-name { flex:1; font-family:'DM Sans',sans-serif; font-size:14px; color:var(--txt); }
+    .hiit-mov-kg { display:flex; align-items:center; gap:3px; background:var(--s3);
+      border:1px solid var(--b); border-radius:5px; padding:3px 6px 3px 4px; flex-shrink:0; }
+    .hiit-kg-input { font-family:'JetBrains Mono',monospace; font-size:15px; font-weight:700;
+      color:var(--txt); background:none; border:none; outline:none; width:46px; text-align:center;
+      padding:2px 0; -moz-appearance:textfield; }
+    .hiit-kg-input::-webkit-outer-spin-button,
+    .hiit-kg-input::-webkit-inner-spin-button { -webkit-appearance:none; }
+    .hiit-kg-input::placeholder { color:var(--mut); font-weight:500; }
+    .hiit-kg-u { font-family:'DM Sans',sans-serif; font-size:9px; font-weight:700;
+      letter-spacing:.5px; text-transform:uppercase; color:var(--mut); }
     .hiit-mov-del { width:28px; height:28px; border:none; background:none; color:var(--mut);
       cursor:pointer; display:flex; align-items:center; justify-content:center; border-radius:5px; flex-shrink:0; }
     .hiit-mov-del:active { background:rgba(255,59,48,.15); color:var(--red); }
@@ -737,6 +747,14 @@ function mkEx(nombre) {
   return isBlockEx(nombre)
     ? { nombre, series:[], modo:'tabata', movimientos:[], rondas:'', ivOn:'', ivOff:'' }
     : { nombre, series:[] };
+}
+// Los movimientos de un bloque HIIT eran strings; ahora son {n, kg}. Compatibilidad hacia atrás.
+const normMov = mv => typeof mv === 'string'
+  ? { n:mv, kg:'' }
+  : { n:(mv && mv.n) || '', kg:(mv && mv.kg !== undefined && mv.kg !== null) ? mv.kg : '' };
+function normBlock(ex) {
+  if (ex && ex.modo === 'tabata') ex.movimientos = (ex.movimientos || []).map(normMov);
+  return ex;
 }
 
 const PREDEFINED = [
@@ -1424,7 +1442,10 @@ function repeatSes(idx) {
           : { reps:'', kg:'', prev:{ reps:s.reps, kg:s.kg } })
       };
       if (n.modo === 'tabata') {
-        n.movimientos = [...(e.movimientos||[])];
+        n.movimientos = (e.movimientos||[]).map(mv => {
+          const o = normMov(mv);
+          return { n:o.n, kg:o.kg, prevKg:o.kg };
+        });
         n.rondas = e.rondas!==undefined ? e.rondas : '';
         n.ivOn   = e.ivOn!==undefined ? e.ivOn : '';
         n.ivOff  = e.ivOff!==undefined ? e.ivOff : '';
@@ -1578,6 +1599,7 @@ function buildExBlock(ex, ei) {
 
   if (isTabata) {
     // ── HIIT BLOCK: intervalo + rondas comunes + lista de movimientos ──
+    normBlock(ex);
     const PRESETS = [[20,10],[30,15],[40,20],[60,30]];
     const curSeg = ex.ivOn!==undefined&&ex.ivOn!==''?+ex.ivOn:null;
     const curOff = ex.ivOff!==undefined&&ex.ivOff!==''?+ex.ivOff:null;
@@ -1589,7 +1611,13 @@ function buildExBlock(ex, ei) {
     const movs = (ex.movimientos||[]).map((mv,mi)=>
       `<div class="hiit-mov">
         <span class="hiit-mov-dot"></span>
-        <span class="hiit-mov-name">${esc(mv)}</span>
+        <span class="hiit-mov-name">${esc(mv.n)}</span>
+        ${mv.prevKg!==undefined&&mv.prevKg!==''?`<span class="prev-tag">${mv.prevKg} kg</span>`:''}
+        <div class="hiit-mov-kg">
+          <input class="hiit-kg-input" type="number" inputmode="decimal" min="0" step="0.5"
+            value="${mv.kg!==undefined&&mv.kg!==''?mv.kg:''}" placeholder="–" data-mov-kg="${ei}-${mi}">
+          <span class="hiit-kg-u">kg</span>
+        </div>
         <button class="hiit-mov-del" data-del-mov="${ei}-${mi}">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
@@ -1720,6 +1748,7 @@ let pickerHiitEi = null;
 function setExModo(ei, modo) {
   const ex = ses.ejercicios[ei];
   ex.modo = (modo === 'tabata' || modo === 'tiempo') ? modo : 'reps';
+  if (ex.modo === 'tabata') normBlock(ex);
   if (ex.modo === 'tabata' && !ex.movimientos) {
     // Initialize HIIT block; migrate old-style series if any
     ex.movimientos = [];
@@ -1737,8 +1766,9 @@ function removeMov(ei, mi) {
 
 function addMovToBlock(ei, nombre) {
   const ex = ses.ejercicios[ei];
+  normBlock(ex);
   if (!ex.movimientos) ex.movimientos = [];
-  ex.movimientos.push(nombre);
+  ex.movimientos.push({ n:nombre, kg:'' });
   autosave(); renderSession();
 }
 
@@ -1774,6 +1804,13 @@ document.getElementById('ses-scroll').addEventListener('change', e => {
   if (bOn) { ses.ejercicios[+bOn.dataset.blockOn].ivOn = bOn.value===''?'':parseFloat(bOn.value); autosave(); return; }
   const bOff = e.target.closest('[data-block-off]');
   if (bOff) { ses.ejercicios[+bOff.dataset.blockOff].ivOff = bOff.value===''?'':parseFloat(bOff.value); autosave(); return; }
+  const mKg = e.target.closest('[data-mov-kg]');
+  if (mKg) {
+    const [ei,mi] = mKg.dataset.movKg.split('-').map(Number);
+    const ex = ses.ejercicios[ei]; normBlock(ex);
+    if (ex.movimientos[mi]) { ex.movimientos[mi].kg = mKg.value===''?'':parseFloat(mKg.value); autosave(); }
+    return;
+  }
   const inp = e.target.closest('.serie-input'); if (!inp) return;
   const {ei,si,f} = inp.dataset;
   if (ei===undefined||si===undefined) return;
