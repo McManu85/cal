@@ -184,6 +184,33 @@
       font-weight:700; letter-spacing:.5px; text-transform:uppercase; cursor:pointer;
       transition:all .2s; text-align:center; }
     .int-pill.sel { border-color:var(--acc); color:#000; background:var(--acc); }
+    /* ── CARDIO MIXTO ─────────────────────────── */
+    .cardio-blk { padding:11px 0; border-bottom:1px solid var(--b); }
+    .cardio-blk:last-child { border-bottom:none; }
+    .cardio-row { display:flex; gap:7px; align-items:center; }
+    .cardio-sel { flex:1; min-width:0; border:1px solid var(--b); border-radius:5px; background:var(--s3);
+      color:var(--txt); font-family:'DM Sans',sans-serif; font-size:14px; padding:9px 6px;
+      outline:none; cursor:pointer; -webkit-appearance:none; appearance:none; }
+    .cardio-min { width:58px; flex-shrink:0; border:1px solid var(--b); border-radius:5px; background:var(--s3);
+      color:var(--txt); font-family:'JetBrains Mono',monospace; font-size:15px; font-weight:700;
+      text-align:center; padding:9px 2px; outline:none; }
+    .cardio-min:focus { border-color:var(--acc); }
+    .cardio-u { font-size:9px; font-weight:700; letter-spacing:1px; color:var(--mut); flex-shrink:0; }
+    .cardio-del { width:26px; height:26px; flex-shrink:0; border:none; background:none; color:var(--mut);
+      font-size:15px; line-height:1; cursor:pointer; padding:0; }
+    .cardio-int { display:flex; gap:6px; margin-top:8px; }
+    .cardio-int button { flex:1; padding:6px 2px; border-radius:5px; border:1px solid var(--b); background:none;
+      color:var(--mut); font-family:'DM Sans',sans-serif; font-size:10px; font-weight:700; letter-spacing:.4px;
+      text-transform:uppercase; cursor:pointer; transition:all .18s; }
+    .cardio-int button.sel { border-color:var(--acc); background:var(--acc); color:#000; }
+    .cardio-total { display:flex; justify-content:space-between; align-items:center;
+      padding:12px 16px 6px; border-top:1px solid var(--b); margin-top:6px; }
+    .cardio-total-val { font-family:'Bebas Neue',sans-serif; font-size:30px; letter-spacing:.02em; color:var(--acc); line-height:1; }
+    .cardio-add { width:calc(100% - 32px); margin:10px 16px 2px; padding:10px; border-radius:6px;
+      border:1.5px dashed var(--b); background:none; color:var(--mut); font-family:'DM Sans',sans-serif;
+      font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; cursor:pointer; }
+    .cardio-add:active { border-color:var(--acc); color:var(--acc); }
+    .card-sub { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--mut); margin-top:3px; letter-spacing:.02em; }
     /* Activity in sessions list */
     .ses-card.act { border-left-color:var(--sage); }
     .ses-act-meta { font-size:11px; color:var(--muted); margin-top:2px; display:flex; gap:8px; }
@@ -382,7 +409,7 @@
     <div class="hdr-logo" style="display:flex;align-items:baseline;gap:8px">
       <span>INDAR<span style="color:var(--acc)">-BI</span></span>
       <span style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut)">Gym Tracker</span>
-      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:0">v17</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:0">v18</span>
     </div>
     <div style="flex:1"></div>
     <button id="btn-user" onclick="gdUserTap()" style="display:flex;align-items:center;gap:7px;padding:6px 12px 6px 10px;background:var(--s2);border:1px solid var(--b);border-radius:20px;cursor:pointer;transition:all .2s">
@@ -431,6 +458,7 @@
       <div class="act-pill" onclick="openActivityLog('Carrera')"><span class="act-pill-icon">🏃</span><span class="act-pill-lbl">Correr</span></div>
       <div class="act-pill" onclick="openActivityLog('Bicicleta')"><span class="act-pill-icon">🚴</span><span class="act-pill-lbl">Bici</span></div>
       <div class="act-pill" onclick="openActivityLog('Natación')"><span class="act-pill-icon">🏊</span><span class="act-pill-lbl">Nadar</span></div>
+      <div class="act-pill" onclick="openCardio()"><span class="act-pill-icon">🏋️</span><span class="act-pill-lbl">Cardio</span></div>
       <div class="act-pill" onclick="openCustomActivity()"><span class="act-pill-icon">✚</span><span class="act-pill-lbl">Otra</span></div>
     </div>
     </div>
@@ -592,6 +620,35 @@
     </div>
     <button class="sheet-btn" style="margin:6px 12px 4px;width:calc(100% - 24px)" onclick="saveActivity()">GUARDAR ACTIVIDAD</button>
     <button id="act-del-btn" style="display:none;margin:0 12px 8px;width:calc(100% - 24px);padding:11px;background:none;border:1px solid rgba(255,80,60,.35);border-radius:8px;color:#ff6b5b;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer" onclick="deleteActivity()">Eliminar actividad</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ OVERLAY: CARDIO ═══════════════════════════ -->
+<div class="overlay" id="ov-cardio">
+  <div class="sheet" style="max-height:90vh">
+    <div class="sheet-hdr">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.04em;color:var(--txt)">🏋️&nbsp; Cardio mixto</div>
+      <button class="ico" onclick="closeOv('ov-cardio')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div style="overflow-y:auto;flex:1;min-height:0;-webkit-overflow-scrolling:touch">
+      <div style="padding:14px 16px 4px">
+        <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--mut);margin-bottom:6px">Fecha</div>
+        <input type="date" id="cardio-fecha" style="width:100%;padding:10px 12px;background:var(--s2);border:1px solid var(--b);border-radius:6px;color:var(--txt);font-family:'JetBrains Mono',monospace;font-size:14px;color-scheme:dark">
+      </div>
+      <div style="padding:12px 16px 0">
+        <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--mut)">Bloques</div>
+      </div>
+      <div id="cardio-blks" style="padding:0 16px"></div>
+      <button class="cardio-add" onclick="addCardioBlk()">+ Añadir máquina</button>
+      <div class="cardio-total">
+        <span style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--mut)">Total</span>
+        <span class="cardio-total-val" id="cardio-total">0 MIN</span>
+      </div>
+    </div>
+    <button class="sheet-btn" style="margin:6px 12px 4px;width:calc(100% - 24px)" onclick="saveCardio()">GUARDAR CARDIO</button>
+    <button id="cardio-del-btn" style="display:none;margin:0 12px 8px;width:calc(100% - 24px);padding:11px;background:none;border:1px solid rgba(255,80,60,.35);border-radius:8px;color:#ff6b5b;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer" onclick="deleteCardio()">Eliminar sesión</button>
   </div>
 </div>
 
@@ -858,6 +915,159 @@ function saveActivity() {
   toast((ACT_EMOJIS[actNombre] || '⚡') + ' ' + actNombre + ' guardado');
 }
 
+// ─── CARDIO MIXTO ─────────────────────────────────────────────────────────────
+const CARDIO_MAQ = [
+  ['Cinta','\U0001F3C3'], ['Caminar','\U0001F6B6'], ['Bici estática','\U0001F6B4'],
+  ['Elíptica','\U0001F300'], ['Escaleras','\U0001FA9C'], ['Remo','\U0001F6A3'], ['Airbike','\U0001F4A8']
+];
+const CARDIO_INT_LBL = { suave:'\U0001F60C Suave', moderada:'\U0001F4AA Mod', intensa:'\U0001F525 Intensa' };
+let cardioBlks = [];
+let cardioEditIdx = -1;
+
+function cardioEmoji(n) { const f = CARDIO_MAQ.find(m => m[0] === n); return f ? f[1] : '\u26A1'; }
+
+function openCardio() {
+  cardioEditIdx = -1;
+  cardioBlks = [{ maq:'Cinta', min:15, int:'moderada' }];
+  document.getElementById('cardio-fecha').value = todayStr();
+  document.getElementById('cardio-del-btn').style.display = 'none';
+  renderCardio();
+  closeOv('ov-session-picker');
+  document.getElementById('ov-cardio').classList.add('open');
+}
+
+function openCardioEdit(idx) {
+  const s = db.sesiones[idx];
+  if (!s) return;
+  cardioEditIdx = idx;
+  cardioBlks = (s.bloques || []).map(b => ({ maq:b.maq, min:+b.min || 0, int:b.int || 'moderada' }));
+  if (!cardioBlks.length) cardioBlks = [{ maq:'Cinta', min:15, int:'moderada' }];
+  document.getElementById('cardio-fecha').value = s.fecha || todayStr();
+  document.getElementById('cardio-del-btn').style.display = 'block';
+  renderCardio();
+  document.getElementById('ov-cardio').classList.add('open');
+}
+
+function updCardioTotal() {
+  const tot = cardioBlks.reduce((a,b) => a + (+b.min || 0), 0);
+  document.getElementById('cardio-total').textContent = tot + ' MIN';
+}
+
+function renderCardio() {
+  const el = document.getElementById('cardio-blks');
+  if (!el) return;
+  el.innerHTML = cardioBlks.map((b,i) => {
+    const known = CARDIO_MAQ.some(m => m[0] === b.maq);
+    let opts = CARDIO_MAQ.map(m =>
+      `<option value="${esc(m[0])}"${b.maq === m[0] ? ' selected' : ''}>${m[1]}  ${esc(m[0])}</option>`).join('');
+    if (!known) opts += `<option value="${esc(b.maq)}" selected>\u26A1  ${esc(b.maq)}</option>`;
+    opts += `<option value="__otra__">\u271A  Otra…</option>`;
+    const ints = ['suave','moderada','intensa'].map(v =>
+      `<button class="${b.int === v ? 'sel' : ''}" data-cint="${i}:${v}">${CARDIO_INT_LBL[v]}</button>`).join('');
+    return `<div class="cardio-blk">
+      <div class="cardio-row">
+        <select class="cardio-sel" data-cmaq="${i}">${opts}</select>
+        <input class="cardio-min" type="number" inputmode="numeric" min="0" max="300" value="${b.min}" data-cmin="${i}">
+        <span class="cardio-u">MIN</span>
+        <button class="cardio-del" data-cdel="${i}">\u2715</button>
+      </div>
+      <div class="cardio-int">${ints}</div>
+    </div>`;
+  }).join('');
+  updCardioTotal();
+}
+
+function addCardioBlk() {
+  const usadas = cardioBlks.map(b => b.maq);
+  const libre = CARDIO_MAQ.find(m => !usadas.includes(m[0]));
+  cardioBlks.push({ maq: libre ? libre[0] : 'Cinta', min:10, int:'moderada' });
+  renderCardio();
+}
+
+const cardioBlksEl = document.getElementById('cardio-blks');
+if (cardioBlksEl) {
+  cardioBlksEl.addEventListener('change', e => {
+    const sel = e.target.closest('[data-cmaq]');
+    if (!sel) return;
+    const i = +sel.dataset.cmaq;
+    if (sel.value === '__otra__') {
+      const n = prompt('Nombre de la máquina o actividad:');
+      if (n && n.trim()) cardioBlks[i].maq = n.trim();
+      renderCardio();
+      return;
+    }
+    cardioBlks[i].maq = sel.value;
+  });
+  cardioBlksEl.addEventListener('input', e => {
+    const inp = e.target.closest('[data-cmin]');
+    if (!inp) return;
+    let v = parseInt(inp.value);
+    if (isNaN(v) || v < 0) v = 0;
+    if (v > 300) { v = 300; inp.value = 300; }
+    cardioBlks[+inp.dataset.cmin].min = v;
+    updCardioTotal();
+  });
+  cardioBlksEl.addEventListener('click', e => {
+    const del = e.target.closest('[data-cdel]');
+    if (del) {
+      if (cardioBlks.length > 1) cardioBlks.splice(+del.dataset.cdel, 1);
+      else toast('Debe quedar al menos un bloque');
+      renderCardio();
+      return;
+    }
+    const pill = e.target.closest('[data-cint]');
+    if (pill) {
+      const parts = pill.dataset.cint.split(':');
+      cardioBlks[+parts[0]].int = parts[1];
+      renderCardio();
+    }
+  });
+  cardioBlksEl.addEventListener('focusin', e => {
+    if (e.target.classList.contains('cardio-min')) e.target.select();
+  });
+}
+
+function saveCardio() {
+  const fecha = document.getElementById('cardio-fecha').value || todayStr();
+  const blks = cardioBlks
+    .filter(b => b.maq && (+b.min) > 0)
+    .map(b => ({ maq:b.maq, min:+b.min, int:b.int || 'moderada' }));
+  if (!blks.length) { toast('Añade minutos a algún bloque'); return; }
+  const total = blks.reduce((a,b) => a + b.min, 0);
+  const acc = { suave:0, moderada:0, intensa:0 };
+  blks.forEach(b => { acc[b.int] = (acc[b.int] || 0) + b.min; });
+  const intensidad = Object.keys(acc).reduce((a,b) => acc[b] > acc[a] ? b : a, 'moderada');
+  if (cardioEditIdx >= 0) {
+    const s = db.sesiones[cardioEditIdx];
+    s.fecha = fecha; s.bloques = blks; s.duracion = total; s.intensidad = intensidad;
+    cardioEditIdx = -1;
+  } else {
+    db.sesiones.push({
+      id: String(Date.now()), fecha: fecha,
+      nombre: 'Cardio', tipo: 'cardio',
+      bloques: blks, duracion: total, intensidad: intensidad,
+      ejercicios: []
+    });
+  }
+  db.sesiones.sort((a,b) => (a.fecha < b.fecha ? -1 : a.fecha > b.fecha ? 1 : 0));
+  saveDB();
+  closeOv('ov-cardio');
+  renderHome();
+  gdAutoSave().catch(() => {});
+  toast('\U0001F3CB\uFE0F Cardio guardado — ' + total + ' min');
+}
+
+function deleteCardio() {
+  if (cardioEditIdx < 0) return;
+  db.sesiones.splice(cardioEditIdx, 1);
+  cardioEditIdx = -1;
+  saveDB();
+  closeOv('ov-cardio');
+  renderHome();
+  gdAutoSave().catch(() => {});
+  toast('Sesión eliminada');
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // RUTINAS SYSTEM
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1084,6 +1294,24 @@ function renderSessions() {
   const sorted = db.sesiones.map((s,i)=>({...s,_i:i})).reverse();
   let html = `<div class="list-label">Sesiones</div>`;
   sorted.forEach(s => {
+    if (s.tipo === 'cardio') {
+      const blks = s.bloques || [];
+      const intLabel = {'suave':'Suave','moderada':'Moderada','intensa':'Intensa'}[s.intensidad] || 'Moderada';
+      const intCls = 'int-' + (s.intensidad || 'moderada');
+      const resumen = blks.map(b => `${cardioEmoji(b.maq)} ${esc(b.maq)} ${b.min}'`).join('  ·  ');
+      html += `<div class="card">
+        <div class="card-main" data-open-ses="${s._i}">
+          <div class="card-info">
+            <div class="card-date">${fmtDate(s.fecha)}</div>
+            <div class="card-name">🏋️ Cardio</div>
+            <div class="card-meta">${s.duracion || 0} min · ${blks.length} bloque${blks.length!==1?'s':''} &nbsp;<span class="int-badge ${intCls}">${intLabel}</span></div>
+            <div class="card-sub">${resumen}</div>
+          </div>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--mut)" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+      </div>`;
+      return;
+    }
     if (s.tipo === 'actividad') {
       const emoji = ACT_EMOJIS[s.nombre] || '⚡';
       const intLabel = {'suave':'Suave','moderada':'Moderada','intensa':'Intensa'}[s.intensidad] || 'Moderada';
@@ -1154,6 +1382,7 @@ function newSes() {
 
 function openSes(idx) {
   const s = db.sesiones[idx];
+  if (s && s.tipo === 'cardio') { openCardioEdit(idx); return; }
   if (s && s.tipo === 'actividad') { openActivityEdit(idx); return; }
   sesIdx = idx;
   ses = JSON.parse(JSON.stringify(db.sesiones[idx]));
