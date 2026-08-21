@@ -409,7 +409,7 @@
     <div class="hdr-logo" style="display:flex;align-items:baseline;gap:8px">
       <span>INDAR<span style="color:var(--acc)">-BI</span></span>
       <span style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut)">Gym Tracker</span>
-      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:0">v19</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:0">v20</span>
     </div>
     <div style="flex:1"></div>
     <button id="btn-user" onclick="gdUserTap()" style="display:flex;align-items:center;gap:7px;padding:6px 12px 6px 10px;background:var(--s2);border:1px solid var(--b);border-radius:20px;cursor:pointer;transition:all .2s">
@@ -917,10 +917,10 @@ function saveActivity() {
 
 // ─── CARDIO MIXTO ─────────────────────────────────────────────────────────────
 const CARDIO_MAQ = [
-  ['Cinta','\U0001F3C3'], ['Caminar','\U0001F6B6'], ['Bici estática','\U0001F6B4'],
-  ['Elíptica','\U0001F300'], ['Escaleras','\U0001FA9C'], ['Remo','\U0001F6A3'], ['Airbike','\U0001F4A8']
+  ['Cinta','🏃'], ['Caminar','🚶'], ['Bici estática','🚴'],
+  ['Elíptica','🌀'], ['Escaleras','🪜'], ['Remo','🚣'], ['Airbike','💨']
 ];
-const CARDIO_INT_LBL = { suave:'\U0001F60C Suave', moderada:'\U0001F4AA Mod', intensa:'\U0001F525 Intensa' };
+const CARDIO_INT_LBL = { suave:'😌 Suave', moderada:'💪 Mod', intensa:'🔥 Intensa' };
 let cardioBlks = [];
 let cardioEditIdx = -1;
 
@@ -1054,7 +1054,7 @@ function saveCardio() {
   closeOv('ov-cardio');
   renderHome();
   gdAutoSave().catch(() => {});
-  toast('\U0001F3CB\uFE0F Cardio guardado — ' + total + ' min');
+  toast('🏋️ Cardio guardado — ' + total + ' min');
 }
 
 function deleteCardio() {
