@@ -271,6 +271,7 @@
     .hiit-cfg .serie-input { width:100%; min-width:0; font-size:19px; padding:6px 2px; }
     .hiit-cfg .iv-select { width:100%; min-width:0; flex:none; border:none; border-radius:0; background:none; }
     .hiit-movs { padding:2px 13px 4px; }
+    .hiit-prev { padding:0 13px 11px; }
     .hiit-mov { display:flex; align-items:center; gap:9px; padding:9px 0; border-bottom:1px solid var(--b); }
     .hiit-mov:last-child { border-bottom:none; }
     .hiit-mov-dot { width:5px; height:5px; border-radius:50%; background:var(--acc); flex-shrink:0; }
@@ -1450,10 +1451,15 @@ function repeatSes(idx) {
         : { reps:'', kg:'', prev:{ reps:s.reps, kg:s.kg } })
       };
       if (n.modo === 'tabata') {
-        n.movimientos = (e.movimientos||[]).map(mv => {
-          const o = normMov(mv);
-          return { n:o.n, kg:o.kg, prevKg:o.kg };
-        });
+        if (isBlockEx(e.nombre)) {
+          n.movimientos = (e.movimientos||[]).map(mv => {
+            const o = normMov(mv);
+            return { n:o.n, kg:o.kg, prevKg:o.kg };
+          });
+        } else {
+          n.kg = e.kg!==undefined ? e.kg : '';
+          n.prevKg = n.kg;
+        }
         n.rondas = e.rondas!==undefined ? e.rondas : '';
         n.ivOn   = e.ivOn!==undefined ? e.ivOn : '';
         n.ivOff  = e.ivOff!==undefined ? e.ivOff : '';
@@ -1508,7 +1514,11 @@ function commitSave(exiting = false) {
   if (!ses) return;
   // A series counts as "real" only if it has actual logged values (not just prev refs)
   const hasData = ses.ejercicios.some(e => {
-    if (e.modo === 'tabata') return (e.movimientos && e.movimientos.length > 0);
+    if (e.modo === 'tabata') {
+      if (isBlockEx(e.nombre)) return (e.movimientos && e.movimientos.length > 0);
+      return (e.rondas!==''&&e.rondas!==undefined) || (e.kg!==''&&e.kg!==undefined)
+          || (e.ivOn!==''&&e.ivOn!==undefined);
+    }
     return (e.series||[]).some(s =>
       (s.reps!==''&&s.reps!==undefined) || (s.kg!==''&&s.kg!==undefined) ||
       (s.rondas!==''&&s.rondas!==undefined) || (s.seg!==''&&s.seg!==undefined)
@@ -1607,7 +1617,8 @@ function buildExBlock(ex, ei) {
 
   if (isTabata) {
     // ── HIIT BLOCK: intervalo + rondas comunes + lista de movimientos ──
-    normBlock(ex);
+    const esBloque = isBlockEx(ex.nombre);
+    if (esBloque) normBlock(ex);
     const PRESETS = [[20,10],[30,15],[40,20],[60,30]];
     const curSeg = ex.ivOn!==undefined&&ex.ivOn!==''?+ex.ivOn:null;
     const curOff = ex.ivOff!==undefined&&ex.ivOff!==''?+ex.ivOff:null;
@@ -1616,7 +1627,7 @@ function buildExBlock(ex, ei) {
     const opts = PRESETS.map(([a,b])=>
       `<option value="${a}-${b}" ${curSeg===a&&curOff===b?'selected':''}>${a}/${b}</option>`
     ).join('') + `<option value="m-m" ${manual?'selected':''}>Manual</option>`;
-    const movs = (ex.movimientos||[]).map((mv,mi)=>
+    const movs = !esBloque ? '' : (ex.movimientos||[]).map((mv,mi)=>
       `<div class="hiit-mov">
         <span class="hiit-mov-dot"></span>
         <span class="hiit-mov-name">${esc(mv.n)}</span>
@@ -1643,6 +1654,12 @@ function buildExBlock(ex, ei) {
             value="${ex.rondas!==undefined&&ex.rondas!==''?ex.rondas:''}" placeholder="8"
             data-block-rondas="${ei}">
         </div>
+        ${esBloque?'':`<div class="serie-field" style="max-width:82px">
+          <label>Kg</label>
+          <input class="serie-input" type="number" inputmode="decimal" min="0" step="0.5"
+            value="${ex.kg!==undefined&&ex.kg!==''?ex.kg:''}" placeholder="–"
+            data-block-kg="${ei}">
+        </div>`}
         ${manual?`<div class="serie-field" style="max-width:64px"><label>ON</label>
           <input class="serie-input" type="number" inputmode="numeric" min="0" step="5"
             value="${curSeg!==null?curSeg:''}" placeholder="seg" data-block-on="${ei}"></div>
@@ -1650,11 +1667,11 @@ function buildExBlock(ex, ei) {
           <input class="serie-input" type="number" inputmode="numeric" min="0" step="5"
             value="${curOff!==null?curOff:''}" placeholder="seg" data-block-off="${ei}"></div>`:''}
       </div>
-      <div class="hiit-movs">${movs || '<div class="hiit-empty">Añade los ejercicios del bloque</div>'}</div>
+      ${esBloque?`<div class="hiit-movs">${movs || '<div class="hiit-empty">Añade los ejercicios del bloque</div>'}</div>
       <button class="hiit-add" data-add-mov="${ei}">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
         Añadir ejercicio al bloque
-      </button>`;
+      </button>`:`${ex.prevKg!==undefined&&ex.prevKg!==''?`<div class="hiit-prev"><span class="prev-tag">Última vez: ${ex.prevKg} kg</span></div>`:''}`}`;
   } else {
     // ── REPS / TIEMPO: series normales ──
     let serHTML = '';
@@ -1756,13 +1773,22 @@ let pickerHiitEi = null;
 function setExModo(ei, modo) {
   const ex = ses.ejercicios[ei];
   ex.modo = (modo === 'tabata' || modo === 'tiempo') ? modo : 'reps';
-  if (ex.modo === 'tabata') normBlock(ex);
-  if (ex.modo === 'tabata' && !ex.movimientos) {
-    // Initialize HIIT block; migrate old-style series if any
-    ex.movimientos = [];
+  if (ex.modo === 'tabata') {
+    const esBloque = isBlockEx(ex.nombre);
     ex.rondas = ex.rondas || '';
     ex.ivOn = ex.ivOn || '';
     ex.ivOff = ex.ivOff || '';
+    if (esBloque) {
+      normBlock(ex);
+      if (!ex.movimientos) ex.movimientos = [];
+    } else {
+      // HIIT de un solo ejercicio: peso propio, sin lista de movimientos
+      delete ex.movimientos;
+      if (ex.kg === undefined) {
+        const last = (ex.series||[]).slice().reverse().find(s => s && s.kg!=='' && s.kg!==undefined);
+        ex.kg = last ? last.kg : '';
+      }
+    }
   }
   autosave(); renderSession();
 }
@@ -1812,6 +1838,8 @@ document.getElementById('ses-scroll').addEventListener('change', e => {
   if (bOn) { ses.ejercicios[+bOn.dataset.blockOn].ivOn = bOn.value===''?'':parseFloat(bOn.value); autosave(); return; }
   const bOff = e.target.closest('[data-block-off]');
   if (bOff) { ses.ejercicios[+bOff.dataset.blockOff].ivOff = bOff.value===''?'':parseFloat(bOff.value); autosave(); return; }
+  const bKg = e.target.closest('[data-block-kg]');
+  if (bKg) { ses.ejercicios[+bKg.dataset.blockKg].kg = bKg.value===''?'':parseFloat(bKg.value); autosave(); return; }
   const mKg = e.target.closest('[data-mov-kg]');
   if (mKg) {
     const [ei,mi] = mKg.dataset.movKg.split('-').map(Number);
