@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B1620">
+<title>Contracciones</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --deep:#0B1620;
+  --surface:#132530;
+  --surface-2:#1B333F;
+  --line:#25454F;
+  --foam:#E9F3F0;
+  --mute:#8FAAB2;
+  --wave:#4FB3A5;
+  --swell:#F2C14E;
+  --signal:#F25F8B;
+  --display:"Bricolage Grotesque",system-ui,-apple-system,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--deep);
+  color:var(--foam);
+  font-family:var(--body);
+  -webkit-font-smoothing:antialiased;
+  padding:20px 18px calc(190px + env(safe-area-inset-bottom));
+  max-width:640px;
+  margin:0 auto;
+}
+.eyebrow{
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color:var(--mute);
+  margin:0 0 6px;
+}
+.status{
+  font-family:var(--display);
+  font-weight:800;
+  font-size:30px;
+  line-height:1.1;
+  letter-spacing:-.02em;
+  margin:0 0 20px;
+}
+.status-on{color:var(--swell)}
+
+/* Firma: tira de ritmo de la última hora */
+.strip-wrap{margin:0 0 22px}
+.strip{
+  position:relative;
+  height:70px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:10px;
+  overflow:hidden;
+}
+.block{
+  position:absolute;
+  top:0;
+  bottom:0;
+  background:var(--wave);
+  border-radius:3px;
+  min-width:3px;
+}
+.block-live{background:var(--swell)}
+.tick{position:absolute;top:0;bottom:0;width:1px;background:var(--line)}
+.strip-legend{
+  display:flex;
+  justify-content:space-between;
+  font-family:var(--mono);
+  font-size:10.5px;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--mute);
+  margin-top:7px;
+}
+
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 20px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 10px}
+.stat-label{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);display:block;margin-bottom:6px}
+.stat-value{font-family:var(--mono);font-size:20px;font-weight:600;font-variant-numeric:tabular-nums}
+
+.rule{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 15px;margin:0 0 22px}
+.rule-on{border-color:var(--signal);background:rgba(242,95,139,.1)}
+.rule-title{font-family:var(--display);font-weight:700;font-size:16px;margin:0 0 10px}
+.check{display:flex;align-items:baseline;gap:9px;font-size:13.5px;color:var(--mute);padding:3px 0}
+.check-mark{font-family:var(--mono);font-size:13px;color:var(--mute);width:14px;flex:none}
+.check-yes .check-mark{color:var(--wave)}
+.check-yes{color:var(--foam)}
+.check-num{font-family:var(--mono);margin-left:auto;font-variant-numeric:tabular-nums;color:var(--foam)}
+.rule-note{font-size:12.5px;line-height:1.5;color:var(--mute);margin:10px 0 0}
+.rule-go{font-family:var(--display);font-weight:800;font-size:17px;color:var(--signal);margin:10px 0 0}
+
+.list-head{display:flex;align-items:baseline;justify-content:space-between;border-top:1px solid var(--line);padding-top:16px;margin-bottom:4px}
+.list-head h2{font-family:var(--display);font-weight:700;font-size:17px;margin:0}
+.count{font-family:var(--mono);font-size:12px;color:var(--mute)}
+.row{
+  display:grid;
+  grid-template-columns:62px 1fr 1fr 30px;
+  align-items:center;
+  gap:8px;
+  padding:11px 0;
+  border-bottom:1px solid var(--line);
+  font-family:var(--mono);
+  font-size:14px;
+  font-variant-numeric:tabular-nums;
+}
+.row-head{
+  font-size:10px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--mute);
+  padding:6px 0;
+  border-bottom:1px solid var(--line);
+}
+.cell-dur{color:var(--swell)}
+.cell-int{color:var(--wave)}
+.cell-int-slow{color:var(--mute)}
+.del{background:none;border:0;color:var(--mute);font-size:17px;line-height:1;padding:6px;cursor:pointer;border-radius:6px}
+.del:hover{color:var(--signal)}
+.empty{color:var(--mute);font-size:14px;line-height:1.6;padding:18px 0}
+
+.tools{display:flex;gap:8px;margin-top:20px}
+.tool{
+  flex:1;
+  background:none;
+  border:1px solid var(--line);
+  color:var(--mute);
+  font-family:var(--body);
+  font-size:13px;
+  padding:11px 8px;
+  border-radius:9px;
+  cursor:pointer;
+}
+.tool:hover{color:var(--foam);border-color:var(--mute)}
+
+.dock{
+  position:fixed;
+  left:0;right:0;bottom:0;
+  padding:14px 18px calc(16px + env(safe-area-inset-bottom));
+  background:linear-gradient(to top,var(--deep) 62%,rgba(11,22,32,0));
+  display:flex;
+  justify-content:center;
+}
+.trigger{
+  width:100%;
+  max-width:604px;
+  height:118px;
+  border:0;
+  border-radius:16px;
+  background:var(--wave);
+  color:#06231F;
+  font-family:var(--display);
+  font-weight:800;
+  font-size:23px;
+  letter-spacing:-.01em;
+  cursor:pointer;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  transition:background .15s ease,transform .08s ease;
+}
+.trigger:active{transform:scale(.985)}
+.trigger-on{background:var(--swell);color:#2B1D00}
+.trigger-clock{font-family:var(--mono);font-size:32px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+:focus-visible{outline:2px solid var(--foam);outline-offset:3px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<p class="eyebrow">Registro de contracciones</p>
+<h1 class="status" id="status">Sin contracciones todavía</h1>
+
+<div class="strip-wrap">
+  <div class="strip" id="strip"></div>
+  <div class="strip-legend"><span>Hace 1 h</span><span>Ahora</span></div>
+</div>
+
+<div class="stats">
+  <div class="stat"><span class="stat-label">Última</span><span class="stat-value" id="s-last">—</span></div>
+  <div class="stat"><span class="stat-label">Frecuencia</span><span class="stat-value" id="s-freq">—</span></div>
+  <div class="stat"><span class="stat-label">En 1 h</span><span class="stat-value" id="s-hour">0</span></div>
+</div>
+
+<div class="rule" id="rule">
+  <p class="rule-title">Regla 5-1-1</p>
+  <div class="check" id="c-freq"><span class="check-mark">○</span><span>Cada 5 minutos o menos</span><span class="check-num" id="n-freq">—</span></div>
+  <div class="check" id="c-dur"><span class="check-mark">○</span><span>Duran 1 minuto o más</span><span class="check-num" id="n-dur">—</span></div>
+  <div class="check" id="c-span"><span class="check-mark">○</span><span>Así desde hace 1 hora</span><span class="check-num" id="n-span">—</span></div>
+  <p class="rule-go" id="rule-go" hidden>Patrón 5-1-1 cumplido: llama al hospital.</p>
+  <p class="rule-note">Orientativo. Manda lo que os haya dicho vuestra matrona. Llamad ya, sin mirar el reloj, si rompe aguas (sobre todo si el líquido no es transparente), hay sangrado, fiebre o el bebé se mueve menos de lo normal.</p>
+</div>
+
+<div class="list-head">
+  <h2>Listado</h2>
+  <span class="count" id="count"></span>
+</div>
+<div class="row row-head"><span>Inicio</span><span>Duración</span><span>Intervalo</span><span></span></div>
+<div id="list"></div>
+
+<div class="tools">
+  <button class="tool" id="copy">Copiar resumen</button>
+  <button class="tool" id="clear">Borrar todo</button>
+</div>
+
+<div class="dock">
+  <button class="trigger" id="trigger">
+    <span id="trigger-label">Empieza la contracción</span>
+    <span class="trigger-clock" id="trigger-clock" hidden>0:00</span>
+  </button>
+</div>
+
+<script>
+// ---- Almacenamiento (persiste si el navegador lo permite; si no, en memoria) ----
+var mem = {};
+var store = {
+  get: function(k){ try { return localStorage.getItem(k); } catch(e){ return mem[k] || null; } },
+  set: function(k,v){ try { localStorage.setItem(k,v); } catch(e){ mem[k]=v; } }
+};
+
+var KEY = 'contracciones.v1';
+var KEY_ACTIVE = 'contracciones.activa';
+
+var entries = [];
+var activeStart = null;
+try { entries = JSON.parse(store.get(KEY) || '[]'); } catch(e){ entries = []; }
+var a = store.get(KEY_ACTIVE);
+if (a) { activeStart = parseInt(a,10) || null; }
+
+function save(){
+  store.set(KEY, JSON.stringify(entries));
+  store.set(KEY_ACTIVE, activeStart ? String(activeStart) : '');
+}
+
+// ---- Formato ----
+function clock(ms){
+  var s = Math.max(0, Math.round(ms/1000));
+  return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
+}
+function hhmm(ts){
+  var d = new Date(ts);
+  return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+
+// ---- Botón ----
+var trigger = document.getElementById('trigger');
+var triggerLabel = document.getElementById('trigger-label');
+var triggerClock = document.getElementById('trigger-clock');
+var wake = null;
+
+function toggle(){
+  if (activeStart){
+    var end = Date.now();
+    if (end - activeStart > 3000) { entries.push({start:activeStart, end:end}); }
+    activeStart = null;
+    releaseWake();
+  } else {
+    activeStart = Date.now();
+    requestWake();
+  }
+  save();
+  render();
+}
+trigger.addEventListener('click', toggle);
+document.addEventListener('keydown', function(e){
+  if (e.code === 'Space' && e.target === document.body){ e.preventDefault(); toggle(); }
+});
+
+function requestWake(){
+  try { if (navigator.wakeLock) { navigator.wakeLock.request('screen').then(function(w){ wake = w; }).catch(function(){}); } } catch(e){}
+}
+function releaseWake(){
+  try { if (wake) { wake.release(); wake = null; } } catch(e){}
+}
+
+// ---- Cálculos ----
+function intervalOf(i){
+  if (i === 0) return null;
+  return entries[i].start - entries[i-1].start;
+}
+function lastHour(){
+  var cut = Date.now() - 3600000;
+  return entries.filter(function(e){ return e.start >= cut; });
+}
+
+// ---- Pintado ----
+function renderStrip(){
+  var strip = document.getElementById('strip');
+  var now = Date.now();
+  var from = now - 3600000;
+  var html = '';
+  for (var t = 1; t <= 5; t++){
+    html += '<div class="tick" style="left:' + (t*100/6) + '%"></div>';
+  }
+  var all = entries.slice();
+  if (activeStart) all.push({start:activeStart, end:now, live:true});
+  all.forEach(function(e){
+    if (e.end < from) return;
+    var s = Math.max(e.start, from);
+    var left = (s - from) / 3600000 * 100;
+    var width = (e.end - s) / 3600000 * 100;
+    html += '<div class="block' + (e.live ? ' block-live' : '') + '" style="left:' + left + '%;width:' + width + '%"></div>';
+  });
+  strip.innerHTML = html;
+}
+
+function renderList(){
+  var list = document.getElementById('list');
+  document.getElementById('count').textContent = entries.length ? entries.length + ' registradas' : '';
+  if (!entries.length){
+    list.innerHTML = '<p class="empty">Pulsa el botón grande cuando empiece una contracción y vuelve a pulsarlo cuando termine.</p>';
+    return;
+  }
+  var html = '';
+  for (var i = entries.length - 1; i >= 0; i--){
+    var e = entries[i];
+    var iv = intervalOf(i);
+    var ivClass = (iv !== null && iv <= 300000) ? 'cell-int' : 'cell-int-slow';
+    html += '<div class="row">' +
+      '<span>' + hhmm(e.start) + '</span>' +
+      '<span class="cell-dur">' + clock(e.end - e.start) + '</span>' +
+      '<span class="' + ivClass + '">' + (iv === null ? '—' : clock(iv)) + '</span>' +
+      '<button class="del" data-i="' + i + '" aria-label="Borrar contracción de las ' + hhmm(e.start) + '">×</button>' +
+      '</div>';
+  }
+  list.innerHTML = html;
+  Array.prototype.forEach.call(list.querySelectorAll('.del'), function(b){
+    b.addEventListener('click', function(){
+      entries.splice(parseInt(b.dataset.i,10), 1);
+      save(); render();
+    });
+  });
+}
+
+function renderStats(){
+  var last = entries[entries.length-1];
+  document.getElementById('s-last').textContent = last ? clock(last.end - last.start) : '—';
+  var lastIv = entries.length > 1 ? intervalOf(entries.length-1) : null;
+  document.getElementById('s-freq').textContent = lastIv === null ? '—' : clock(lastIv);
+  document.getElementById('s-hour').textContent = String(lastHour().length);
+}
+
+function renderRule(){
+  var win = lastHour();
+  var avgDur = null, avgIv = null, spanMin = 0;
+  if (win.length){
+    avgDur = win.reduce(function(a,e){ return a + (e.end - e.start); }, 0) / win.length;
+  }
+  var ivs = [];
+  for (var i = 1; i < entries.length; i++){
+    if (entries[i].start >= Date.now() - 3600000) ivs.push(intervalOf(i));
+  }
+  if (ivs.length) avgIv = ivs.reduce(function(a,b){ return a+b; },0) / ivs.length;
+
+  // Racha: hacia atrás mientras se mantengan intervalo <= 5 min y duración >= 1 min
+  if (entries.length){
+    var j = entries.length - 1;
+    var lastEnd = entries[j].end;
+    if (Date.now() - lastEnd <= 600000 || activeStart){
+      while (j > 0){
+        var iv = intervalOf(j);
+        if (iv > 300000 || (entries[j].end - entries[j].start) < 60000) break;
+        j--;
+      }
+      spanMin = (Date.now() - entries[j].start) / 60000;
+    }
+  }
+
+  var okFreq = avgIv !== null && avgIv <= 300000;
+  var okDur = avgDur !== null && avgDur >= 60000;
+  var okSpan = spanMin >= 60;
+
+  function mark(id, ok, text){
+    var el = document.getElementById(id);
+    el.classList.toggle('check-yes', ok);
+    el.querySelector('.check-mark').textContent = ok ? '✓' : '○';
+    el.querySelector('.check-num').textContent = text;
+  }
+  mark('c-freq', okFreq, avgIv === null ? '—' : clock(avgIv));
+  mark('c-dur', okDur, avgDur === null ? '—' : clock(avgDur));
+  mark('c-span', okSpan, entries.length ? Math.floor(spanMin) + ' min' : '—');
+
+  var all = okFreq && okDur && okSpan;
+  document.getElementById('rule').classList.toggle('rule-on', all);
+  document.getElementById('rule-go').hidden = !all;
+}
+
+function renderTrigger(){
+  var status = document.getElementById('status');
+  if (activeStart){
+    trigger.classList.add('trigger-on');
+    triggerLabel.textContent = 'Termina la contracción';
+    triggerClock.hidden = false;
+    triggerClock.textContent = clock(Date.now() - activeStart);
+    status.textContent = 'Contracción en curso desde las ' + hhmm(activeStart);
+    status.classList.add('status-on');
+  } else {
+    trigger.classList.remove('trigger-on');
+    triggerLabel.textContent = 'Empieza la contracción';
+    triggerClock.hidden = true;
+    status.classList.remove('status-on');
+    if (!entries.length){
+      status.textContent = 'Sin contracciones todavía';
+    } else {
+      var last = entries[entries.length-1];
+      status.textContent = 'Última hace ' + clock(Date.now() - last.end);
+    }
+  }
+}
+
+function render(){
+  renderTrigger();
+  renderStrip();
+  renderStats();
+  renderRule();
+  renderList();
+}
+
+// ---- Herramientas ----
+document.getElementById('copy').addEventListener('click', function(){
+  if (!entries.length) return;
+  var txt = entries.map(function(e,i){
+    var iv = intervalOf(i);
+    return hhmm(e.start) + ' · dura ' + clock(e.end - e.start) + ' · cada ' + (iv === null ? '—' : clock(iv));
+  }).join('\n');
+  var btn = this;
+  function done(){ btn.textContent = 'Copiado'; setTimeout(function(){ btn.textContent = 'Copiar resumen'; }, 1800); }
+  try {
+    navigator.clipboard.writeText(txt).then(done, function(){ window.prompt('Copia el resumen:', txt); });
+  } catch(e){ window.prompt('Copia el resumen:', txt); }
+});
+
+document.getElementById('clear').addEventListener('click', function(){
+  if (!entries.length && !activeStart) return;
+  if (window.confirm('¿Borrar todas las contracciones registradas?')){
+    entries = []; activeStart = null; save(); render();
+  }
+});
+
+render();
+setInterval(function(){
+  renderTrigger();
+  renderStrip();
+  renderStats();
+  renderRule();
+}, 1000);
+</script>
+</body>
+</html>
