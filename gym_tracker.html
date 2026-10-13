@@ -286,6 +286,8 @@
     .modo-btn.sel { background:var(--acc); color:#000; }
     .serie-row { display:flex; align-items:center; gap:7px; flex-wrap:wrap;
       padding:8px 13px; border-bottom:1px solid var(--b); }
+    .prev-fill { cursor:pointer; text-decoration:underline dotted; text-underline-offset:2px; -webkit-tap-highlight-color:transparent; }
+    .prev-fill:active { color:var(--acc); }
     .prev-tag { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--mut);
       background:var(--s2); padding:2px 6px; border-radius:4px; white-space:nowrap;
       letter-spacing:.02em; flex-shrink:0; }
@@ -1684,7 +1686,7 @@ function buildExBlock(ex, ei) {
               value="${s.kg!==''&&s.kg!==undefined?s.kg:''}" placeholder="${p.kg!==undefined&&p.kg!==''?p.kg:'—'}"
               data-ei="${ei}" data-si="${si}" data-f="kg">
           </div>
-          ${(p.seg||p.kg)?`<span class="prev-tag">ant. ${p.seg||'·'}s${p.kg!==undefined&&p.kg!==''?' · '+p.kg+'kg':''}</span>`:''}
+          ${(p.seg||p.kg)?`<span class="prev-tag prev-fill" data-fill-prev="${ei}-${si}">ant. ${p.seg||'·'}s${p.kg!==undefined&&p.kg!==''?' · '+p.kg+'kg':''}</span>`:''}
           <button class="serie-del" data-del-serie="${ei}-${si}">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
           </button>
@@ -1704,7 +1706,7 @@ function buildExBlock(ex, ei) {
               value="${s.kg!==''&&s.kg!==undefined?s.kg:''}" placeholder="${p.kg!==undefined&&p.kg!==''?p.kg:'—'}"
               data-ei="${ei}" data-si="${si}" data-f="kg">
           </div>
-          ${(p.reps||p.kg)?`<span class="prev-tag">ant. ${p.reps||'·'}×${p.kg!==undefined&&p.kg!==''?p.kg+'kg':'·'}</span>`:''}
+          ${(p.reps||p.kg)?`<span class="prev-tag prev-fill" data-fill-prev="${ei}-${si}">ant. ${p.reps||'·'}×${p.kg!==undefined&&p.kg!==''?p.kg+'kg':'·'}</span>`:''}
           <button class="serie-del" data-del-serie="${ei}-${si}">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
           </button>
@@ -1750,6 +1752,8 @@ document.getElementById('ses-scroll').addEventListener('click', e => {
   const delEx    = e.target.closest('[data-del-ex]');
   const addMov   = e.target.closest('[data-add-mov]');
   const delMov   = e.target.closest('[data-del-mov]');
+  const fillPrev = e.target.closest('[data-fill-prev]');
+  if (fillPrev) { const [ei,si]=fillPrev.dataset.fillPrev.split('-').map(Number); fillFromPrev(ei,si); return; }
   if (modoBtn)  { const [m,ei]=modoBtn.dataset.modo.split('-'); setExModo(+ei, m); return; }
   if (addMov)   { pickerCtx='hiit-mov'; pickerHiitEi=+addMov.dataset.addMov; openPicker(null); return; }
   if (delMov)   { const [ei,mi]=delMov.dataset.delMov.split('-').map(Number); removeMov(ei,mi); return; }
@@ -1761,6 +1765,15 @@ document.getElementById('ses-scroll').addEventListener('click', e => {
 });
 
 let pickerHiitEi = null;
+
+function fillFromPrev(ei, si) {
+  const s = ses.ejercicios[ei] && ses.ejercicios[ei].series[si];
+  if (!s || !s.prev) return;
+  ['reps','seg','kg'].forEach(f => {
+    if (f in s && s.prev[f] !== undefined && s.prev[f] !== '') s[f] = s.prev[f];
+  });
+  autosave(); renderSession();
+}
 
 function setExModo(ei, modo) {
   const ex = ses.ejercicios[ei];
