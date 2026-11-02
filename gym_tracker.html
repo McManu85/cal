@@ -441,7 +441,7 @@
     <div class="hdr-logo" style="display:flex;align-items:baseline;gap:8px">
       <span>INDAR<span style="color:var(--acc)">-BI</span></span>
       <span style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut)">Gym Tracker</span>
-      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:0">v22</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:0">v23</span>
     </div>
     <div style="flex:1"></div>
     <button id="btn-user" onclick="gdUserTap()" style="display:flex;align-items:center;gap:7px;padding:6px 12px 6px 10px;background:var(--s2);border:1px solid var(--b);border-radius:20px;cursor:pointer;transition:all .2s">
@@ -769,11 +769,19 @@ function normBlock(ex) {
   return ex;
 }
 
+// Renombrados de catálogo: unifica nombres antiguos en todo el historial
+const EX_RENAMES = { 'Face pulls':'Face pull' };
+function renameEx(o) {
+  if (Array.isArray(o)) { for (let i = 0; i < o.length; i++) { if (typeof o[i] === 'string' && EX_RENAMES[o[i]]) o[i] = EX_RENAMES[o[i]]; else if (o[i] && typeof o[i] === 'object') renameEx(o[i]); } }
+  else if (o && typeof o === 'object') { for (const k in o) { const v = o[k]; if (typeof v === 'string' && EX_RENAMES[v]) o[k] = EX_RENAMES[v]; else if (v && typeof v === 'object') renameEx(v); } }
+  return o;
+}
+
 const PREDEFINED = [
   ...BLOCK_EXERCISES,
   'Press banca','Press inclinado','Press declinado','Aperturas cable','Fondos pecho','Fondos lastrados',
   'Press militar','Press Arnold','Push press','Elevaciones laterales','Elevaciones frontales',
-  'Pájaros','Face pulls',
+  'Pájaros','Face pull',
   'Pull over mancuerna','Pull over polea','Press banca mancuernas','Press inclinado mancuernas','Press landmine','Pike push-ups','Handstand push-up progresión','Fondos anillas',
   'Plyo push-ups','Push-ups explosivos',
   'Muscle-up progresión',
@@ -829,6 +837,7 @@ function loadDB() {
     const raw = localStorage.getItem(LS);
     if (raw) {
       const p = JSON.parse(raw);
+      renameEx(p);
       p.ejercicios_predefinidos = [...new Set([...PREDEFINED, ...(p.ejercicios_predefinidos||[])])];
       p.plantillas = p.plantillas || [];
       return p;
@@ -2244,6 +2253,7 @@ document.getElementById('file-import').addEventListener('change', e => {
       const p = JSON.parse(ev.target.result);
       if (p.sesiones) {
         db = p;
+        renameEx(db);
         db.ejercicios_predefinidos = [...new Set([...PREDEFINED,...(db.ejercicios_predefinidos||[])])];
         db.plantillas = db.plantillas || [];
         saveDB(); renderHome(); toast('Datos importados');
@@ -2343,6 +2353,7 @@ async function gdRefresh() {
         const localTime = db.last_modified  || 0;
         if (driveTime > localTime) {
           db = data;
+          renameEx(db);
           db.ejercicios_predefinidos = [...new Set([...PREDEFINED,...(db.ejercicios_predefinidos||[])])];
           db.plantillas = db.plantillas || [];
           if (!db.rutinas) initRutinas();
@@ -2546,6 +2557,7 @@ async function gdAutoLoad() {
     const localTime = db.last_modified  || 0;
     if (driveTime > localTime) {
       db = data;
+      renameEx(db);
       db.ejercicios_predefinidos = [...new Set([...PREDEFINED,...(db.ejercicios_predefinidos||[])])];
       db.plantillas = db.plantillas || [];
       if (!db.rutinas) initRutinas();
@@ -2588,6 +2600,7 @@ async function gdLoad() {
     const data = await res.json();
     if (data.sesiones) {
       db = data;
+      renameEx(db);
       db.ejercicios_predefinidos = [...new Set([...PREDEFINED, ...(db.ejercicios_predefinidos || [])])];
       db.plantillas = db.plantillas || [];
       if (!db.rutinas) initRutinas();
