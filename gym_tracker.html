@@ -328,6 +328,15 @@
       display:flex; align-items:center; justify-content:center; gap:8px; }
     .btn-add-ex:active { background:var(--acc2); border-style:solid; }
 
+
+    /* ── DRAG & DROP ORDEN ───────────── */
+    .drag-h { display:flex; align-items:center; justify-content:center; width:24px; height:32px; margin:-6px -4px -6px -6px;
+      color:var(--mut); touch-action:none; cursor:grab; flex:none; }
+    .ex-hdr, .tpl-ex-row { -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }
+    .sorting .ex-block > :not(.ex-hdr) { display:none; }
+    .sorting .ex-hdr { border-bottom:none; }
+    .sort-dragging { position:relative; z-index:50; border-color:var(--acc) !important; background:var(--s1);
+      box-shadow:0 10px 28px rgba(0,0,0,.35); opacity:.97; transition:none !important; }
     /* ── PLANTILLA EDITOR (screen) ───────────── */
     .tpl-ex-row { display:flex; align-items:center; gap:10px;
       padding:13px 14px; border-bottom:1px solid var(--b); }
@@ -432,7 +441,7 @@
     <div class="hdr-logo" style="display:flex;align-items:baseline;gap:8px">
       <span>INDAR<span style="color:var(--acc)">-BI</span></span>
       <span style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut)">Gym Tracker</span>
-      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:0">v21</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:0">v22</span>
     </div>
     <div style="flex:1"></div>
     <button id="btn-user" onclick="gdUserTap()" style="display:flex;align-items:center;gap:7px;padding:6px 12px 6px 10px;background:var(--s2);border:1px solid var(--b);border-radius:20px;cursor:pointer;transition:all .2s">
@@ -1736,6 +1745,7 @@ function buildExBlock(ex, ei) {
 
   div.innerHTML = `
     <div class="ex-hdr">
+      <span class="drag-h" title="Mantén y arrastra"><svg width="10" height="16" viewBox="0 0 10 16" fill="currentColor"><circle cx="2" cy="2" r="1.6"/><circle cx="8" cy="2" r="1.6"/><circle cx="2" cy="8" r="1.6"/><circle cx="8" cy="8" r="1.6"/><circle cx="2" cy="14" r="1.6"/><circle cx="8" cy="14" r="1.6"/></svg></span>
       <button class="ex-name" data-rename="${ei}">${esc(ex.nombre)} <span>▾</span></button>
       <div class="modo-toggle">
         <button class="modo-btn ${(!isTabata&&!isTiempo)?'sel':''}" data-modo="reps-${ei}">Reps</button>
@@ -1935,6 +1945,7 @@ function renderTplEdit() {
   }
   c.innerHTML = tpl.ejercicios.map((n,i) => `
     <div class="tpl-ex-row">
+      <span class="drag-h" title="Mantén y arrastra"><svg width="10" height="16" viewBox="0 0 10 16" fill="currentColor"><circle cx="2" cy="2" r="1.6"/><circle cx="8" cy="2" r="1.6"/><circle cx="2" cy="8" r="1.6"/><circle cx="8" cy="8" r="1.6"/><circle cx="2" cy="14" r="1.6"/><circle cx="8" cy="14" r="1.6"/></svg></span>
       <span class="tpl-ex-num">${i+1}</span>
       <span class="tpl-ex-name" data-tpl-rename="${i}">${esc(n)}</span>
       <button class="tpl-ex-del" data-tpl-del="${i}">
@@ -1944,6 +1955,95 @@ function renderTplEdit() {
 }
 
 function saveTpl() { saveDia(); } // alias for backward compat
+
+// ── Reordenar arrastrando (mantener pulsado) ─────────────────────────────────
+function makeSortable(cont, o) {
+  let st = null;
+  const list = () => [...cont.children].filter(el => el.matches(o.item));
+  const scrollParent = el => {
+    for (let p = el.parentElement; p; p = p.parentElement) {
+      const ov = getComputedStyle(p).overflowY;
+      if ((ov === 'auto' || ov === 'scroll') && p.scrollHeight > p.clientHeight) return p;
+    }
+    return document.scrollingElement;
+  };
+  const natTop = () => st.item.getBoundingClientRect().top - st.ty;
+  function place() {
+    const others = list().filter(el => el !== st.item);
+    let k = 0;
+    for (const el of others) { const r = el.getBoundingClientRect(); if (st.y > r.top + r.height / 2) k++; }
+    if (list().indexOf(st.item) !== k) {
+      const ref = others[k] || (others.length ? others[others.length - 1].nextSibling : null);
+      cont.insertBefore(st.item, ref);
+    }
+    st.ty = st.y - st.grab - natTop();
+    st.item.style.transform = `translateY(${st.ty}px)`;
+  }
+  function loop() {
+    if (!st || !st.on) return;
+    const doc = st.sp === document.scrollingElement;
+    const top = doc ? 0 : st.sp.getBoundingClientRect().top;
+    const bot = doc ? innerHeight : st.sp.getBoundingClientRect().bottom;
+    if (st.y < top + 70) st.sp.scrollTop -= Math.ceil((top + 70 - st.y) / 6);
+    else if (st.y > bot - 70) st.sp.scrollTop += Math.ceil((st.y - bot + 70) / 6);
+    place();
+    requestAnimationFrame(loop);
+  }
+  function start() {
+    st.on = true;
+    if (navigator.vibrate) navigator.vibrate(15);
+    st.from = list().indexOf(st.item);
+    st.sp = scrollParent(cont);
+    if (o.sortClass) cont.classList.add(o.sortClass);
+    st.item.classList.add('sort-dragging');
+    st.ty = 0;
+    const r = st.item.getBoundingClientRect();
+    if (o.sortClass) { st.grab = r.height / 2; st.sp.scrollTop += r.top + st.grab - st.y; }
+    else st.grab = st.y - r.top;
+    place(); requestAnimationFrame(loop);
+  }
+  function end() {
+    if (!st) return;
+    clearTimeout(st.timer);
+    const s = st; st = null;
+    if (!s.on) return;
+    s.item.style.transform = '';
+    s.item.classList.remove('sort-dragging');
+    if (o.sortClass) cont.classList.remove(o.sortClass);
+    const eat = ev => { ev.stopPropagation(); ev.preventDefault(); };
+    window.addEventListener('click', eat, { capture: true, once: true });
+    setTimeout(() => window.removeEventListener('click', eat, true), 400);
+    const to = list().indexOf(s.item);
+    if (to !== s.from) o.onDrop(s.from, to);
+  }
+  cont.addEventListener('pointerdown', e => {
+    if (e.button > 0 || st) return;
+    const item = e.target.closest(o.item);
+    if (!item || item.parentElement !== cont) return;
+    const onHandle = !!e.target.closest('.drag-h');
+    if (!onHandle && (!e.target.closest(o.zone) || (o.exclude && e.target.closest(o.exclude)) ||
+        e.target.closest('input,select,textarea,[contenteditable="true"]'))) return;
+    st = { item, id: e.pointerId, x0: e.clientX, y0: e.clientY, y: e.clientY, on: false };
+    st.timer = setTimeout(start, onHandle ? 120 : 420);
+  });
+  window.addEventListener('pointermove', e => {
+    if (!st || e.pointerId !== st.id) return;
+    st.y = e.clientY;
+    if (!st.on && Math.hypot(e.clientX - st.x0, e.clientY - st.y0) > 8) { clearTimeout(st.timer); st = null; }
+  });
+  document.addEventListener('touchmove', e => { if (st && st.on) e.preventDefault(); }, { passive: false });
+  cont.addEventListener('contextmenu', e => { if (st) e.preventDefault(); });
+  window.addEventListener('pointerup', end);
+  window.addEventListener('pointercancel', end);
+}
+makeSortable(document.getElementById('exercises'), {
+  item: '.ex-block', zone: '.ex-hdr', exclude: '.modo-btn', sortClass: 'sorting',
+  onDrop: (f, t) => { const [x] = ses.ejercicios.splice(f, 1); ses.ejercicios.splice(t, 0, x); autosave(); renderSession(); }
+});
+makeSortable(document.getElementById('tpl-edit-exercises'), {
+  item: '.tpl-ex-row', zone: '.tpl-ex-row', exclude: '.tpl-ex-del',
+  onDrop: (f, t) => { const [x] = tpl.ejercicios.splice(f, 1); tpl.ejercicios.splice(t, 0, x); renderTplEdit(); }
+});
 
 document.getElementById('tpl-edit-back').addEventListener('click', () => {
   saveDia(); openRutinasScreen(); toast('Día guardado');
